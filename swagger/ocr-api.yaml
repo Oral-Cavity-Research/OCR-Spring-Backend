@@ -10,28 +10,232 @@ servers:
     url: https://localhost
 
 paths:
-  /users:
-    get:
-      summary: Get a list of users
+
+  /api/user/patient/update/{id}:
+    post:
+      summary: Update patient details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatientUpdate"
       responses:
         "200":
-          description: OK
+          description: Successfully updated patient details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+        "401":
+          description: Unauthorized acccess
+        "500":
+          description: Internal server error
+  /api/user/patient/get:
+    get:
+      summary: Get all patients
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: sort
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List op patients
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  patients:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Patient"  
+        "401":
+          description: Unauthorized acccess
+        "500":
+          description: Internal server error
+
+  /api/user/patient/check/{id}:
+    get:
+      summary: Check if patient exists
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: patient exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exists:
+                    type: boolean
+        "401":
+          description: Unauthorized acccess
+        "500":
+          description: Internal server error
+
+  /api/user/patient/{id}:
+    get:
+      summary: get one patient
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: patient details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+        "401":
+          description: Unauthorized acccess
+        "404":
+          description: Patient not found
+        "500":
+          description: Internal server error
+  
+  /api/user/patient/shared/{id}:
+    get:
+      summary: get one shared patient
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: shared patient details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+        "401":
+          description: Unauthorized acccess
+        "404":
+          description: Patient not found
+        "500":
+          description: Internal server error
+
+  /api/user/reviewer/all:
+    get:
+      summary: Get all reviewers
+      responses:
+        "200":
+          description: List of reviewers
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/User"
+                  $ref: '#/components/schemas/ReviewerDetails'
+        "401":
+          description: Unauthorized access
+        "404":
+          description: Reviewers not found
+        "500":
+          description: Internal Server Error
+    
+  
+
+        
+
+
+
+
+
 
 components:
   schemas:
-    User:
+
+    Patient:
       type: object
       properties:
-        id:
+        patient_id:
           type: string
-        username:
+        clinician_id:
           type: string
-        email:
+        patinent_name:
           type: string
-        # Other user properties
+        rist_factors:
+          type: array
+        DOB: 
+          type: string
+        gender:
+          type: string
+        histo_diagnosis:
+          type: string
+        medical_history:
+          type: array
+        family_history:
+          type: array
+        systemic_disease:
+          type: array
+        contact_no:
+          type: string
+        consent_form:
+          type: string
+
+    PatientUpdate:
+      type: object
+      properties:
+        patient_name:
+          type: string
+        gender:
+          type: string
+        DOB:
+          type: string
+        risk_factors:
+          type: string
+        histo_diagnosis:
+          type: string
+        contact_no:
+          type: string
+        systemic_disease:
+          type: string
+        family_history:
+          type: string
+        medical_history:
+          type: string
+    
+    ReviewerDetails:
+      type: object
+      properties:
+        telecon_entry_id: 
+          type: string
+        reviewer_id:
+          type: string
+        provisional_diagnosis:
+          type: string
+        management_suggestions:
+          type: string
+        referral_suggestions:
+          type: string
+        other_comments:
+          type: string
+
+
+        
