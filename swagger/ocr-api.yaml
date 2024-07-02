@@ -10,28 +10,109 @@ servers:
     url: https://localhost
 
 paths:
-  /users:
+
+  /user/self:
     get:
-      summary: Get a list of users
+      summary: Get a user
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+          
+  /user/self/hospitals:
+    get:
+      summary: get hospital list on signup page
+      responses:
+        "200":
+          description: successful responses
+          content:
+            application/json:
+              schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/User"
+                  $ref: "#/components/schemas/hospital"
+        "500":
+          description: Internal Server Error
+  
+
+  /user/self/update:
+    post:
+      summary: Update a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+             $ref: "#/components/schemas/userUpdate"
+      responses:
+        "200":
+          description: user details updated succesfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error  
+
+  
 
 components:
   schemas:
     User:
       type: object
       properties:
-        id:
-          type: string
         username:
           type: string
         email:
           type: string
-        # Other user properties
+        reg_no:
+          type: string
+        hospital:
+          type: string
+        designation:
+          type: string
+        contact_no:
+          type: string
+        availability:
+          type: boolean
+        role:
+          type: string
+    
+    hospital:
+      type: object
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+        city:
+          type: string
+        address:
+          type: string
+        contact_no:
+          type: string
+
+    userUpdate:
+      type: object
+      properties:
+        username:
+          type: string
+        hospital:
+          type: string
+        contact_no:
+          type: string
+        availability:
+          type: boolean
+        
+        
+        
+   
