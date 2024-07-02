@@ -23,6 +23,21 @@ paths:
                 items:
                   $ref: "#/components/schemas/User"
 
+  /api/image/update:
+    post: 
+      summary: update image
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Image"
+        "500":
+          description: Internal Server Error
+
 components:
   schemas:
     User:
@@ -35,3 +50,22 @@ components:
         email:
           type: string
         # Other user properties
+
+    Image:
+      type: object
+      properties:
+        telecon_entry_id:
+          type: string
+        image_name:
+          type: string
+        loacation:
+          type: string
+        lesions_appear:
+          type: boolean
+          default: false
+        annotation:
+          type: array
+          default: []
+        predicted_vat:
+          type: string
+        # Other image properties
