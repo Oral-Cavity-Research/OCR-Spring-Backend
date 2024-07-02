@@ -23,7 +23,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/User"
 
-  /signup:
+  /admin/auth/signup:
     post:
       summary: To add the initial admin
       responses:
