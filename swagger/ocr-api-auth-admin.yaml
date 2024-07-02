@@ -1,0 +1,84 @@
+openapi: 3.0.0
+info:
+  title: OCR api
+  description: API for managing OCR apps
+  version: 1.0.0
+
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://localhost
+
+paths:
+  /users:
+    get:
+      summary: Get a list of users
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+  /signup:
+    post:
+      summary: To add the initial admin
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NewAdminSignUp"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  error:
+                    type: string
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        # Other user properties
+
+    NewAdminSignUp:
+      type: object
+      properties:
+        reg_no:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        hospital:
+          type: string
+        role:
+          type: string
