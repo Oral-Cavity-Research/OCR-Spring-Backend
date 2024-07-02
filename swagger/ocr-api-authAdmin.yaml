@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: OCR api
+  title: OCR api 
   description: API for managing OCR apps
   version: 1.0.0
 
