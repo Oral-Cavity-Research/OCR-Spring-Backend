@@ -9,29 +9,114 @@ servers:
   - description: SwaggerHub API Auto Mocking
     url: https://localhost
 
+
 paths:
-  /users:
+  /api/dashboard/percentages:
     get:
-      summary: Get a list of users
+      summary: Get the percentage of risk habits
       responses:
         "200":
-          description: OK
+          description: Successful response
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/User"
+                  $ref: "#/components/schemas/RiskHabitPercentage"
+        "401":
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/dashboard/totals:
+    get:
+      summary: Get the total number of doctors, images and patients
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  doctors:
+                    type: integer
+                    description: Number of doctors
+                    example: 10
+                  images:
+                    type: integer
+                    description: Number of images
+                    example: 100
+                  patients:
+                    type: integer
+                    description: Number of patients
+                    example: 1000
+                    $ref: "#/components/schemas/TotalCounts"
+        "401":
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+
 
 components:
   schemas:
-    User:
+    RiskHabitPercentage:
       type: object
       properties:
-        id:
+        item:
           type: string
-        username:
+          description: Name of the risk habit
+          example: Smoking
+        percentage:
+          type: number
+          description: >
+            Percentage of patients with this habit.
+            Example: If there are 100 patients and 20 of them have the 'Smoking' habit, the percentage is 20%.
+          example: 20
+
+    Error:
+      type: object
+      properties:
+        message:
           type: string
-        email:
-          type: string
-        # Other user properties
+          description: Error message
+          example: Unauthorized access
+
+    TotalCounts:
+      type: object
+      properties:
+        doctors:
+          type: integer
+          description: Total number of doctors
+          example: 10
+        patients:
+          type: integer
+          description: Total number of patients
+          example: 50
+        images:
+          type: integer
+          description: Total number of images
+          example: 100
+
+ 
+
+
+
