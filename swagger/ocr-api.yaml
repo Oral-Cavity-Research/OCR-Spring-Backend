@@ -10,28 +10,385 @@ servers:
     url: https://localhost
 
 paths:
-  /users:
-    get:
-      summary: Get a list of users
+
+
+  /api/user/entry/add/{id}:
+    post:
+      summary: Add a telecunsultation entry
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: The patient id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                  start_time:
+                    type: string
+                    format: date-time
+                  end_time:
+                    type: string
+                    format: date-time
+                  complaint:
+                    type: string
+                  findings:
+                    type: string
+                  current_habits:
+                    type: string  
       responses:
         "200":
-          description: OK
+          description: telecunsultation entry created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeleConEntry" 
+        "401":
+          description: Unauthorized access
+        "404" :
+          description: Patient not found
+        "500":
+          description: Internal server error    
+
+  /api/user/entry/get:
+    get:
+      summary: get all entries added by user
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: page number for pagination
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum: [created Date,updated Date,Assigned,Unassigned,Reviewed,Unreviewed]
+          description: filter for entries
+      responses:
+        "200":
+          description: A list of telecunsultation entries
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/User"
+                  $ref: "#/components/schemas/TeleConEntry"
+        "401":
+          description: Unauthorized access
+        "500":  
+          description: Internal server error
+
+  /api/user/entry/get/patient/{id}:
+    get:
+      summary: Get patient's entries
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: The patient Id
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: page number for pagination
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum: [created Date,updated Date]
+          description: filter for entries
+      responses:
+        "200":
+          description: A list of telecunsultation entries for the patient
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TeleConEntry"
+        "401":
+          description: Unauthorized access
+        "500":
+          description: Internal server error
+  
+  /api/user/entry/shared/patient/{id}:
+    get:
+      summary: Get shared patient's entries(view only)
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: The patient Id
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: page number for pagination
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum: [created Date,updated Date]
+          description: filter for entries
+      responses:
+        "200":
+          description: A list of telecunsultation entries for the patient
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TeleConEntry"
+        "401":
+          description: Unauthorized access
+        "500":
+          description: Internal server error
+
+  /api/user/entry/get/{id}:
+    get:
+      summary: get one entry details added by users
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: The entry Id
+       
+      responses:
+        "200":
+          description: telecunsultation entry details
+          content:
+            application/json:
+              schema:
+               $ref: "#/components/schemas/TeleConEntry"
+        "401":
+          description: Unauthorized access
+        "500":
+          description: Internal server error
+
+  /api/user/entry/count/newreviews:
+    get:
+      summary: get count of new reviews
+      responses:
+        "200":
+          description: count of new reviews
+          content:
+            application/json:
+              schema:
+                type: integer
+                example: 5
+        "401":
+          description: Unauthorized access
+        "500":
+          description: Internal server error
+      
+  /api/user/entry/count/newentries:
+    get:
+      summary: get unreviewed entry count
+      responses:
+        "200":
+          description: count of unreviewed entries
+          content:
+            application/json:
+              schema:
+                type: integer
+                example: 4
+        "401":
+          description: Unauthorized access
+        "500":
+          description: Internal server error
+
+  /api/user/entry/reviewer/add/{id}:
+    post:
+      summary: Add a reviewer by user
+      parameters:
+        - in: path
+          name: Id
+          schema:
+            type: string
+          required: true
+          description: The entry Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                  reviewer_id:
+                    type: string
+                    example: 5f7b1b3b7f3b9b0017b3b9b0
+      responses:
+        "200":
+          description: reviewer added successfully
+        "401":
+          description: Unauthorized access
+        "404" :
+          description: Entry not found
+        "500":
+          description: Internal server error
+
+  /api/user/entry/reviewer/remove/{id}:
+    post:
+      summary: remove a reviewer by user
+      parameters:
+        - in: path
+          name: Id
+          schema:
+            type: string
+          required: true
+          description: The entry Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                  reviewer_id:
+                    type: string
+                    example: 5f7b1b3b7f3b9b0017b3b9b0
+      responses:
+        "200":
+          description: reviewer removed successfully
+        "401":
+          description: Unauthorized access
+        "404" :
+          description: Entry not found
+        "500":
+          description: Internal server error
+  /api/user/entry/delete/{id}:
+    post:
+      summary: delete a telecunsultation entry within 24 hours(after 24 hours cannot delete)
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: The entry Id
+      responses:
+        "200":
+          description: telecunsultation entry deleted successfully
+        "401":
+          description: Unauthorized access
+        "404" :
+          description: Entry not found
+        "500":
+          description: Internal server error
+      
+  /api/user/entry/shared/all:
+    get:
+      summary: Get all shared entries
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: page number for pagination
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum: [All,Reviewed,Unreviewed]
+          description: filter for entries
+      responses:
+        "200":
+          description: A list of shared telecunsultation entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TeleConEntry"
+        "401":
+          description: Unauthorized access
+        "500":
+          description: Internal server error
+
+      
+
+          
+  
+  
+
+  
 
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
-    User:
+    
+    TeleConEntry:
       type: object
       properties:
-        id:
+        patient:
           type: string
-        username:
+          description: ObjectId reference of the patient
+        clinician_id:
           type: string
-        email:
+          description: ObjectId reference to the user
+        complaint:
           type: string
+          description: complaint of the patient
+        start_time:
+          type: string
+          format: date-time
+          description: start time of the telecon
+        end_time:
+          type: string
+          format: date-time
+          description: end time of the telecon
+        findings:
+          type: string
+          description: findings of the telecon
+        curent_habits:
+          type: array
+          items:
+            type: string
+          description: current habits of the patient
+          default: []
+        updated:
+          type: boolean
+          description: whether the telecon is updated
+        reviewers:
+          type: array
+          items:
+            type: string
+            description: ObjectId reference to the User (reviewers)
+        reviews:
+          type: array
+          items:
+            type: string
+            description: ObjectId reference to the Review
+        images:
+          type: array
+          items:
+            type: string
+            description: ObjectId reference to the Image
+        reports:
+          type: array
+          items: 
+            type: string
+            description: ObjectId reference to the Report
+      required:
+        - patient
+        - clinician_id
+          
+
+                
         # Other user properties
