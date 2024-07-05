@@ -1,37 +1,179 @@
 openapi: 3.0.0
 info:
-  title: OCR api
+  title: OCR API
   description: API for managing OCR apps
   version: 1.0.0
 
 servers:
-  # Added by API Auto Mocking Plugin
-  - description: SwaggerHub API Auto Mocking
-    url: https://localhost
+  - description: Local server
+    url: http://localhost:3000
 
+# 
 paths:
-  /users:
-    get:
-      summary: Get a list of users
+  /api/user/draftentry/add/{id}:
+    post:
+      summary: Add a draft teleconsultation entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                start_time:
+                  type: string
+                  format: date-time
+                end_time:
+                  type: string
+                  format: date-time
+                complaint:
+                  type: string
+                findings:
+                  type: string
+                current_habits:
+                  type: string
       responses:
         "200":
-          description: OK
+          description: Draft teleconsultation entry added successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DraftEntry"
+        "401":
+          description: Unauthorized access
+        "404":
+          description: Patient not registered
+        "500":
+          description: Internal Server Error
+
+  /api/user/draftentry/get:
+    get:
+      summary: Get all draft entries added by the user
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: filter
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of draft entries
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/User"
+                  $ref: "#/components/schemas/DraftEntry"
+        "401":
+          description: Unauthorized access
+        "500":
+          description: Internal Server Error
+
+  /api/user/draftentry/get/patient/{id}:
+    get:
+      summary: Get all draft entries for a specific patient
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: filter
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of draft entries for the patient
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DraftEntry"
+        "401":
+          description: Unauthorized access
+        "500":
+          description: Internal Server Error
+
+  /api/user/draftentry/get/{id}:
+    get:
+      summary: Get details of a specific draft entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Details of the draft entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DraftEntry"
+        "401":
+          description: Unauthorized access
+        "404":
+          description: Draft entry not found
+        "500":
+          description: Internal Server Error
 
 components:
   schemas:
-    User:
+    DraftEntry:
       type: object
       properties:
-        id:
+        patient:
           type: string
-        username:
+        clinician_id:
           type: string
-        email:
+        start_time:
           type: string
-        # Other user properties
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        complaint:
+          type: string
+        findings:
+          type: string
+        current_habits:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+        reports:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    # User:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: string
+    #     username:
+    #       type: string
+    #     email:
+    #       type: string
