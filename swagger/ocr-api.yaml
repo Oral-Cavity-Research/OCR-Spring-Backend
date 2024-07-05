@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: OCR api
+  title: OCR api 
   description: API for managing OCR apps
   version: 1.0.0
 
@@ -10,28 +10,71 @@ servers:
     url: https://localhost
 
 paths:
-  /users:
-    get:
-      summary: Get a list of users
-      responses:
+  /api/admin/auth/signup:
+    post:
+      summary: To add the initial admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:  
+              $ref: "#/components/schemas/NewAdminSignUp"
+      responses: 
         "200":
-          description: OK
+          description: "Successfully signed in"
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/NewAdminSignUpResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  error:
+                    type: string
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    
 
 components:
   schemas:
-    User:
+    NewAdminSignUp:
       type: object
       properties:
-        id:
+        reg_no:
           type: string
         username:
           type: string
         email:
           type: string
-        # Other user properties
+        hospital:
+          type: string
+        role:
+          type: string
+          
+    NewAdminSignUpResponse:
+      type: object
+      properties:
+        reg_no:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        hospital:
+          type: string
+        role:
+          type: string
+    
