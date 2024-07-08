@@ -295,10 +295,46 @@ paths:
           description: Reviewers not found
         "500":
           description: Internal Server Error
-
+  /api/admin/auth/signup:
+    post:
+      summary: To add the initial admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:  
+              $ref: "#/components/schemas/NewAdminSignUp"
+      responses: 
+        "200":
+          description: "Successfully signed in"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewAdminSignUpResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  error:
+                    type: string
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
 
 components:
   schemas:
+
     LoginRequest:
       type: object
       required:
@@ -639,3 +675,30 @@ components:
         other_comments:
           type: string
     
+    NewAdminSignUp:
+      type: object
+      properties:
+        reg_no:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        hospital:
+          type: string
+        role:
+          type: string
+          
+    NewAdminSignUpResponse:
+      type: object
+      properties:
+        reg_no:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        hospital:
+          type: string
+        role:
+          type: string
