@@ -8,22 +8,329 @@ servers:
   - description: SwaggerHub API Auto Mocking
     url: https://localhost
 
+tags:
+  - name: Authentication
+    description: Operations related to user authentication
+
 paths:
-  /users:
-    get:
-      summary: Get a list of users
+  /api/auth/signup:
+    post:
       tags:
-        - Users
+        - Authentication
+      summary: Sign up a new user
+      description: >
+        This endpoint adds a new user signup request. If the registration number or email is already registered,
+        it returns an appropriate message. If a signup request already exists for the registration number or email,
+        it returns a message indicating that. Otherwise, it creates a new signup request.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupRequest"
       responses:
         "200":
-          description: OK
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SignupSuccess"
+                  - $ref: "#/components/schemas/SignupExists"
+        "401":
+          description: Registration number or email is already registered
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/RegNoError"
+                  - $ref: "#/components/schemas/EmailError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/auth/verify:
+    post:
+      tags:
+        - Authentication
+      summary: Verify a user
+      description: >
+        This endpoint verifies a user signup request. If the request is valid, it sends an email to the user.
+        If the request is not found, it returns an error message.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+
+      responses:
+        "200":
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginSuccess"
+
+        "400":
+          description: User is not registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserNotRegisteredError"
+
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/auth/refreshToken:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: >
+        This endpoint refreshes the access token using a provided refresh token.
+      responses:
+        "200":
+          description: >
+            Refresh token successful.
+            Note: Although a 200 status code is not explicitly set in the code, this response is implied for successful refresh token operations.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RefreshTokenSuccess"
+        "400":
+          description: Token is required or an error occurred
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RefreshTokenError"
+
+  /api/auth/revokeToken:
+    post:
+      tags:
+        - Authentication
+      summary: Revoke a token
+      description: >
+        This endpoint revokes an access or refresh token. The token can be provided in the request body or in cookies.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RevokeTokenRequest"
+      responses:
+        "200":
+          description: >
+            Token revoked successfully.
+            Note: Although a 200 status code is not explicitly set in the code, this response is implied for successful revocation operations.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RevokeTokenSuccess"
+        "400":
+          description: Token is required or an error occurred
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RevokeTokenError"
+        "403":
+          description: User is not authorized to revoke this token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+
+  /api/user/patient/update/{id}:
+    post:
+      summary: Update patient details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatientUpdate"
+      responses:
+        "200":
+          description: Successfully updated patient details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+        "401":
+          description: Unauthorized acccess
+        "500":
+          description: Internal server error
+  
+  /api/user/patient/get:
+    get:
+      summary: Get all patients
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: sort
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List op patients
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  patients:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Patient"  
+        "401":
+          description: Unauthorized acccess
+        "500":
+          description: Internal server error
+
+  /api/user/patient/check/{id}:
+    get:
+      summary: Check if patient exists
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: patient exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exists:
+                    type: boolean
+        "401":
+          description: Unauthorized acccess
+        "500":
+          description: Internal server error
+
+  /api/user/patient/{id}:
+    get:
+      summary: get one patient
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: patient details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+        "401":
+          description: Unauthorized acccess
+        "404":
+          description: Patient not found
+        "500":
+          description: Internal server error
+
+  /api/user/patient/shared/{id}:
+    get:
+      summary: get one shared patient
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: shared patient details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+        "401":
+          description: Unauthorized acccess
+        "404":
+          description: Patient not found
+        "500":
+          description: Internal server error
+
+  /api/user/reviewer/all:
+    get:
+      summary: Get all reviewers
+      responses:
+        "200":
+          description: List of reviewers
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/User"
-
+                  $ref: '#/components/schemas/ReviewerDetails'
+        "401":
+          description: Unauthorized access
+        "404":
+          description: Reviewers not found
+        "500":
+          description: Internal Server Error
+  /api/admin/auth/signup:
+    post:
+      summary: To add the initial admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:  
+              $ref: "#/components/schemas/NewAdminSignUp"
+      responses: 
+        "200":
+          description: "Successfully signed in"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewAdminSignUpResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  error:
+                    type: string
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
   /api/admin/requests:
     get:
       summary: Get all requests
@@ -697,26 +1004,376 @@ paths:
               schema: 
                 $ref: "#/components/schemas/InternalServerErrorResponse"
 
-
-
 components:
   schemas:
-    User:
+
+    LoginRequest:
       type: object
+      required:
+        - email
       properties:
-        username: 
-          type: string
         email:
           type: string
+          description: Email address
+          example: johndoe@example.com
+        password:
+          type: string
+          description: Password
+          example: "yourpassword"
+
+    SignupRequest:
+      type: object
+      required:
+        - reg_no
+        - username
+        - email
+      properties:
         reg_no:
           type: string
+          description: Registration number
+          example: ABC123
+        username:
+          type: string
+          description: Username
+          example: johndoe
+        email:
+          type: string
+          description: Email address
+          example: johndoe@example.com
         hospital:
           type: string
+          description: Name of the hospital
+          example: General Hospital
         designation:
+          type: string
+          description: Designation of the user
+          example: Doctor
+        contact_no:
+          type: string
+          description: Contact number
+          example: "+1234567890"
+
+    SignupSuccess:
+      type: object
+      properties:
+        reg_no:
+          type: string
+          description: Registration number
+        username:
+          type: string
+          description: Username
+        email:
+          type: string
+          description: Email address
+        hospital:
+          type: string
+          description: Name of the hospital
+        designation:
+          type: string
+          description: Designation of the user
+        contact_no:
+          type: string
+          description: Contact number
+        message:
+          type: string
+          description: Success message
+          example: "Request is sent successfully. You will receive an Email on acceptance."
+
+    SignupExists:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Message indicating an existing request
+          example: "A request for registration already exists."
+
+    RegNoError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message for registered registration number
+          example: "The Reg No is already registered"
+
+    EmailError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message for registered email address
+          example: "Email address is already registered"
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message
+          example: "Internal Server Error!"
+        error:
+          type: string
+          description: Detailed error information
+          example: "Detailed error information here."
+
+    LoginSuccess:
+      type: object
+      properties:
+        accessToken:
+          type: object
+          properties:
+            token:
+              type: string
+              description: Access token
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            expiry:
+              type: string
+              description: Token expiry time
+              example: "1h"
+        ref:
+          type: object
+          description: User reference details
+          properties:
+            _id:
+              type: string
+              description: User ID
+              example: "60b6b3b8f9c0c40015c10f5a"
+            email:
+              type: string
+              description: User's email address
+              example: "johndoe@example.com"
+            username:
+              type: string
+              description: Username
+              example: "johndoe"
+            role:
+              type: string
+              description: User's role
+              example: "admin"
+        others:
+          type: object
+          description: Additional details
+          properties:
+            message:
+              type: string
+              description: Success message
+              example: "Successfully logged in"
+            permissions:
+              type: array
+              items:
+                type: string
+              description: List of user permissions
+              example: ["read", "write", "delete"]
+      
+    UserNotRegisteredError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message indicating the user is not registered
+          example: "User is not registered!"
+
+    RefreshTokenSuccess:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the operation was successful
+          example: true
+        message:
+          type: string
+          description: Success message
+          example: "Refresh token successful"
+        ref:
+          type: object
+          description: User reference details
+          properties:
+            _id:
+              type: string
+              description: User ID
+              example: "60b6b3b8f9c0c40015c10f5a"
+            email:
+              type: string
+              description: User's email address
+              example: "johndoe@example.com"
+            username:
+              type: string
+              description: Username
+              example: "johndoe"
+            role:
+              type: string
+              description: User's role
+              example: "admin"
+        permissions:
+          type: array
+          items:
+            type: string
+          description: List of user permissions
+          example: ["read", "write", "delete"]
+        accessToken:
+          type: object
+          properties:
+            token:
+              type: string
+              description: Access token
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            expiry:
+              type: string
+              description: Token expiry time
+              example: "1h"
+
+    RefreshTokenError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the operation was successful
+          example: false
+        message:
+          type: string
+          description: Error message
+          example: "Token is required"
+        error:
+          type: string
+          description: Detailed error information
+          example: "Detailed error information here."
+
+    RevokeTokenRequest:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: Access token to revoke
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    RevokeTokenSuccess:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the operation was successful
+          example: true
+        message:
+          type: string
+          description: Success message
+          example: "Token revoked"
+
+    RevokeTokenError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the operation was successful
+          example: false
+        message:
+          type: string
+          description: Error message
+          example: "Token is required"
+
+    UnauthorizedError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the operation was successful
+          example: false
+        message:
+          type: string
+          description: Error message
+          example: "You are not authorized to revoke this token"
+    
+    Patient:
+      type: object
+      properties:
+        patient_id:
+          type: string
+        clinician_id:
+          type: string
+        patinent_name:
+          type: string
+        rist_factors:
+          type: array
+        DOB: 
+          type: string
+        gender:
+          type: string
+        histo_diagnosis:
+          type: string
+        medical_history:
+          type: array
+        family_history:
+          type: array
+        systemic_disease:
+          type: array
+        contact_no:
+          type: string
+        consent_form:
+          type: string
+
+    PatientUpdate:
+      type: object
+      properties:
+        patient_name:
+          type: string
+        gender:
+          type: string
+        DOB:
+          type: string
+        risk_factors:
+          type: string
+        histo_diagnosis:
           type: string
         contact_no:
           type: string
-        availability:
+        systemic_disease:
+          type: string
+        family_history:
+          type: string
+        medical_history:
+          type: string
+
+    ReviewerDetails:
+      type: object
+      properties:
+        telecon_entry_id: 
+          type: string
+        reviewer_id:
+          type: string
+        provisional_diagnosis:
+          type: string
+        management_suggestions:
+          type: string
+        referral_suggestions:
+          type: string
+        other_comments:
+          type: string
+    
+    NewAdminSignUp:
+      type: object
+      properties:
+        reg_no:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        hospital:
+          type: string
+        role:
+          type: string
+          
+    NewAdminSignUpResponse:
+
+
+    
+      type: object
+      properties:
+        reg_no:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        hospital:
           type: string
         role:
           type: string
@@ -830,8 +1487,6 @@ components:
           type: string
           default: "option is saved"
 
-
-#Error Responses
 
     SuccessResponse:
       type: object
@@ -948,4 +1603,3 @@ components:
         message:
           type: string
           default: "option already exist"
-
