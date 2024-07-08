@@ -317,13 +317,193 @@ paths:
         "500":
           description: Internal server error
 
-      
 
-          
-  
-  
+  /api/user/entry/shared/{id}:
+      get:
+        summary: Get one shared entry (view only)
+        parameters:
+          - name: id
+            in: path
+            required: true
+            description: Entry ID
+            schema:
+              type: string
+        responses:
+          200:
+            description: Teleconsultation entry details
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/TeleConEntry'
+          401:
+            description: Unauthorized access
+          404:
+            description: Entry not found
+          500:
+            description: Internal Server Error
 
-  
+  /api/user/entry/shared/data/{id}:
+    get:
+      summary: Get assigned entry details
+      tags:
+        - Teleconsultation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the assignment
+      responses:
+        200:
+          description: Detailed teleconsultation entry with assignment data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeleConEntryWithAssignment'
+        401:
+          description: Unauthorized access
+        404:
+          description: Entry not found
+        500:
+          description: Internal Server Error
+
+  /api/user/entry/reviews/{id}:
+    get:
+      summary: Get reviews of a teleconsultation entry
+      tags:
+        - Reviews
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the teleconsultation entry
+      responses:
+        200:
+          description: List of reviews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+        401:
+          description: Unauthorized access
+        404:
+          description: Entry not found
+        500:
+          description: Internal Server Error
+
+  /api/user/entry/reviewer/change/{id}:
+    post:
+      summary: Change the reviewer of an assignment
+      tags:
+        - Reviewer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the assignment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reviewer_id:
+                  type: string
+                  description: The ID of the new reviewer
+      responses:
+        200:
+          description: Reviewer assigned successfully
+        401:
+          description: Unauthorized access
+        404:
+          description: Entry not found
+        500:
+          description: Internal Server Error
+
+  /api/user/entry/review/{id}:
+    post:
+      summary: Add a new review to a teleconsultation entry
+      tags:
+        - Reviews
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the teleconsultation entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                provisional_diagnosis:
+                  type: string
+                management_suggestions:
+                  type: string
+                referral_suggestions:
+                  type: string
+                other_comments:
+                  type: string
+      responses:
+        200:
+          description: Review added successfully
+        401:
+          description: Unauthorized access
+        404:
+          description: Entry not found
+        500:
+          description: Internal Server Error
+
+  /api/user/entry/mark/{id}:
+    post:
+      summary: Mark an assignment as read
+      tags:
+        - Assignment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the assignment
+      responses:
+        200:
+          description: Marked as read
+        401:
+          description: Unauthorized access
+        500:
+          description: Internal Server Error
+
+  /api/user/entry/open/{id}:
+    post:
+      summary: Mark a teleconsultation entry as read
+      tags:
+        - Teleconsultation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the teleconsultation entry
+      responses:
+        200:
+          description: Marked as read
+        401:
+          description: Unauthorized access
+        500:
+          description: Internal Server Error
 
 components:
   securitySchemes:
@@ -331,8 +511,8 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+
   schemas:
-    
     TeleConEntry:
       type: object
       properties:
@@ -388,7 +568,32 @@ components:
       required:
         - patient
         - clinician_id
+    Review:
+      type: object
+      properties:
+        id:
+          type: string
+        entry_id:
+          type: string
+        reviewer_id:
+          type: string
+        review_text:
+          type: string
+        review_date:
+          type: string
+          format: date-time
+    TeleConEntryWithAssignment:
+      allOf:
+        - $ref: '#/components/schemas/TeleConEntry'
+          properties:
+            assignedAt:
+              type: string
+              format : date-time
+            checked:
+              type: boolean
+            reviewed:
+              type: boolean
           
-
-                
-        # Other user properties
+    
+  
+          
