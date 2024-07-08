@@ -593,7 +593,3 @@ components:
               type: boolean
             reviewed:
               type: boolean
-          
-    
-  
-          
