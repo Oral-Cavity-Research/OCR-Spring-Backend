@@ -487,10 +487,9 @@ paths:
 
   /api/admin/users/role/{role}:
     get:
-      summary: Get users by the roles, only read write access permission
+      summary: Get users by role with read-write access permission
       tags:
         - Admin
-    
       parameters:
         - in: path
           name: role
@@ -499,7 +498,7 @@ paths:
             type: string
           description: The role to filter users by
       responses:
-        "200":
+        '200':
           description: Successful response
           content:
             application/json:
@@ -507,18 +506,19 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/User"
-        "401":
+        '401':
           description: Unauthorized access
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/UnauthorizedResponse"
-        "500":
+        '500':
           description: Internal server error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/InternalServerErrorResponse"
+
 
   /api/admin/roles:
     get:
@@ -623,47 +623,6 @@ paths:
               schema: 
                 $ref: "#/components/schemas/InternalServerErrorResponse"
   
-  /api/admin/user/{id}:
-    get:
-      summary: get one user by id
-      tags:
-        - Admin
-    
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-          description: The ID of the user to retrieve
-      responses:
-        "200":
-          description: successful
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        
-        "401":
-          description: unauthorized access
-          content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/UnauthorizedResponse"
-
-        "404":
-          description: user not found
-          content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/RequestNotFoundResponse"
-
-        "500": 
-          description: internal server error
-          content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/InternalServerErrorResponse"
 
   /api/admin/update/user/{id}:
     post:
@@ -1083,6 +1042,25 @@ paths:
 
 components:
   schemas:
+    User:
+      type: object
+      properties:
+        username: 
+          type: string
+        email:
+          type: string
+        reg_no:
+          type: string
+        hospital:
+          type: string
+        designation:
+          type: string
+        contact_no:
+          type: string
+        availability:
+          type: string
+        role:
+          type: string
 
     LoginRequest:
       type: object
