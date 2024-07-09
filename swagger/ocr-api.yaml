@@ -23,6 +23,8 @@ tags:
     description: Operations related to teleconsultation
   - name: User Self
     description: Operations related to the user's own data
+  - name: Draft Upload
+    description: Operations related to draft uploads
 
 
 paths:
@@ -1726,6 +1728,103 @@ paths:
         "500":
           description: Internal Server Error            
 
+  /api/user/draftentry/upload/images/{id}:
+    post:
+      tags:
+        - Draft Upload
+      summary: Upload images for a draft entry
+      description: Allows authenticated users to upload multiple images for a specific draft teleconsultation entry.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                data:
+                  type: string
+                  description: JSON string containing image metadata
+      responses:
+        "200":
+          description: Images uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  docs:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/DraftImage"
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized access
+        "404":
+          description: Entry not found
+        "500":
+          description: Internal Server Error
+
+  /api/user/draftentry/upload/reports/{id}:
+    post:
+      tags:
+        - Draft Upload
+      summary: Upload reports for a draft entry
+      description: Allows authenticated users to upload multiple reports for a specific draft teleconsultation entry.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                data:
+                  type: string
+                  description: JSON string containing report metadata
+      responses:
+        "200":
+          description: Reports uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  docs:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/DraftReport"
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized access
+        "404":
+          description: Entry not found
+        "500":
+          description: Internal Server Error
+
+
 components:
   schemas:
 
@@ -2526,3 +2625,27 @@ components:
               type: boolean
             reviewed:
               type: boolean    
+
+    DraftImage:
+      type: object
+      properties:
+        _id:
+          type: string
+        filename:
+          type: string
+        path:
+          type: string
+        draft_entry:
+          type: string
+
+    DraftReport:
+      type: object
+      properties:
+        _id:
+          type: string
+        filename:
+          type: string
+        path:
+          type: string
+        draft_entry:
+          type: string
