@@ -1066,6 +1066,21 @@ paths:
                 $ref: "#/components/schemas/Error"
                 
 
+  /api/image/update:
+    post: 
+      summary: update image
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Image"
+        "500":
+          description: Internal Server Error
+
 components:
   schemas:
 
@@ -1701,3 +1716,20 @@ components:
           type: integer
           description: Total number of images
           example: 100    
+    Image:
+      type: object
+      properties:
+        telecon_entry_id:
+          type: string
+        image_name:
+          type: string
+        loacation:
+          type: string
+        lesions_appear:
+          type: boolean
+          default: false
+        annotation:
+          type: array
+          default: []
+        predicted_vat:
+          type: string
