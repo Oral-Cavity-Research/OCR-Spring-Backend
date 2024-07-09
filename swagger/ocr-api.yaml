@@ -1,16 +1,1178 @@
+
 openapi: 3.0.0
 info:
-  title: OCR api
+  title: OCR API
   description: API for managing OCR apps
   version: 1.0.0
 
 servers:
-  # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
     url: https://localhost
 
-paths:
+tags:
+  - name: Admin
+    description: Administrative operations
+  - name: Authentication
+    description: Operations related to user authentication
+  - name: Reviewer
+    description: Operations related to reviewers
+  - name: Reviews
+    description: Operations related to reviews
+  - name: Assignment
+    description: Operations related to assignments
+  - name: Teleconsultation
+    description: Operations related to teleconsultation
 
+
+paths:
+  /api/auth/signup:
+    post:
+      tags:
+        - Authentication
+      summary: Sign up a new user
+      description: >
+        This endpoint adds a new user signup request. If the registration number or email is already registered,
+        it returns an appropriate message. If a signup request already exists for the registration number or email,
+        it returns a message indicating that. Otherwise, it creates a new signup request.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupRequest"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SignupSuccess"
+                  - $ref: "#/components/schemas/SignupExists"
+        "401":
+          description: Registration number or email is already registered
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/RegNoError"
+                  - $ref: "#/components/schemas/EmailError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/auth/verify:
+    post:
+      tags:
+        - Authentication
+      summary: Verify a user
+      description: >
+        This endpoint verifies a user signup request. If the request is valid, it sends an email to the user.
+        If the request is not found, it returns an error message.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+
+      responses:
+        "200":
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginSuccess"
+
+        "400":
+          description: User is not registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserNotRegisteredError"
+
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/auth/refreshToken:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: >
+        This endpoint refreshes the access token using a provided refresh token.
+      responses:
+        "200":
+          description: >
+            Refresh token successful.
+            Note: Although a 200 status code is not explicitly set in the code, this response is implied for successful refresh token operations.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RefreshTokenSuccess"
+        "400":
+          description: Token is required or an error occurred
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RefreshTokenError"
+
+  /api/auth/revokeToken:
+    post:
+      tags:
+        - Authentication
+      summary: Revoke a token
+      description: >
+        This endpoint revokes an access or refresh token. The token can be provided in the request body or in cookies.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RevokeTokenRequest"
+      responses:
+        "200":
+          description: >
+            Token revoked successfully.
+            Note: Although a 200 status code is not explicitly set in the code, this response is implied for successful revocation operations.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RevokeTokenSuccess"
+        "400":
+          description: Token is required or an error occurred
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RevokeTokenError"
+        "403":
+          description: User is not authorized to revoke this token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+
+  /api/user/patient/update/{id}:
+    post:
+      summary: Update patient details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatientUpdate"
+      responses:
+        "200":
+          description: Successfully updated patient details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+        "401":
+          description: Unauthorized acccess
+        "500":
+          description: Internal server error
+  
+  /api/user/patient/get:
+    get:
+      summary: Get all patients
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: sort
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List op patients
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  patients:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Patient"  
+        "401":
+          description: Unauthorized acccess
+        "500":
+          description: Internal server error
+
+  /api/user/patient/check/{id}:
+    get:
+      summary: Check if patient exists
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: patient exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exists:
+                    type: boolean
+        "401":
+          description: Unauthorized acccess
+        "500":
+          description: Internal server error
+
+  /api/user/patient/{id}:
+    get:
+      summary: get one patient
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: patient details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+        "401":
+          description: Unauthorized acccess
+        "404":
+          description: Patient not found
+        "500":
+          description: Internal server error
+
+  /api/user/patient/shared/{id}:
+    get:
+      summary: get one shared patient
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: shared patient details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+        "401":
+          description: Unauthorized acccess
+        "404":
+          description: Patient not found
+        "500":
+          description: Internal server error
+
+  /api/user/reviewer/all:
+    get:
+      summary: Get all reviewers
+      responses:
+        "200":
+          description: List of reviewers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReviewerDetails'
+        "401":
+          description: Unauthorized access
+        "404":
+          description: Reviewers not found
+        "500":
+          description: Internal Server Error
+  /api/admin/auth/signup:
+    post:
+      summary: To add the initial admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:  
+              $ref: "#/components/schemas/NewAdminSignUp"
+      responses: 
+        "200":
+          description: "Successfully signed in"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewAdminSignUpResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  error:
+                    type: string
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /api/admin/requests:
+    get:
+      summary: Get all requests
+      tags:
+        - Admin
+      
+      responses:
+        "200":
+          description: "Images Uploaded Successfully"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Request"
+        "401":
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerErrorResponse"
+
+  /api/admin/requests/{id}:
+    get:
+      summary: Get one request by ID
+      tags:
+        - Admin
+  
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the request to retrieve
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Request"
+        "401":
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Request not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequestNotFoundResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerErrorResponse"
+
+    post: 
+      summary: Reject a request
+      tags:
+        - Admin
+      
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the request to reject
+      responses:
+        "200":
+          description: Request deleted and email has been sent
+        "401":
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Request not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequestNotFoundResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerErrorResponse"
+
+  /api/admin/accept/{id}:
+    post:
+      summary: Accept a request
+      tags:
+        - Admin
+      
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the request to accept
+      responses:
+        "200":
+          description: Request acceptance response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - description: User registration successful
+                    $ref: "#/components/schemas/SuccessResponse"
+                  - description: User registration successful but email notification failed
+                    $ref: "#/components/schemas/PartialSuccessResponse"
+        "401":
+          description: Unauthorized access or conflict in registration
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - description: Permission denied
+                    $ref: "#/components/schemas/UnauthorizedResponse"
+                  - description: Registration number not in use
+                    $ref: "#/components/schemas/RegNotInUseResponse"
+                  - description: Email address already in use
+                    $ref: "#/components/schemas/EmailInUseResponse"
+        "404":
+          description: Request not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequestNotFoundResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - description: Error during registration
+                    $ref: "#/components/schemas/RegistrationFailedResponse"
+                  - description: Error during email notification
+                    $ref: "#/components/schemas/InternalServerErrorResponse"
+
+  /api/admin/users/role/{role}:
+    get:
+      summary: Get users by role with read-write access permission
+      tags:
+        - Admin
+      parameters:
+        - in: path
+          name: role
+          required: true
+          schema:
+            type: string
+          description: The role to filter users by
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerErrorResponse"
+
+
+  /api/admin/roles:
+    get:
+      summary: get all user roles
+      tags:
+        - Admin
+  
+      responses:
+        "200":
+          description: successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        
+        "401":
+          description: unauthorized access
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/UnauthorizedResponse"
+
+        "500":
+          description: internal server error
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/InternalServerErrorResponse"
+
+    post:
+      summary: create a new role
+      tags:
+        - Admin
+        
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Role"
+      responses:
+        "200":
+          description: successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Role"
+        
+        "401":
+          description: unauthorized access
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/UnauthorizedResponse"
+
+        "500":
+          description: internal server error
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/InternalServerErrorResponse"
+
+  /api/admin/roles/{id}:
+    get:
+      summary: get one user by role
+      tags:
+        - Admin
+        
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The role to filter users by
+      responses:
+        "200":
+          description: successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Role"
+        
+        "401":
+          description: unauthorized access
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/UnauthorizedResponse"
+
+        "404":
+          description: role not found
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/RequestNotFoundResponse"
+
+        "500": 
+          description: internal server error
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/InternalServerErrorResponse"
+  
+
+  /api/admin/update/user/{id}:
+    post:
+      summary: update user details
+      tags:
+        - Admin
+  
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the user to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/details"
+      responses:
+        "200":
+          description: successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/details"
+        
+        "401":
+          description: unauthorized access
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/UnauthorizedResponse"
+
+        "404":
+          description: user not found
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/RequestNotFoundResponse"
+
+        "500": 
+          description: internal server error
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/InternalServerErrorResponse"
+
+  /api/admin/delete/user/{id}:
+    post:
+      summary: delete user
+      tags:
+        - Admin
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the user to delete
+      responses:
+        "200":
+          description: successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/userdelete"
+        
+        "401":
+          description: unauthorized access
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/UnauthorizedResponse"
+
+        "404":
+          description: user not found
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/RequestNotFoundResponse"
+
+        "500": 
+          description: internal server error
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/InternalServerErrorResponse"
+
+  /api/admin/hospital:
+    post:
+      summary: create a new hospital
+      tags:
+        - Admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/hospital"
+      responses:
+        "200":
+          description: successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/hospitaladded"
+        
+        "401":
+          description: unauthorized access
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/hospitalalreadyadded"
+
+        "500":
+          description: internal server error
+          content:
+            application/json:
+              schema: 
+                oneOf:
+                  - description: hospital addition failed
+                    $ref: "#/components/schemas/hospitaladedfailed"
+                  - description: Internal server error
+                    $ref: "#/components/schemas/InternalServerErrorResponse"
+
+  /api/admin/hospitals/update/{id}:
+    post:
+      summary: update hospital details
+      tags:
+        - Admin
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the hospital to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/hospital"
+      responses:
+        "200":
+          description: successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/hospitaladded"
+        
+        "401":
+          description: unauthorized access
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - description: Unauthorized access
+                    $ref: "#/components/schemas/UnauthorizedResponse"
+                  - description: hospital addition failed
+                    $ref: "#/components/schemas/hospitaladedfailed" 
+
+        "404":
+          description: hospital not found
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/RequestNotFoundResponse"
+
+        "500": 
+          description: internal server error
+          content:
+            application/json:
+              schema: 
+                oneOf:
+                  - description: hospital addition failed
+                    $ref: "#/components/schemas/hospitaladedfailed"
+                  - description: Internal server error
+                    $ref: "#/components/schemas/InternalServerErrorResponse"
+                
+  /api/admin/hospitals/delete/{id}:
+    post:
+      summary: delete hospital
+      tags:
+        - Admin
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the hospital to delete
+      responses:
+        "200":
+          description: successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/hospitaldeleted"
+        
+        "401":
+          description: unauthorized access
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/UnauthorizedResponse"
+
+        "404":
+          description: hospital not found
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/hospitalnotfound"
+
+        "500": 
+          description: internal server error
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/InternalServerErrorResponse"
+
+  /api/admin/hospitals/{id}:
+    get:
+      summary: get one hospital by id
+      tags:
+        - Admin
+    
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the hospital to retrieve
+      responses:
+        "200":
+          description: successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/hospital"
+        
+        "401":
+          description: unauthorized access
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/UnauthorizedResponse"
+
+        "404":
+          description: hospital not found
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/hospitalnotfound"
+
+        "500": 
+          description: internal server error
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/InternalServerErrorResponse"
+
+  /api/admin/option/{name}:
+    get:
+      summary: get options
+      tags:
+        - Admin
+    
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+          description: The name of the hospital to retrieve
+      responses:
+        "200":
+          description: successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/hospital"
+        
+        "401":
+          description: unauthorized access
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/UnauthorizedResponse"
+
+        "404":
+          description: hospital not found
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/hospitalnotfound"
+
+        "500": 
+          description: internal server error
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/InternalServerErrorResponse"
+
+  /api/admin/option:
+    post:
+      summary: only to add options by tech team
+      tags:
+        - Admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/option"
+      responses:
+        "200":
+          description: successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/optionsaved"
+        
+        "401":
+          description: unauthorized access
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/optioinalreadexist"
+
+        "500":
+          description: internal server error
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/InternalServerErrorResponse"
+  /api/dashboard/percentages:
+    get:
+      summary: Get the percentage of risk habits
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RiskHabitPercentage"
+        "401":
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/dashboard/totals:
+    get:
+      summary: Get the total number of doctors, images and patients
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  doctors:
+                    type: integer
+                    description: Number of doctors
+                    example: 10
+                  images:
+                    type: integer
+                    description: Number of images
+                    example: 100
+                  patients:
+                    type: integer
+                    description: Number of patients
+                    example: 1000
+                    $ref: "#/components/schemas/TotalCounts"
+        "401":
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+                
+
+  /api/image/update:
+    post: 
+      summary: update image
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Image"
+        "500":
+          description: Internal Server Error
+  
+  /api/user/draftentry/add/{id}:
+    post:
+      summary: Add a draft teleconsultation entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                start_time:
+                  type: string
+                  format: date-time
+                end_time:
+                  type: string
+                  format: date-time
+                complaint:
+                  type: string
+                findings:
+                  type: string
+                current_habits:
+                  type: string
+      responses:
+        "200":
+          description: Draft teleconsultation entry added successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DraftEntry"
+        "401":
+          description: Unauthorized access
+        "404":
+          description: Patient not registered
+        "500":
+          description: Internal Server Error
+
+  /api/user/draftentry/get:
+    get:
+      summary: Get all draft entries added by the user
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: filter
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of draft entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DraftEntry"
+        "401":
+          description: Unauthorized access
+        "500":
+          description: Internal Server Error
+
+  /api/user/draftentry/get/patient/{id}:
+    get:
+      summary: Get all draft entries for a specific patient
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: filter
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of draft entries for the patient
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DraftEntry"
+        "401":
+          description: Unauthorized access
+        "500":
+          description: Internal Server Error
+
+  /api/user/draftentry/get/{id}:
+    get:
+      summary: Get details of a specific draft entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Details of the draft entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DraftEntry"
+        "401":
+          description: Unauthorized access
+        "404":
+          description: Draft entry not found
+        "500":
+          description: Internal Server Error
 
   /api/user/entry/add/{id}:
     post:
@@ -504,15 +1666,714 @@ paths:
           description: Unauthorized access
         500:
           description: Internal Server Error
+          
+          
 
 components:
-  securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-
   schemas:
+    User:
+      type: object
+      properties:
+        username: 
+          type: string
+        email:
+          type: string
+        reg_no:
+          type: string
+        hospital:
+          type: string
+        designation:
+          type: string
+        contact_no:
+          type: string
+        availability:
+          type: string
+        role:
+          type: string
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          description: Email address
+          example: johndoe@example.com
+        password:
+          type: string
+          description: Password
+          example: "yourpassword"
+
+    SignupRequest:
+      type: object
+      required:
+        - reg_no
+        - username
+        - email
+      properties:
+        reg_no:
+          type: string
+          description: Registration number
+          example: ABC123
+        username:
+          type: string
+          description: Username
+          example: johndoe
+        email:
+          type: string
+          description: Email address
+          example: johndoe@example.com
+        hospital:
+          type: string
+          description: Name of the hospital
+          example: General Hospital
+        designation:
+          type: string
+          description: Designation of the user
+          example: Doctor
+        contact_no:
+          type: string
+          description: Contact number
+          example: "+1234567890"
+
+    SignupSuccess:
+      type: object
+      properties:
+        reg_no:
+          type: string
+          description: Registration number
+        username:
+          type: string
+          description: Username
+        email:
+          type: string
+          description: Email address
+        hospital:
+          type: string
+          description: Name of the hospital
+        designation:
+          type: string
+          description: Designation of the user
+        contact_no:
+          type: string
+          description: Contact number
+        message:
+          type: string
+          description: Success message
+          example: "Request is sent successfully. You will receive an Email on acceptance."
+
+    SignupExists:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Message indicating an existing request
+          example: "A request for registration already exists."
+
+    RegNoError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message for registered registration number
+          example: "The Reg No is already registered"
+
+    EmailError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message for registered email address
+          example: "Email address is already registered"
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message
+          example: "Internal Server Error!"
+        error:
+          type: string
+          description: Detailed error information
+          example: "Detailed error information here."
+
+    LoginSuccess:
+      type: object
+      properties:
+        accessToken:
+          type: object
+          properties:
+            token:
+              type: string
+              description: Access token
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            expiry:
+              type: string
+              description: Token expiry time
+              example: "1h"
+        ref:
+          type: object
+          description: User reference details
+          properties:
+            _id:
+              type: string
+              description: User ID
+              example: "60b6b3b8f9c0c40015c10f5a"
+            email:
+              type: string
+              description: User's email address
+              example: "johndoe@example.com"
+            username:
+              type: string
+              description: Username
+              example: "johndoe"
+            role:
+              type: string
+              description: User's role
+              example: "admin"
+        others:
+          type: object
+          description: Additional details
+          properties:
+            message:
+              type: string
+              description: Success message
+              example: "Successfully logged in"
+            permissions:
+              type: array
+              items:
+                type: string
+              description: List of user permissions
+              example: ["read", "write", "delete"]
+      
+    UserNotRegisteredError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message indicating the user is not registered
+          example: "User is not registered!"
+
+    RefreshTokenSuccess:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the operation was successful
+          example: true
+        message:
+          type: string
+          description: Success message
+          example: "Refresh token successful"
+        ref:
+          type: object
+          description: User reference details
+          properties:
+            _id:
+              type: string
+              description: User ID
+              example: "60b6b3b8f9c0c40015c10f5a"
+            email:
+              type: string
+              description: User's email address
+              example: "johndoe@example.com"
+            username:
+              type: string
+              description: Username
+              example: "johndoe"
+            role:
+              type: string
+              description: User's role
+              example: "admin"
+        permissions:
+          type: array
+          items:
+            type: string
+          description: List of user permissions
+          example: ["read", "write", "delete"]
+        accessToken:
+          type: object
+          properties:
+            token:
+              type: string
+              description: Access token
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            expiry:
+              type: string
+              description: Token expiry time
+              example: "1h"
+
+    RefreshTokenError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the operation was successful
+          example: false
+        message:
+          type: string
+          description: Error message
+          example: "Token is required"
+        error:
+          type: string
+          description: Detailed error information
+          example: "Detailed error information here."
+
+    RevokeTokenRequest:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: Access token to revoke
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    RevokeTokenSuccess:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the operation was successful
+          example: true
+        message:
+          type: string
+          description: Success message
+          example: "Token revoked"
+
+    RevokeTokenError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the operation was successful
+          example: false
+        message:
+          type: string
+          description: Error message
+          example: "Token is required"
+
+    UnauthorizedError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the operation was successful
+          example: false
+        message:
+          type: string
+          description: Error message
+          example: "You are not authorized to revoke this token"
+    
+    Patient:
+      type: object
+      properties:
+        patient_id:
+          type: string
+        clinician_id:
+          type: string
+        patinent_name:
+          type: string
+        rist_factors:
+          type: array
+        DOB: 
+          type: string
+        gender:
+          type: string
+        histo_diagnosis:
+          type: string
+        medical_history:
+          type: array
+        family_history:
+          type: array
+        systemic_disease:
+          type: array
+        contact_no:
+          type: string
+        consent_form:
+          type: string
+
+    PatientUpdate:
+      type: object
+      properties:
+        patient_name:
+          type: string
+        gender:
+          type: string
+        DOB:
+          type: string
+        risk_factors:
+          type: string
+        histo_diagnosis:
+          type: string
+        contact_no:
+          type: string
+        systemic_disease:
+          type: string
+        family_history:
+          type: string
+        medical_history:
+          type: string
+
+    ReviewerDetails:
+      type: object
+      properties:
+        telecon_entry_id: 
+          type: string
+        reviewer_id:
+          type: string
+        provisional_diagnosis:
+          type: string
+        management_suggestions:
+          type: string
+        referral_suggestions:
+          type: string
+        other_comments:
+          type: string
+    
+    NewAdminSignUp:
+      type: object
+      properties:
+        reg_no:
+          type: string
+          description: Name of the risk habit
+          example: Smoking
+        percentage:
+          type: number
+          description: >
+            Percentage of patients with this habit.
+            Example: If there are 100 patients and 20 of them have the 'Smoking' habit, the percentage is 20%.
+          example: 20
+
+
+
+    
+          
+    NewAdminSignUpResponse:
+
+
+    
+      type: object
+      properties:
+        reg_no:
+          type: string
+          description: clinician id
+        consent_form:
+          type: string
+        email:
+          type: string
+        hospital:
+          type: string
+        role:
+          type: string
+
+    Request:
+      type: object
+      properties:
+        username:
+          type: string 
+        email:
+          type: string
+          uniqueItems: true
+        reg_no:
+          type: string
+          uniqueItems: true
+        hospital:
+          type: string
+        designation:
+          type: string
+        contact_no:
+          type: string
+      
+    
+    Role:
+      type: object
+      properties:
+        role:
+          type: string
+        permission:
+          type: array
+          default: []
+
+    details:
+      type: object
+      properties:
+        username: 
+          type: string
+        email:
+          type: string
+        reg_no:
+          type: string
+        hospital:
+          type: string
+        designation:
+          type: string
+        contact_no:
+          type: string
+        availability:
+          type: string
+        role:
+          type: string
+        message:
+          type: string
+          default: "user details updated successfully"
+
+    userdelete:
+      type: object
+      properties:
+        message:
+          type: string
+          default: "user deleted successfully"
+      
+    hospital:
+      type: object
+      properties:
+        name:
+          type: string
+        catagory:
+          type: string
+        city:
+          type: string
+        address:
+          type: string
+        contact_no:
+          type: string
+
+    hospitaldeleted:
+      type: object
+      properties:
+        message:
+          type: string
+          default: "hospital deleted successfully"
+    
+    hospitalnotfound:
+      type: object
+      properties:
+        message:
+          type: string
+          default: "hospital not found"
+
+    hospitaldeletionfailed:
+      type: object
+      properties:
+        message:
+          type: string
+          default: "hospital deletion failed"
+
+    option:
+      type: object
+      properties:
+        name:
+          type: string
+        options:
+          type: array
+          default: []
+    
+    optionsaved:
+      type: object
+      properties:
+        message:
+          type: string
+          default: "option is saved"
+
+
+    SuccessResponse:
+      type: object
+      properties:
+        username: 
+          type: string
+        email:
+          type: string
+        reg_no:
+          type: string
+        hospital:
+          type: string
+        designation:
+          type: string
+        contact_no:
+          type: string
+        availability:
+          type: string
+        role:
+          type: string
+        message:
+          type: string
+          default: "Request accepted successfully"
+
+    PartialSuccessResponse:
+      type: object
+      properties:
+        username: 
+          type: string
+        email:
+          type: string
+        reg_no:
+          type: string
+        hospital:
+          type: string
+        designation:
+          type: string
+        contact_no:
+          type: string
+        availability:
+          type: string
+        role:
+          type: string
+        message:
+          type: string
+          default: "Request accepted successfully but email notification failed"
+    
+    UnauthorizedResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          default: "Unauthorized access"
+
+    RegNotInUseResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          default: "Registration number not in use"
+
+    EmailInUseResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          default: "Email address already in use"
+
+    RequestNotFoundResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          default: "Request not found"
+
+    RegistrationFailedResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          default: "Registration failed"
+
+    InternalServerErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          default: "Internal server error"
+
+    hospitaladded:
+      type: object
+      properties:
+        message:
+          type: string
+          default: "hospital added successfully"
+
+    hospitaladedfailed:
+      type: object
+      properties:
+        message:
+          type: string
+          default: "hospital addition failed"
+    
+    hospitalalreadyadded:
+      type: object
+      properties:
+        message:
+          type: string
+          default: "hospital already added"
+
+    optioinalreadexist:
+      type: object
+      properties:
+        message:
+          type: string
+          default: "option already exist"
+
+    RiskHabitPercentage:
+      type: object
+      properties:
+        item:
+          type: string
+          description: Name of the risk habit
+          example: Smoking
+        percentage:
+          type: number
+          description: >
+            Percentage of patients with this habit.
+            Example: If there are 100 patients and 20 of them have the 'Smoking' habit, the percentage is 20%.
+          example: 20
+
+
+
+    TotalCounts:
+      type: object
+      properties:
+        doctors:
+          type: integer
+          description: Total number of doctors
+          example: 10
+        patients:
+          type: integer
+          description: Total number of patients
+          example: 50
+        images:
+          type: integer
+          description: Total number of images
+          example: 100    
+    Image:
+      type: object
+      properties:
+        telecon_entry_id:
+          type: string
+        image_name:
+          type: string
+        loacation:
+          type: string
+        lesions_appear:
+          type: boolean
+          default: false
+        annotation:
+          type: array
+          default: []
+        predicted_vat:
+          type: string
+    DraftEntry:
+      type: object
+      properties:
+        patient:
+          type: string
+        clinician_id:
+          type: string
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        complaint:
+          type: string
+        findings:
+          type: string
+        current_habits:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+        reports:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
     TeleConEntry:
       type: object
       properties:
@@ -592,4 +2453,4 @@ components:
             checked:
               type: boolean
             reviewed:
-              type: boolean
+              type: boolean    
