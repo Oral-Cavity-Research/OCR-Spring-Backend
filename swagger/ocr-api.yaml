@@ -339,7 +339,7 @@ paths:
       
       responses:
         "200":
-          description: OK
+          description: "Images Uploaded Successfully"
           content:
             application/json:
               schema:
@@ -1039,6 +1039,190 @@ paths:
                   $ref: "#/components/schemas/Image"
         "500":
           description: Internal Server Error
+  /api/user/upload/images/{id}:
+    post:
+      summary: To uplaoad images for teleconsultation entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:  
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                data:
+                    type: string
+                    description: JASON string containing image metadata
+      responses: 
+        "200":
+          description: "Images Uploaded Successfully"
+          content:
+            application/json:
+              schema:
+                type: object 
+                properties:
+                  docs:
+                    type: array
+                    items:
+                      type: string
+                      description: Image document id
+                  message:
+                    type: string
+        
+        "401":
+          description: "Unauthorized access"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  error:
+                    type: string
+        "404":
+          description: "Entry Not Found"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  
+  /api/user/upload/reports/{id}:
+    post:
+      summary: upload reports to teleconsultaation entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:  
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                data:
+                    type: string
+                    description: JASON string containing report metadata
+      responses: 
+        "200":
+          description: "reports Uploaded Successfully"
+          content:
+            application/json:
+              schema:
+                type: object 
+                properties:
+                  docs:
+                    type: array
+                    items:
+                      type: string
+                      description: Report document id
+                  message:
+                    type: string
+        "401":
+          description: "Unauthorized access"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  error:
+                    type: string
+        "404":
+          description: "No Entry found"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /api/user/upload/patient:
+    post:
+      summary: add new patient with consent form
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:  
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                data:
+                    type: string
+                    description: JASON string containing patient data
+      responses: 
+        "200":
+          description: "patient added Successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/addNewPatient"
+                  
+        "401":
+          description: "Patient ID already exists"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  error:
+                    type: string
 
 components:
   schemas:
@@ -1428,7 +1612,8 @@ components:
       properties:
         reg_no:
           type: string
-        username:
+          description: clinician id
+        consent_form:
           type: string
         email:
           type: string
@@ -1711,3 +1896,16 @@ components:
           default: []
         predicted_vat:
           type: string
+
+    addNewPatient:
+      type: object
+      properties:
+        patient_id:
+          type: string 
+          description: patient id
+        clinician_id:
+          type: string
+          description: clinician id
+        consent_form:
+          type: string
+          description: consent form
