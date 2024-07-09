@@ -500,7 +500,7 @@ paths:
           description: The role to filter users by
       responses:
         "200":
-          description: OK
+          description: Successful response
           content:
             application/json:
               schema:
@@ -1003,6 +1003,68 @@ paths:
             application/json:
               schema: 
                 $ref: "#/components/schemas/InternalServerErrorResponse"
+  /api/dashboard/percentages:
+    get:
+      summary: Get the percentage of risk habits
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RiskHabitPercentage"
+        "401":
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/dashboard/totals:
+    get:
+      summary: Get the total number of doctors, images and patients
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  doctors:
+                    type: integer
+                    description: Number of doctors
+                    example: 10
+                  images:
+                    type: integer
+                    description: Number of images
+                    example: 100
+                  patients:
+                    type: integer
+                    description: Number of patients
+                    example: 1000
+                    $ref: "#/components/schemas/TotalCounts"
+        "401":
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+                
 
 components:
   schemas:
@@ -1352,14 +1414,18 @@ components:
       properties:
         reg_no:
           type: string
-        username:
-          type: string
-        email:
-          type: string
-        hospital:
-          type: string
-        role:
-          type: string
+          description: Name of the risk habit
+          example: Smoking
+        percentage:
+          type: number
+          description: >
+            Percentage of patients with this habit.
+            Example: If there are 100 patients and 20 of them have the 'Smoking' habit, the percentage is 20%.
+          example: 20
+
+
+
+    
           
     NewAdminSignUpResponse:
 
@@ -1603,3 +1669,35 @@ components:
         message:
           type: string
           default: "option already exist"
+
+    RiskHabitPercentage:
+      type: object
+      properties:
+        item:
+          type: string
+          description: Name of the risk habit
+          example: Smoking
+        percentage:
+          type: number
+          description: >
+            Percentage of patients with this habit.
+            Example: If there are 100 patients and 20 of them have the 'Smoking' habit, the percentage is 20%.
+          example: 20
+
+
+
+    TotalCounts:
+      type: object
+      properties:
+        doctors:
+          type: integer
+          description: Total number of doctors
+          example: 10
+        patients:
+          type: integer
+          description: Total number of patients
+          example: 50
+        images:
+          type: integer
+          description: Total number of images
+          example: 100    
