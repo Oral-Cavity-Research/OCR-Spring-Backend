@@ -366,6 +366,7 @@ paths:
                 properties:
                   message:
                     type: string
+                    example: "Internal Server Error!"
                   error:
                     type: string
         "401":
@@ -2362,38 +2363,61 @@ components:
     NewAdminSignUp:
       type: object
       properties:
-        reg_no:
+        reg_no:  
+          type: integer
+          description: clinician reg_no
+          example: 96905
+        username: 
           type: string
-          description: Name of the risk habit
-          example: Smoking
-        percentage:
-          type: number
-          description: >
-            Percentage of patients with this habit.
-            Example: If there are 100 patients and 20 of them have the 'Smoking' habit, the percentage is 20%.
-          example: 20
-
-
-
+          description: clinician name
+          example: "Nethmini Karunarathne"
+        email: 
+          type: string
+          description: clinician email
+          example: "e20189@eng.pdn.ac.lk"
+        hospital: 
+          type: string
+          description: clinician hospital
+          example: "Peradeniya Teaching Hospital"
     
-          
     NewAdminSignUpResponse:
-
-
-    
       type: object
       properties:
-        reg_no:
+        username: 
           type: string
-          description: clinician id
-        consent_form:
+          example: "Nethmini Karunarathne"
+        email: 
           type: string
-        email:
+          example: "e20189@eng.pdn.ac.lk"
+        reg_no: 
           type: string
-        hospital:
+          example: "96964"
+        hospital: 
           type: string
-        role:
+        designation: 
           type: string
+          example: ""
+        contact_no: 
+          type: string
+          example: ""
+        availability: 
+          type: boolean
+          example: true
+        role: 
+          type: string
+          example: "System Admin"
+        _id: 
+          type: string
+          example: "60b6b3b8f9c0c40015c10f5a"
+        createdAt: 
+          type: string
+          example: "2024-07-11T01:35:29.190Z"
+        updatedAt: 
+          type: string
+          example: "2024-07-11T01:35:29.190Z" 
+        message: 
+          type: string
+          example: "Successfully signed in"
 
     Request:
       type: object
