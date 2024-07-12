@@ -13,18 +13,22 @@ tags:
     description: Administrative operations
   - name: Authentication
     description: Operations related to user authentication
-  - name: Reviewer
-    description: Operations related to reviewers
-  - name: Reviews
-    description: Operations related to reviews
-  - name: Assignment
-    description: Operations related to assignments
-  - name: Teleconsultation
+  - name: Admin Authentication
+    description: Operations related to admin authentication
+  - name: Entry
     description: Operations related to teleconsultation
-  - name: User Self
+  - name: User
     description: Operations related to the user's own data
-  - name: Draft Upload
-    description: Operations related to draft uploads
+  - name: Draft Entry Uploads
+    description: Operations related to Draft Entry Uploads
+  - name: Draft Entry
+    description: Operations related to draft entries
+  - name: Patient Details
+    description: Operations related to patients
+  - name: Dashboard
+    description: Operations related to the dashboard
+  - name: Images
+    description: Operations related to images
 
 
 paths:
@@ -164,7 +168,11 @@ paths:
 
   /api/user/patient/update/{id}:
     post:
-      summary: Update patient details
+      tags:
+        - Patient Details
+      summary: Update patient Details
+      description: >
+        This endpoint updates the details of a patient. If the patient is not found, it returns an error message.
       parameters:
         - name: id
           in: path
@@ -191,7 +199,11 @@ paths:
   
   /api/user/patient/get:
     get:
+      tags:
+        - Patient Details
       summary: Get all patients
+      description: >
+        This endpoint returns a list of all patients. It supports pagination and search.
       parameters:
         - name: page
           in: query
@@ -224,7 +236,11 @@ paths:
 
   /api/user/patient/check/{id}:
     get:
+      tags:
+        - Patient Details
       summary: Check if patient exists
+      description: >
+        This endpoint checks if a patient exists. If the patient is found, it returns a boolean value.
       parameters:
         - name: id
           in: path
@@ -248,7 +264,11 @@ paths:
 
   /api/user/patient/{id}:
     get:
+      tags:
+        - Patient Details
       summary: get one patient
+      description:
+        This endpoint returns the details of a patient. If the patient is not found, it returns an error message.
       parameters:
         - name: id
           in: path
@@ -271,7 +291,11 @@ paths:
 
   /api/user/patient/shared/{id}:
     get:
+      tags: 
+        - Patient Details 
       summary: get one shared patient
+      description: >
+        This endpoint returns the details of a shared patient. If the patient is not found, it returns an error message.
       parameters:
         - name: id
           in: path
@@ -294,7 +318,11 @@ paths:
 
   /api/user/reviewer/all:
     get:
+      tags: 
+        - User
       summary: Get all reviewers
+      description: >
+        This endpoint returns a list of all reviewers. If no reviewers are found, it returns an error message.
       responses:
         "200":
           description: List of reviewers
@@ -310,11 +338,14 @@ paths:
           description: Reviewers not found
         "500":
           description: Internal Server Error
+  
   /api/admin/auth/signup:
     post:
+      tags: 
+        - Admin Authentication
       summary: To add the initial admin
-      tags:
-        - Admin
+      description: >
+        This endpoint adds the initial admin to the system. If the admin already exists, it returns an error message.
       requestBody:
         required: true
         content:
@@ -349,13 +380,14 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "User name is taken"
+  
   /api/admin/requests:
     get:
       summary: Get all requests
       tags:
         - Admin
-      
+      description: >
+        This endpoint returns a list of all requests. If no requests are found, it returns an error message.
       responses:
         "200":
           description: "Images Uploaded Successfully"
@@ -383,7 +415,8 @@ paths:
       summary: Get one request by ID
       tags:
         - Admin
-  
+      description: >
+        This endpoint returns the details of a request. If the request is not found, it returns an error message.
       parameters:
         - in: path
           name: id
@@ -421,7 +454,8 @@ paths:
       summary: Reject a request
       tags:
         - Admin
-      
+      description:
+        This endpoint deletes a request. If the request is not found, it returns an error message.
       parameters:
         - in: path
           name: id
@@ -453,10 +487,11 @@ paths:
 
   /api/admin/accept/{id}:
     post:
-      summary: Accept a request
       tags:
         - Admin
-      
+      summary: Accept a request
+      description: >
+        This endpoint accepts a request. If the request is not found, it returns an error message.
       parameters:
         - in: path
           name: id
@@ -506,9 +541,11 @@ paths:
 
   /api/admin/users/role/{role}:
     get:
-      summary: Get users by role with read-write access permission
       tags:
         - Admin
+      summary: Get users by role with read-write access permission
+      description: >
+        This endpoint returns a list of users with the specified role. If no users are found, it returns an error message.
       parameters:
         - in: path
           name: role
@@ -538,13 +575,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/InternalServerErrorResponse"
 
-
   /api/admin/roles:
     get:
-      summary: get all user roles
       tags:
         - Admin
-  
+      summary: get all user roles
+      description: >
+        This endpoint returns a list of all user roles. If no roles are found, it returns an error message.
       responses:
         "200":
           description: successful
@@ -571,7 +608,8 @@ paths:
       summary: create a new role
       tags:
         - Admin
-        
+      description: >
+        This endpoint creates a new role. If the role already exists, it returns an error message.
       requestBody:
         required: true
         content:
@@ -602,10 +640,11 @@ paths:
 
   /api/admin/roles/{id}:
     get:
-      summary: get one user by role
       tags:
         - Admin
-        
+      summary: get one user by role
+      description: >
+        This endpoint returns the details of a user with the specified role. If the user is not found, it returns an error message.
       parameters:
         - in: path
           name: id
@@ -642,13 +681,13 @@ paths:
               schema: 
                 $ref: "#/components/schemas/InternalServerErrorResponse"
   
-
   /api/admin/update/user/{id}:
     post:
       summary: update user details
       tags:
         - Admin
-  
+      description: >
+        This endpoint updates the details of a user. If the user is not found, it returns an error message.
       parameters:
         - in: path
           name: id
@@ -696,6 +735,8 @@ paths:
       summary: delete user
       tags:
         - Admin
+      description: > 
+        This endpoint deletes a user. If the user is not found, it returns an error message.
       parameters:
         - in: path
           name: id
@@ -737,6 +778,8 @@ paths:
       summary: create a new hospital
       tags:
         - Admin
+      description: >
+        This endpoint creates a new hospital. If the hospital already exists, it returns an error message.
       requestBody:
         required: true
         content:
@@ -774,6 +817,8 @@ paths:
       summary: update hospital details
       tags:
         - Admin
+      description: >
+        This endpoint updates the details of a hospital. If the hospital is not found, it returns an error message.
       parameters:
         - in: path
           name: id
@@ -829,6 +874,8 @@ paths:
       summary: delete hospital
       tags:
         - Admin
+      description: > 
+        This endpoint deletes a hospital. If the hospital is not found, it returns an error message.
       parameters:
         - in: path
           name: id
@@ -866,10 +913,14 @@ paths:
                 $ref: "#/components/schemas/InternalServerErrorResponse"
 
   /api/admin/hospitals/{id}:
+    description: >
+      This endpoint returns the details of a hospital. If the hospital is not found, it returns an error message.
     get:
       summary: get one hospital by id
       tags:
         - Admin
+      description: >
+        This endpoint returns the details of a hospital. If the hospital is not found, it returns an error message.
     
       parameters:
         - in: path
@@ -912,7 +963,8 @@ paths:
       summary: get options
       tags:
         - Admin
-    
+      description: >
+        This endpoint returns the details of an option. If the option is not found, it returns an error message.
       parameters:
         - in: path
           name: name
@@ -954,6 +1006,8 @@ paths:
       summary: only to add options by tech team
       tags:
         - Admin
+      description: >
+        This endpoint creates a new option. If the option already exists, it returns an error message.
       requestBody:
         required: true
         content:
@@ -981,9 +1035,14 @@ paths:
             application/json:
               schema: 
                 $ref: "#/components/schemas/InternalServerErrorResponse"
+  
   /api/dashboard/percentages:
     get:
+      tags: 
+        - Dashboard 
       summary: Get the percentage of risk habits
+      description: >
+        This endpoint returns the percentage of risk habits. If no data is found, it returns an error message.
       responses:
         "200":
           description: Successful response
@@ -1008,7 +1067,11 @@ paths:
 
   /api/dashboard/totals:
     get:
+      tags: 
+        - Dashboard
       summary: Get the total number of doctors, images and patients
+      description: >
+        This endpoint returns the total number of doctors, images and patients. If no data is found, it returns an error message.
       responses:
         "200":
           description: Successful response
@@ -1043,10 +1106,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
                 
-
   /api/image/update:
     post: 
+      tags: 
+        - Images
       summary: update image
+      description: >
+        This endpoint updates the details of an image. If the image is not found, it returns an error message.
       responses:
         "200":
           description: OK
@@ -1061,7 +1127,11 @@ paths:
   
   /api/user/draftentry/add/{id}:
     post:
-      summary: Add a draft teleconsultation entry
+      tags: 
+        - Draft Entry
+      summary: Add a draft Entry
+      description: >
+        This endpoint adds a draft Entry. If the patient is not found, it returns an error message.
       parameters:
         - name: id
           in: path
@@ -1089,7 +1159,7 @@ paths:
                   type: string
       responses:
         "200":
-          description: Draft teleconsultation entry added successfully
+          description: Draft Entry added successfully
           content:
             application/json:
               schema:
@@ -1103,7 +1173,11 @@ paths:
 
   /api/user/draftentry/get:
     get:
+      tags: 
+        - Draft Entry
       summary: Get all draft entries added by the user
+      description: >
+        This endpoint returns a list of all draft entries added by the user. It supports pagination and search.
       parameters:
         - name: page
           in: query
@@ -1129,6 +1203,10 @@ paths:
 
   /api/user/draftentry/get/patient/{id}:
     get:
+      tags: 
+        - Draft Entry
+      description: >
+        This endpoint returns a list of all draft entries for a specific patient. It supports pagination and search.
       summary: Get all draft entries for a specific patient
       parameters:
         - name: id
@@ -1160,7 +1238,11 @@ paths:
 
   /api/user/draftentry/get/{id}:
     get:
+      tags: 
+        - Draft Entry
       summary: Get details of a specific draft entry
+      description: >
+        This endpoint returns the details of a specific draft entry. If the draft entry is not found, it returns an error message.
       parameters:
         - name: id
           in: path
@@ -1183,7 +1265,11 @@ paths:
 
   /api/user/entry/add/{id}:
     post:
+      tags:
+        - Entry
       summary: Add a telecunsultation entry
+      description: >
+        This endpoint adds a Entry. If the patient is not found, it returns an error message.
       parameters:
         - in: path
           name: id
@@ -1226,7 +1312,11 @@ paths:
 
   /api/user/entry/get:
     get:
+      tags:
+        - Entry
       summary: get all entries added by user
+      description: >
+        This endpoint returns a list of all teleconsultation entries added by the user. It supports pagination and search.
       parameters:
         - in: query
           name: page
@@ -1255,7 +1345,11 @@ paths:
 
   /api/user/entry/get/patient/{id}:
     get:
+      tags:
+        - Entry
       summary: Get patient's entries
+      description: >
+        This endpoint returns a list of all teleconsultation entries for a specific patient. It supports pagination and search.
       parameters:
         - in: path
           name: id
@@ -1290,7 +1384,11 @@ paths:
   
   /api/user/entry/shared/patient/{id}:
     get:
+      tags:
+        - Entry
       summary: Get shared patient's entries(view only)
+      description: >
+        This endpoint returns a list of all shared teleconsultation entries for a specific patient. It supports pagination and search.
       parameters:
         - in: path
           name: id
@@ -1325,7 +1423,11 @@ paths:
 
   /api/user/entry/get/{id}:
     get:
+      tags:
+        - Entry
       summary: get one entry details added by users
+      description: >
+        This endpoint returns the details of a Entry. If the entry is not found, it returns an error message.
       parameters:
         - in: path
           name: id
@@ -1348,7 +1450,11 @@ paths:
 
   /api/user/entry/count/newreviews:
     get:
+      tags: 
+        - Entry
       summary: get count of new reviews
+      description: >
+        This endpoint returns the count of new reviews. If no reviews are found, it returns an error message.
       responses:
         "200":
           description: count of new reviews
@@ -1364,7 +1470,11 @@ paths:
       
   /api/user/entry/count/newentries:
     get:
+      tags: 
+        - Entry 
       summary: get unreviewed entry count
+      description: >
+        This endpoint returns the count of unreviewed entries. If no unreviewed entries are found, it returns an error message.
       responses:
         "200":
           description: count of unreviewed entries
@@ -1380,7 +1490,11 @@ paths:
 
   /api/user/entry/reviewer/add/{id}:
     post:
+      tags: 
+        - Entry
       summary: Add a reviewer by user
+      description: >
+        This endpoint adds a reviewer to an entry. If the entry is not found, it returns an error message.
       parameters:
         - in: path
           name: Id
@@ -1410,6 +1524,10 @@ paths:
 
   /api/user/entry/reviewer/remove/{id}:
     post:
+      tags: 
+        - Entry
+      description: >
+        This endpoint removes a reviewer from an entry. If the entry is not found, it returns an error message.
       summary: remove a reviewer by user
       parameters:
         - in: path
@@ -1437,9 +1555,14 @@ paths:
           description: Entry not found
         "500":
           description: Internal server error
+  
   /api/user/entry/delete/{id}:
     post:
+      tags: 
+        - Entry
       summary: delete a telecunsultation entry within 24 hours(after 24 hours cannot delete)
+      description: >
+        This endpoint deletes a Entry. If the entry is not found, it returns an error message.
       parameters:
         - in: path
           name: id
@@ -1459,7 +1582,11 @@ paths:
       
   /api/user/entry/shared/all:
     get:
+      tags:
+        - Entry
       summary: Get all shared entries
+      description: >
+        This endpoint returns a list of all shared teleconsultation entries. It supports pagination and search.
       parameters:
         - in: query
           name: page
@@ -1486,36 +1613,41 @@ paths:
         "500":
           description: Internal server error
 
-
   /api/user/entry/shared/{id}:
-      get:
-        summary: Get one shared entry (view only)
-        parameters:
-          - name: id
-            in: path
-            required: true
-            description: Entry ID
-            schema:
-              type: string
-        responses:
-          200:
-            description: Teleconsultation entry details
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/TeleConEntry'
-          401:
-            description: Unauthorized access
-          404:
-            description: Entry not found
-          500:
-            description: Internal Server Error
+    get:
+      tags:
+        - Entry
+      summary: Get one shared entry (view only)
+      description: >
+        This endpoint returns the details of a shared Entry. If the entry is not found, it returns an error message.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Entry ID
+          schema:
+            type: string
+      responses:
+        200:
+          description: Entry details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeleConEntry'
+        401:
+          description: Unauthorized access
+        404:
+          description: Entry not found
+        500:
+          description: Internal Server Error
 
   /api/user/entry/shared/data/{id}:
     get:
-      summary: Get assigned entry details
       tags:
-        - Teleconsultation
+        - Entry
+      summary: Get assigned entry details
+      description: >
+        This endpoint returns the details of a shared Entry with assignment data. If the entry is not found, it returns an error message.
       parameters:
         - name: id
           in: path
@@ -1525,7 +1657,7 @@ paths:
           description: The ID of the assignment
       responses:
         200:
-          description: Detailed teleconsultation entry with assignment data
+          description: Detailed Entry with assignment data
           content:
             application/json:
               schema:
@@ -1539,16 +1671,18 @@ paths:
 
   /api/user/entry/reviews/{id}:
     get:
-      summary: Get reviews of a teleconsultation entry
+      summary: Get reviews of a Entry
       tags:
-        - Reviews
+        - Entry
+      description:
+        This endpoint returns a list of reviews for a specific Entry. If no reviews are found, it returns an error message.
       parameters:
         - name: id
           in: path
           required: true
           schema:
             type: string
-          description: The ID of the teleconsultation entry
+          description: The ID of the Entry
       responses:
         200:
           description: List of reviews
@@ -1569,7 +1703,9 @@ paths:
     post:
       summary: Change the reviewer of an assignment
       tags:
-        - Reviewer
+        - Entry
+      description:
+        This endpoint allows users to change the reviewer of an assignment. If the assignment is not found, it returns an error message.
       parameters:
         - name: id
           in: path
@@ -1599,16 +1735,18 @@ paths:
 
   /api/user/entry/review/{id}:
     post:
-      summary: Add a new review to a teleconsultation entry
+      summary: Add a new review to a Entry
       tags:
-        - Reviews
+        - Entry
+      description:
+        This endpoint allows users to add a new review to a Entry. If the entry is not found, it returns an error message.
       parameters:
         - name: id
           in: path
           required: true
           schema:
             type: string
-          description: The ID of the teleconsultation entry
+          description: The ID of the Entry
       requestBody:
         required: true
         content:
@@ -1638,7 +1776,9 @@ paths:
     post:
       summary: Mark an assignment as read
       tags:
-        - Assignment
+        - Entry
+      description:
+        This endpoint allows users to mark an assignment as read. If the assignment is not found, it returns an error message.
       parameters:
         - name: id
           in: path
@@ -1656,16 +1796,18 @@ paths:
 
   /api/user/entry/open/{id}:
     post:
-      summary: Mark a teleconsultation entry as read
+      summary: Mark a Entry as read
       tags:
-        - Teleconsultation
+        - Entry
+      description:
+        This endpoint allows users to mark a Entry as read. If the entry is not found, it returns an error message.
       parameters:
         - name: id
           in: path
           required: true
           schema:
             type: string
-          description: The ID of the teleconsultation entry
+          description: The ID of the Entry
       responses:
         200:
           description: Marked as read
@@ -1678,7 +1820,9 @@ paths:
     get:
       summary: Get a user
       tags:
-        - User Self
+        - User
+      description: >
+        This endpoint returns the details of the authenticated user.
       responses:
         "200":
           description: OK
@@ -1693,9 +1837,11 @@ paths:
           
   /api/user/self/hospitals:
     get:
+      description: >
+        This endpoint returns the list of hospitals available for the user to select.
       summary: Get hospital list on signup page
       tags:
-        - User Self
+        - User
       responses:
         "200":
           description: Successful response
@@ -1708,12 +1854,13 @@ paths:
         "500":
           description: Internal Server Error
   
-
   /api/user/self/update:
     post:
       summary: Update a user
       tags:
-        - User Self
+        - User
+      description: >
+        This endpoint allows users to update their details. If the user is not found, it returns an error message.
       requestBody:
         required: true
         content:
@@ -1735,9 +1882,9 @@ paths:
   /api/user/draftentry/upload/images/{id}:
     post:
       tags:
-        - Draft Upload
+        - Draft Entry Uploads
       summary: Upload images for a draft entry
-      description: Allows authenticated users to upload multiple images for a specific draft teleconsultation entry.
+      description: Allows authenticated users to upload multiple images for a specific draft Entry.
       parameters:
         - name: id
           in: path
@@ -1783,9 +1930,9 @@ paths:
   /api/user/draftentry/upload/reports/{id}:
     post:
       tags:
-        - Draft Upload
+        - Draft Entry Uploads
       summary: Upload reports for a draft entry
-      description: Allows authenticated users to upload multiple reports for a specific draft teleconsultation entry.
+      description: Allows authenticated users to upload multiple reports for a specific draft Entry.
       parameters:
         - name: id
           in: path
@@ -1828,10 +1975,8 @@ paths:
         "500":
           description: Internal Server Error
 
-
 components:
   schemas:
-
     User:
       type: object
       properties:
@@ -1864,8 +2009,7 @@ components:
           type: string
         contact_no:
           type: string
-
-
+          
     UserUpdate:
       type: object
       properties:
