@@ -25,8 +25,8 @@ tags:
     description: Operations related to the user's own data
   - name: Draft Upload
     description: Operations related to draft uploads
-
-
+  - name: User Upload
+    description: Operations related to user uploads
 paths:
   /api/auth/signup:
     post:
@@ -1828,6 +1828,199 @@ paths:
         "500":
           description: Internal Server Error
 
+  /api/user/upload/images/{id}:
+    post:
+      tags:
+        - User Upload
+      summary: Upload images for teleconsultation entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The object ID of the teleconsultation entry
+        - name: _id
+          in: header
+          required: true
+          schema:
+            type: string
+          description: The header _id afeter going through authentication process
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: string
+                  format: binary
+                  description: The image file to upload
+                data:
+                  type: string
+                  description: JSON string containing image metadata
+                  $ref: "#/components/schemas/Image"
+      responses:
+        "200":
+          description: "Images Uploaded Successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  docs:
+                    type: array
+                    items:
+                      type: string
+                      description: Image data containing JASON string
+                      $ref: "#/components/schemas/imageUploadResponse"
+                  message:
+                    type: string
+                    example: "Images Uploaded Successfully"
+
+        "401":
+          description: Unauthorized access
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal Server Error
+                  error:
+                    type: string
+        "404":
+          description: "Entry Not Found"
+  /api/user/upload/reports/{id}:
+    post:
+      tags:
+        - User Upload
+      summary: Upload reports for teleconsultation entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The object ID of the teleconsultation entry
+        - name: _id
+          in: header
+          required: true
+          schema:
+            type: string
+          description: The header _id afeter going through authentication process
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: string
+                  format: binary
+                  description: The report file to upload
+                data:
+                  type: string
+                  description: JSON string containing report metadata
+                  $ref: "#/components/schemas/Report"
+      responses:
+        "200":
+          description: "Reports Uploaded Successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  docs:
+                    type: array
+                    items:
+                      type: string
+                      description: Report data containing JASON string
+                      $ref: "#/components/schemas/imageUploadResponse"
+                  message:
+                    type: string
+                    example: "reports Uploaded Successfully"
+
+        "401":
+          description: Unauthorized access
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal Server Error
+                  error:
+                    type: string
+        "404":
+          description: "Entry Not Found"
+  /api/user/upload/patient:
+    post:
+      tags:
+        - User Upload
+      summary: add new patient with consent form
+      parameters:
+        - name: _id
+          in: header
+          required: true
+          schema:
+            type: string
+          description: The header _id afeter going through authentication process
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                patient_id:
+                  type: string
+                  description: The patient ID
+                files:
+                  type: string
+                  format: binary
+                  description: The consent form to upload
+                data:
+                  type: string
+                  description: JSON string containing report metadata
+                  $ref: "#/components/schemas/Patient"
+      responses:
+        "200":
+          description: Consent form Uploaded Successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  docs:
+                    type: array
+                    items:
+                      type: string
+                      description: patient data containing JASON string
+                      $ref: "#/components/schemas/consentFormUploadResponse"
+
+        "401":
+          description: "Patient ID already exists"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal Server Error
+                  error:
+                    type: string
 
 components:
   schemas:
@@ -2539,6 +2732,15 @@ components:
           default: []
         predicted_vat:
           type: string
+    Report:
+      type: object
+      properties:
+        telecon_entry_id:
+          type: string
+        report_name:
+          type: string
+
+        
     DraftEntry:
       type: object
       properties:
@@ -2676,3 +2878,96 @@ components:
           type: string
         draft_entry:
           type: string
+    imageUploadResponse:
+      type: object
+      properties:
+        telecon_entry_id: 
+          type: string
+          example: "642e422546ac21a667ea0a0d"
+        image_name: 
+          type: string
+          example: "image1.jpeg"
+        location: 
+          type: string
+          example: "Upper labial mucosa"
+        clinical_diagnosis: 
+          type: string
+          example: "Normal"
+        lesions_appear: 
+          type: boolean
+          example: true
+        annotation: 
+          type: array
+          example: []
+        predicted_cat: 
+          type: string
+          example: ""
+        _id: 
+          type: string
+          example: "669095c86782e6762ddd5f35"
+        createdAt: 
+          type: string
+          example: "2024-07-12T02:32:40.650Z"
+        updatedAt: 
+          type: string
+          example: "2024-07-12T02:32:40.650Z"
+    reportUploadResponse:
+      type: object
+      properties:
+        telecon_entry_id: 
+          type: string
+          example: "642e422546ac21a667ea0a0d"
+        report_name: 
+          type: string
+          example: "report1.pdf"
+        _id: 
+          type: string
+          example: "669095c86782e6762ddd5f35"
+        createdAt: 
+          type: string
+          example: "2024-07-12T02:32:40.650Z"
+        updatedAt: 
+          type: string
+          example: "2024-07-12T02:32:40.650Z"
+    consentFormUploadResponse:
+      type: object
+      properties:
+        patient_id:
+          type: string
+        clinician_id:
+          type: string
+        patient_name:
+          type: string
+        risk_factors:
+          type: array
+          items:
+            type: string
+        DOB:
+          type: string
+          format: date-time
+        gender:
+          type: string
+        histo_diagnosis:
+          type: string
+        medical_history:
+          type: array
+          items:
+            type: string
+        family_history:
+          type: array
+          items:
+            type: string
+        systemic_disease:
+          type: string
+        contact_no:
+          type: string
+        consent_form:
+          type: string
+        _id:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
