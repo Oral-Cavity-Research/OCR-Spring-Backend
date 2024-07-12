@@ -2268,15 +2268,15 @@ components:
     SignupSuccess:
       type: object
       properties:
-        reg_no:
-          type: string
-          description: Registration number
         username:
           type: string
           description: Username
         email:
           type: string
           description: Email address
+        reg_no:
+          type: string
+          description: Registration number
         hospital:
           type: string
           description: Name of the hospital
@@ -2286,6 +2286,15 @@ components:
         contact_no:
           type: string
           description: Contact number
+        _id:
+          type: string
+          description: User ID
+        createdAt:
+          type: string
+          description: Date of creation
+        updatedAt:
+          type: string
+          description: Date of last update
         message:
           type: string
           description: Success message
@@ -2326,6 +2335,65 @@ components:
           type: string
           description: Detailed error information
           example: "Detailed error information here."
+    userref:
+          type: object
+          description: User reference details
+          properties:
+            _id:
+              type: string
+              description: User ID
+              example: "60b6b3b8f9c0c40015c10f5a"
+            username:
+              type: string
+              description: Username
+              example: "johndoe"
+            email:
+              type: string
+              description: User's email address
+              example: "johndoe@example.com"
+            reg_no:
+              type: string
+              description: Registration number
+              example: "1"
+            hospital:
+              type: string
+              description: Name of the hospital
+              example: "Colombo Hospital"
+            designation:
+              type: string
+              description: Designation of the user
+              example: "Doctor"
+            contact_no:
+              type: string
+              description: Contact number
+              example: "+1234567890"
+            password:
+              type: string
+              description: Encrypted password
+              example: "$2a$10$3Q"
+            availability:
+              type: boolean
+              description: Availability status
+              example: true
+            role:
+              type: string
+              description: User's role
+              example: "admin"
+            createdAt:
+              type: string
+              description: Date of creation
+              example: "2021-06-01T12:00:00.000Z"
+            updatedAt:
+              type: string
+              description: Date of last update
+              example: "2021-06-01T12:00:00.000Z" 
+            message:
+              type: string
+              description: Success message
+              example: "Successfully logged in"
+            permissions: 
+              type: array
+              example: [300]
 
     LoginSuccess:
       type: object
@@ -2342,39 +2410,15 @@ components:
               description: Token expiry time
               example: "1h"
         ref:
-          type: object
           description: User reference details
-          properties:
-            _id:
-              type: string
-              description: User ID
-              example: "60b6b3b8f9c0c40015c10f5a"
-            email:
-              type: string
-              description: User's email address
-              example: "johndoe@example.com"
-            username:
-              type: string
-              description: Username
-              example: "johndoe"
-            role:
-              type: string
-              description: User's role
-              example: "admin"
-        others:
           type: object
-          description: Additional details
-          properties:
-            message:
-              type: string
-              description: Success message
-              example: "Successfully logged in"
-            permissions:
-              type: array
-              items:
-                type: string
-              description: List of user permissions
-              example: ["read", "write", "delete"]
+          allOf:
+            - $ref: "#/components/schemas/userref"
+        others:
+          description: User reference details
+          type: object
+          allOf:
+            - $ref: "#/components/schemas/userref"
       
     UserNotRegisteredError:
       type: object
@@ -2401,26 +2445,46 @@ components:
           properties:
             _id:
               type: string
-              description: User ID
               example: "60b6b3b8f9c0c40015c10f5a"
-            email:
-              type: string
-              description: User's email address
-              example: "johndoe@example.com"
             username:
               type: string
-              description: Username
               example: "johndoe"
+            email:
+              type: string
+              example: "johndoe@example.com"
+            reg_no:
+              type: string
+              example: "1"
+            hospital:
+              type: string
+              example: "Colombo Hospital"
+            designation:
+              type: string
+              example: "Doctor"
+            contact_no:
+              type: string
+              example: "+1234567890"
+            password:
+              type: string
+              example: "$2a$10$3Q"
+            availability:
+              type: boolean
+              example: true
             role:
               type: string
-              description: User's role
               example: "admin"
+            createdAt:
+              type: string
+              example: "2021-06-01T12:00:00.000Z"
+            updatedAt:
+              type: string
+              example: "2021-06-01T12:00:00.000Z" 
         permissions:
           type: array
           items:
-            type: string
+            type: integer
           description: List of user permissions
-          example: ["read", "write", "delete"]
+          example: [300]
         accessToken:
           type: object
           properties:
