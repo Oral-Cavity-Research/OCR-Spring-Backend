@@ -13,6 +13,8 @@ tags:
     description: Administrative operations
   - name: Authentication
     description: Operations related to user authentication
+  - name: Admin Authentication
+    description: Operations related to admin authentication
   - name: Entry
     description: Operations related to teleconsultation
   - name: User
@@ -340,7 +342,7 @@ paths:
   /api/admin/auth/signup:
     post:
       tags: 
-        - Admin 
+        - Admin Authentication
       summary: To add the initial admin
       description: >
         This endpoint adds the initial admin to the system. If the admin already exists, it returns an error message.
