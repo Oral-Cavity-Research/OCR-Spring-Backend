@@ -13,6 +13,7 @@ public class userService {
     private UserRepository repo;
 
     public List<User> AllDetails(){
+
         return repo.findAll();
     }
     public User createUser(User user){
