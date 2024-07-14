@@ -4,10 +4,9 @@ https://www.figma.com/design/ULY00JogEgJQoOlaJPKouz/OASIS-Teledentistry?node-id=
 
 <img src="https://github.com/user-attachments/assets/63643678-f6bc-43d8-83d8-54051e912152" width="300" />
 <img src="https://github.com/user-attachments/assets/b347dd86-e49a-433c-81e2-5f67de9d1331" width="300" />
-
 <img src="https://github.com/user-attachments/assets/d76c5944-1844-4663-b186-6decfe8bfd2d" width="300" />
 <img src="https://github.com/user-attachments/assets/0daf17b1-92d4-497d-8021-eeabe480ff1e" width="300" />
-<img src="https://github.com/user-attachments/assets/86e22f47-3aa2-4145-96d4-1cc5822ff69e" width="300" />
+
 <img src="https://github.com/user-attachments/assets/47244a1e-9bab-49db-acac-ec9f505e9b12" width="300" />
 <img src="https://github.com/user-attachments/assets/d8dee0ef-cccd-408d-9246-c6880c0d29ae" width="300" />
 <img src="https://github.com/user-attachments/assets/0dfe427d-e94c-4787-96a4-03f9277f9b66" width="300" />
