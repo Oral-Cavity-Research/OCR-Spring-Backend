@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "hospitals")
 public class Hospital {
     @Id
-    private Long id;
+    private String id;
     private String category;
     private String city;
     private String address;

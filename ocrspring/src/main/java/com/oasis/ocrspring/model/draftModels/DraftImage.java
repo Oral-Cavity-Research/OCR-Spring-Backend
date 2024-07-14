@@ -8,8 +8,8 @@ import java.util.List;
 @Document(collection = "draftimages")
 public class DraftImage {
     @Id
-    private Long id;
-    private Long telecon_entry_id;
+    private String id;
+    private String telecon_entry_id;
     private String image_name;
     private String location;
     private String clinical_diagnosis;
@@ -17,7 +17,7 @@ public class DraftImage {
     private List<String>annotation;
     private String predicted_cat;
 
-    public DraftImage(Long telecon_entry_id, String image_name, String location, String clinical_diagnosis, Boolean lesions_appear, List<String> annotation, String predicted_cat) {
+    public DraftImage(String telecon_entry_id, String image_name, String location, String clinical_diagnosis, Boolean lesions_appear, List<String> annotation, String predicted_cat) {
         this.telecon_entry_id = telecon_entry_id;
         this.image_name = image_name;
         this.location = location;
@@ -27,11 +27,11 @@ public class DraftImage {
         this.predicted_cat = predicted_cat;
     }
 
-    public Long getTelecon_entry_id() {
+    public String getTelecon_entry_id() {
         return telecon_entry_id;
     }
 
-    public void setTelecon_entry_id(Long telecon_entry_id) {
+    public void setTelecon_entry_id(String telecon_entry_id) {
         this.telecon_entry_id = telecon_entry_id;
     }
 

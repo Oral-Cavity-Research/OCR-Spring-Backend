@@ -10,11 +10,11 @@ public class Option {
     @Id
     private String id;
     private String name;
-    private List<String> option;
+    private List<String> options;
 
-    public Option(String name, List<String> option) {
+    public Option(String name, List<String> options) {
         this.name = name;
-        this.option = option;
+        this.options = options;
     }
 
     public String getName() {
@@ -25,19 +25,19 @@ public class Option {
         this.name = name;
     }
 
-    public List<String> getOption() {
-        return option;
+    public List<String> getoptions() {
+        return options;
     }
 
-    public void setOption(List<String> option) {
-        this.option = option;
+    public void setoptions(List<String> options) {
+        this.options = options;
     }
 
     @Override
     public String toString() {
-        return "Option{" +
+        return "options{" +
                 "name='" + name + '\'' +
-                ", option=" + option +
+                ", options=" + options +
                 '}';
     }
 }

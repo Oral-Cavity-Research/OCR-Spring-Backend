@@ -9,9 +9,9 @@ import java.util.List;
 @Document(collection = "draftentries")
 public class DraftEntry {
     @Id
-    private Long id;
-    private Long patient_id;
-    private Long clinician_id;
+    private String id;
+    private String patient_id;
+    private String clinician_id;
     private String complaint;
     private LocalDateTime start_time;
     private LocalDateTime end_time;
@@ -19,7 +19,7 @@ public class DraftEntry {
     private List<String> current_habits;
     private boolean updated;
 
-    public DraftEntry(Long patient_id, Long clinician_id, String complaint, LocalDateTime start_time, LocalDateTime end_time, String findings, List<String> current_habits, boolean updated) {
+    public DraftEntry(String patient_id, String clinician_id, String complaint, LocalDateTime start_time, LocalDateTime end_time, String findings, List<String> current_habits, boolean updated) {
         this.patient_id = patient_id;
         this.clinician_id = clinician_id;
         this.complaint = complaint;
@@ -30,19 +30,19 @@ public class DraftEntry {
         this.updated = updated;
     }
 
-    public Long getPatient_id() {
+    public String getPatient_id() {
         return patient_id;
     }
 
-    public void setPatient_id(Long patient_id) {
+    public void setPatient_id(String patient_id) {
         this.patient_id = patient_id;
     }
 
-    public Long getClinician_id() {
+    public String getClinician_id() {
         return clinician_id;
     }
 
-    public void setClinician_id(Long clinician_id) {
+    public void setClinician_id(String clinician_id) {
         this.clinician_id = clinician_id;
     }
 

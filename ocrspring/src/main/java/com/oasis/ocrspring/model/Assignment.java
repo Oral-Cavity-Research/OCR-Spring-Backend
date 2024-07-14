@@ -3,35 +3,35 @@ package com.oasis.ocrspring.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "assigments")
+@Document(collection = "assignments")
 public class Assignment {
     @Id
-    private Long id;
-    private Long reviewer_id;
-    private Long telecon_entry;
+    private String id;
+    private String reviewer_id;
+    private String telecon_entry;
     private Boolean checked;
     private Boolean reviewed;
 
-    public Assignment(Long reviewer_id, Long telecon_entry, Boolean checked, Boolean reviewed) {
+    public Assignment(String reviewer_id, String telecon_entry, Boolean checked, Boolean reviewed) {
         this.reviewer_id = reviewer_id;
         this.telecon_entry = telecon_entry;
         this.checked = checked;
         this.reviewed = reviewed;
     }
 
-    public Long getReviewer_id() {
+    public String getReviewer_id() {
         return reviewer_id;
     }
 
-    public void setReviewer_id(Long reviewer_id) {
+    public void setReviewer_id(String reviewer_id) {
         this.reviewer_id = reviewer_id;
     }
 
-    public Long getTelecon_entry() {
+    public String getTelecon_entry() {
         return telecon_entry;
     }
 
-    public void setTelecon_entry(Long telecon_entry) {
+    public void setTelecon_entry(String telecon_entry) {
         this.telecon_entry = telecon_entry;
     }
 
