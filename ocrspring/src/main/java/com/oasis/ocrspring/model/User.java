@@ -1,38 +1,46 @@
 package com.oasis.ocrspring.model;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection ="users")
+@Document(collection = "users")
 public class User {
+
+    @Id
+    private String id; // ObjectId field
+
     private String username;
     private String email;
-    private String regNo;
+    private String reg_no; // Updated variable name
     private String hospital;
     private String designation;
-    private String contactNo;
+    private String contact_no;
     private String password;
     private boolean availability;
     private String role;
 
-
-
+    // Default constructor
     public User() {
     }
 
-    public User(String username, String email, String regNo, String hospital, String designation, String contactNo, String password, boolean availability, String role) {
+    // Constructor with parameters
+    public User( String username, String email, String reg_no, String hospital, String designation, String contact_no, String password, boolean availability, String role) {
+
         this.username = username;
         this.email = email;
-        this.regNo = regNo;
+        this.reg_no = reg_no; // Updated variable name
         this.hospital = hospital;
         this.designation = designation;
-        this.contactNo = contactNo;
+        this.contact_no = contact_no;
         this.password = password;
         this.availability = availability;
         this.role = role;
     }
 
-    public String getUsername() {
+    // Getters and setters
 
+
+    public String getUsername() {
         return username;
     }
 
@@ -48,12 +56,12 @@ public class User {
         this.email = email;
     }
 
-    public String getRegNo() {
-        return regNo;
+    public String getReg_no() { // Updated method name
+        return reg_no;
     }
 
-    public void setRegNo(String regNo) {
-        this.regNo = regNo;
+    public void setReg_no(String reg_no) { // Updated method name
+        this.reg_no = reg_no;
     }
 
     public String getHospital() {
@@ -72,12 +80,12 @@ public class User {
         this.designation = designation;
     }
 
-    public String getContactNo() {
-        return contactNo;
+    public String getcontact_no() {
+        return contact_no;
     }
 
-    public void setContactNo(String contactNo) {
-        this.contactNo = contactNo;
+    public void setcontact_no(String contact_no) {
+        this.contact_no = contact_no;
     }
 
     public String getPassword() {
@@ -106,13 +114,14 @@ public class User {
 
     @Override
     public String toString() {
-        return "userDetails{" +
-                "username='" + username + '\'' +
+        return "User{" +
+                "id='" + id + '\'' +
+                ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
-                ", regNo='" + regNo + '\'' +
+                ", reg_no='" + reg_no + '\'' + // Updated variable name
                 ", hospital='" + hospital + '\'' +
                 ", designation='" + designation + '\'' +
-                ", contactNo='" + contactNo + '\'' +
+                ", contact_no='" + contact_no + '\'' +
                 ", password='" + password + '\'' +
                 ", availability=" + availability +
                 ", role='" + role + '\'' +
