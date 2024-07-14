@@ -65,12 +65,12 @@ public class Controller {
         return userservice.AllUserDetails();
 
     }
-    @GetMapping("/allPatientDetails")
-    public List<Patient> AllPatientDetails(){
-
-        System.out.println("Get all user details");
-        return patientService.AllPatientDetails();
-    }
+//    @GetMapping("/allPatientDetails")
+//    public List<Patient> AllPatientDetails(){
+//
+//        System.out.println("Get all user details");
+//        return patientService.AllPatientDetails();
+//    }
     @GetMapping("/allRoleDetails")
     public List<Role> AllRoleDetails(){
 
