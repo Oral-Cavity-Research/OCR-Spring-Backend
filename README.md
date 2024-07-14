@@ -15,11 +15,14 @@ https://www.figma.com/design/ULY00JogEgJQoOlaJPKouz/OASIS-Teledentistry?node-id=
 <img src="https://github.com/user-attachments/assets/05753e11-7927-4aa5-b64c-cb0fe4ca310f" width="300" />
 <img src="https://github.com/user-attachments/assets/8f4cd4d7-610a-4eb8-83d1-b3ee0b28a2d8" width="300" />
 <img src="https://github.com/user-attachments/assets/95c722a4-87a4-423c-ba7c-a8b3e1c6ecab" width="300" />
-<img src="https://github.com/user-attachments/assets/700212e9-8b4b-4613-8734-e38584352353" width="300" />
 <img src="https://github.com/user-attachments/assets/101dca3f-382f-4eac-8135-cdca67cfb9b4" width="300" />
 <img src="https://github.com/user-attachments/assets/39b060b0-e568-4ea8-bb90-8c50af8f57b1" width="300" />
 <img src="https://github.com/user-attachments/assets/671da8b5-1be6-4849-bf66-6b5899f37b73" width="300" />
 <img src="https://github.com/user-attachments/assets/62104368-ceb9-416e-b631-48b29ee6d58a" width="300" />
+<img src="https://github.com/user-attachments/assets/1338830f-9c03-4adc-a480-dbb96b2925cd" width="300" />
+<img src="https://github.com/user-attachments/assets/f50c42b0-d6d2-4195-8ba7-8da2e9039e32" width="300" />
+
+
 
 
 
