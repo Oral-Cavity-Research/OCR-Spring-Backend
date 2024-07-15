@@ -13,6 +13,7 @@ public class Image {
     public String updateImage() {
         // update image
         return "/api/image/update";
+
     }
 
 
