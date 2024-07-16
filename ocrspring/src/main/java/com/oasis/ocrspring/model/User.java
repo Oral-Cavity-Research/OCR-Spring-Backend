@@ -2,6 +2,7 @@ package com.oasis.ocrspring.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "users")
 public class User {
@@ -11,7 +12,8 @@ public class User {
 
     private String username;
     private String email;
-    private String reg_no; // Updated variable name
+    @Field("reg_no")
+    private String regNo; // Updated variable name
     private String hospital;
     private String designation;
     private String contact_no;
@@ -24,11 +26,11 @@ public class User {
     }
 
     // Constructor with parameters
-    public User( String username, String email, String reg_no, String hospital, String designation, String contact_no, String password, boolean availability, String role) {
+    public User( String username, String email, String regNo, String hospital, String designation, String contact_no, String password, boolean availability, String role) {
 
         this.username = username;
         this.email = email;
-        this.reg_no = reg_no; // Updated variable name
+        this.regNo = regNo; // Updated variable name
         this.hospital = hospital;
         this.designation = designation;
         this.contact_no = contact_no;
@@ -56,12 +58,12 @@ public class User {
         this.email = email;
     }
 
-    public String getReg_no() { // Updated method name
-        return reg_no;
+    public String getRegNo() { // Updated method name
+        return regNo;
     }
 
-    public void setReg_no(String reg_no) { // Updated method name
-        this.reg_no = reg_no;
+    public void setRegNo(String regNo) { // Updated method name
+        this.regNo = regNo;
     }
 
     public String getHospital() {
@@ -118,7 +120,7 @@ public class User {
                 "id='" + id + '\'' +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
-                ", reg_no='" + reg_no + '\'' + // Updated variable name
+                ", regNo='" + regNo + '\'' + // Updated variable name
                 ", hospital='" + hospital + '\'' +
                 ", designation='" + designation + '\'' +
                 ", contact_no='" + contact_no + '\'' +
