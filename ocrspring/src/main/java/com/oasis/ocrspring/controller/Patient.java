@@ -7,12 +7,15 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/user/patient/")
 public class Patient {
     @Autowired
     private PatientService patientService;
+
 
 
     @ApiIgnore
@@ -30,9 +33,12 @@ public class Patient {
 
     //get all patients
     @GetMapping("/get")
-    public String getPatient(){
-        return "/api/user/patient/get";
+    public List<com.oasis.ocrspring.model.Patient> getPatient(){
+
+
+        return patientService.AllPatientDetails();
     }
+
 
     //check if a patient exists
     @GetMapping("/check/{id}")
@@ -43,9 +49,9 @@ public class Patient {
 
     //get one id
     @GetMapping("/{id}")
-    public String getPatientById(long id){
+    public com.oasis.ocrspring.model.Patient getPatientById(String id){
         //print patient id
-        return "/api/user/patient/"+ id;
+        return patientService.getPatientById(id);
     }
 
     //get one shared id

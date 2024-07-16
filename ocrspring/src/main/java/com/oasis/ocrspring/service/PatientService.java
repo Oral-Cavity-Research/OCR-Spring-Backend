@@ -19,4 +19,8 @@ public class PatientService {
 
         return PatientRepo.save(patient);
     }
+
+    public Patient getPatientById(String id){
+        return PatientRepo.findById(id).orElse(null);
+    }
 }

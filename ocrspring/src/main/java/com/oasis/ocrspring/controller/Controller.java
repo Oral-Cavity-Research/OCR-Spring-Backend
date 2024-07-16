@@ -22,9 +22,9 @@ import java.util.List;
 public class Controller {
     @Autowired
     private userService userservice;
+//    @Autowired
+//    private PatientService patientService;
     @Autowired
-    private PatientService patientService;
-    @Autowired                                  
     private RoleService roleService;
     @Autowired
     private RequestService requestService;
@@ -111,11 +111,11 @@ public class Controller {
         return optionService.AllOptionDetails();
     }
 
-    @GetMapping("/allImageDetails")
-    public List<Image> AllImageDetails() {
-
-        return imageService.AllImageDetails();
-    }
+//    @GetMapping("/allImageDetails")
+//    public List<Image> AllImageDetails() {
+//
+//        return imageService.AllImageDetails();
+//    }
     @GetMapping("/allHospitalDetails")
     public List<Hospital> AllHospitalDetails() {
 
