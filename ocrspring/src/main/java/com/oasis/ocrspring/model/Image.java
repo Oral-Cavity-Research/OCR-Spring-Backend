@@ -17,6 +17,7 @@ public class Image {
     private List<String> annotation;
     private String predicted_cat;
 
+    public Image(){}
     public Image(String telecon_entry_id, String image_name, String location, String clinical_diagnosis, Boolean lesions_appear, List<String> annotation, String predicted_cat) {
         this.telecon_entry_id = telecon_entry_id;
         this.image_name = image_name;

@@ -85,6 +85,8 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+					<source>17</source>
+					<target>17</target>
 				</configuration>
 			</plugin>
 		</plugins>

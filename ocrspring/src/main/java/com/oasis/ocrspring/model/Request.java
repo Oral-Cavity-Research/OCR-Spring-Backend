@@ -2,6 +2,7 @@ package com.oasis.ocrspring.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "requests")
 public class Request {
@@ -9,16 +10,17 @@ public class Request {
     private String id;
     private String username;
     private String email;
-    private String reg_no;
+    @Field("reg_no")
+    private String regNo;
     private String hospital;
     private String designation;
     private String contact_no;
 
-    public Request( String username, String email, String reg_no, String hospital, String designation, String contact_no) {
+    public Request( String username, String email, String regNo, String hospital, String designation, String contact_no) {
 
         this.username = username;
         this.email = email;
-        this.reg_no = reg_no;
+        this.regNo = regNo;
         this.hospital = hospital;
         this.designation = designation;
         this.contact_no = contact_no;
@@ -50,12 +52,12 @@ public class Request {
         this.email = email;
     }
 
-    public String getReg_no() {
-        return reg_no;
+    public String getRegNo() {
+        return regNo;
     }
 
-    public void setReg_no(String reg_no) {
-        this.reg_no = reg_no;
+    public void setRegNo(String regNo) {
+        this.regNo = regNo;
     }
 
     public String getHospital() {
@@ -79,7 +81,7 @@ public class Request {
         return "Request{" +
                 "username='" + username + '\'' +
                 ", email='" + email + '\'' +
-                ", reg_no='" + reg_no + '\'' +
+                ", regNo='" + regNo + '\'' +
                 ", hospital='" + hospital + '\'' +
                 ", designation='" + designation + '\'' +
                 '}';
