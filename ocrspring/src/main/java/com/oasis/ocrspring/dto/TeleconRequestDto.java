@@ -1,14 +1,14 @@
-package com.oasis.ocrspring.model;
+package com.oasis.ocrspring.dto;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
-
-@Document(collection="images")
-public class Image {
-    @Id
-    private String id;
+//@Data
+//@AllArgsConstructor
+//@NoArgsConstructor
+public class TeleconRequestDto {
     private String telecon_entry_id;
     private String image_name;
     private String location;
@@ -17,16 +17,6 @@ public class Image {
     private List<String> annotation;
     private String predicted_cat;
 
-    public Image(){}
-    public Image(String telecon_entry_id, String image_name, String location, String clinical_diagnosis, Boolean lesions_appear, List<String> annotation, String predicted_cat) {
-        this.telecon_entry_id = telecon_entry_id;
-        this.image_name = image_name;
-        this.location = location;
-        this.clinical_diagnosis = clinical_diagnosis;
-        this.lesions_appear = lesions_appear;
-        this.annotation = annotation;
-        this.predicted_cat = predicted_cat;
-    }
 
     public String getTelecon_entry_id() {
         return telecon_entry_id;
@@ -82,22 +72,5 @@ public class Image {
 
     public void setPredicted_cat(String predicted_cat) {
         this.predicted_cat = predicted_cat;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public String toString() {
-        return "Image{" +
-                "telecon_entry_id=" + telecon_entry_id +
-                ", image_name='" + image_name + '\'' +
-                ", location='" + location + '\'' +
-                ", clinical_diagnosis='" + clinical_diagnosis + '\'' +
-                ", lesions_appear=" + lesions_appear +
-                ", annotation=" + annotation +
-                ", predicted_cat='" + predicted_cat + '\'' +
-                '}';
     }
 }
