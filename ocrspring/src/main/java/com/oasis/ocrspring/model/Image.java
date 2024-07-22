@@ -1,8 +1,16 @@
 package com.oasis.ocrspring.model;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Document(collection="images")
@@ -16,8 +24,13 @@ public class Image {
     private Boolean lesions_appear;
     private List<String> annotation;
     private String predicted_cat;
+    private String createdAt;
+
+    private String updatedAt;
 
     public Image(){}
+
+
     public Image(String telecon_entry_id, String image_name, String location, String clinical_diagnosis, Boolean lesions_appear, List<String> annotation, String predicted_cat) {
         this.telecon_entry_id = telecon_entry_id;
         this.image_name = image_name;
@@ -27,6 +40,16 @@ public class Image {
         this.annotation = annotation;
         this.predicted_cat = predicted_cat;
     }
+//    @PrePersist
+//    public void onCreate(){
+//        String now = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
+//        this.createdAt = now;
+//        this.updatedAt = now;
+//    }
+//    @PreUpdate
+//    public void onUpdate(){
+//        this.updatedAt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
+//    }
 
     public String getTelecon_entry_id() {
         return telecon_entry_id;
@@ -84,16 +107,38 @@ public class Image {
         this.predicted_cat = predicted_cat;
     }
 
+    public String getId() {
+        return id;
+    }
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     @Override
     public String toString() {
         return "Image{" +
-                "telecon_entry_id=" + telecon_entry_id +
+                "id='" + id + '\'' +
+                ", telecon_entry_id='" + telecon_entry_id + '\'' +
                 ", image_name='" + image_name + '\'' +
                 ", location='" + location + '\'' +
                 ", clinical_diagnosis='" + clinical_diagnosis + '\'' +
                 ", lesions_appear=" + lesions_appear +
                 ", annotation=" + annotation +
                 ", predicted_cat='" + predicted_cat + '\'' +
+                ", createdAt='" + createdAt + '\'' +
+                ", updatedAt='" + updatedAt + '\'' +
                 '}';
     }
 }
