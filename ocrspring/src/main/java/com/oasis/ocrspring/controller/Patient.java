@@ -34,37 +34,38 @@ public class Patient {
     //get all patients
     @GetMapping("/get")
     public List<com.oasis.ocrspring.model.Patient> getPatient(){
-
-
+        //todo : should add user id and his authentication checking
         return patientService.AllPatientDetails();
     }
 
 
     //check if a patient exists
     @GetMapping("/check/{id}")
-    public String checkPatient(long id){
-        //print patient id
-        return "/api/user/patient/check/"+ id;
+    public boolean checkPatient(String id){
+        //todo : should add user id and his authentication checking
+        return patientService.isexist(id);
     }
 
     //get one id
     @GetMapping("/{id}")
     public com.oasis.ocrspring.model.Patient getPatientById(String id){
-        //print patient id
+        //todo : should add user id and his authentication checking
         return patientService.getPatientById(id);
     }
 
     //get one shared id
     //id is patient id
     @GetMapping("/shared/{id}")
-    public String getSharedPatient(long id){
+    public String getSharedPatient(String id, @RequestHeader String review_id){
+
         //print patient id
-        return "/api/user/patient/shared/"+ id;
+        return "/api/user/patient/shared/"+ id + review_id;
     }
 
     //get available reviewers
     @GetMapping("/reviewer/all")
     public String getReviewers(){
+        //todo : should add user id and his authentication checking
         return "/api/user/patient/reviewer/all";
     }
 
