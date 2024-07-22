@@ -66,6 +66,7 @@ public class Patient {
     @GetMapping("/reviewer/all")
     public String getReviewers(){
         //todo : should add user id and his authentication checking
+        //todo : should complete role service
         return "/api/user/patient/reviewer/all";
     }
 

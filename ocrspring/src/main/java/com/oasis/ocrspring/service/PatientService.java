@@ -2,9 +2,11 @@ package com.oasis.ocrspring.service;
 
 import com.oasis.ocrspring.model.Patient;
 import com.oasis.ocrspring.model.TeleconEntry;
+import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.repository.PatientRepository;
 import com.oasis.ocrspring.repository.ReviewRepository;
 import com.oasis.ocrspring.repository.TeleconEntriesRepository;
+import com.oasis.ocrspring.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,9 @@ public class PatientService {
 
     @Autowired
     private TeleconEntriesRepository TeleconEntriesRepo;
+
+    @Autowired
+    private UserRepository UserRepo;
 
     public List<Patient> AllPatientDetails(){
 
@@ -47,4 +52,22 @@ public class PatientService {
             return null;
         }
     }
+
+//    public List<User> getReviewer(String id){
+//        Optional<TeleconEntry> entry = TeleconEntriesRepo.findByPatientIn(id);
+//        List<User> reviewers = null;
+//        if (entry.isPresent()) {
+//            for (String reviewerId : entry.get().getReviewers()) {
+//                Optional<User> reviewer = UserRepo.findById(reviewerId);
+//                if (reviewer.isPresent()) {
+//                    reviewers.add(reviewer.get());
+//                }
+//            }
+//            return reviewers;
+//        }
+//        else {
+//            return null;
+//        }
+//    }
+
 }
