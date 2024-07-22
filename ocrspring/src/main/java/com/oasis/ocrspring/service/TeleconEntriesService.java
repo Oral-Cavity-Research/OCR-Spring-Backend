@@ -17,4 +17,11 @@ public class TeleconEntriesService {
 
         return TeleconEntriesRepo.findAll();
     }
+    public TeleconEntry findByID(String id){
+        return TeleconEntriesRepo.findById(id).orElse(null);
+    }
+    public void save(TeleconEntry teleconEntry){
+        TeleconEntriesRepo.save(teleconEntry);
+    }
 }
+
