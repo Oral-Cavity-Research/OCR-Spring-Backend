@@ -56,10 +56,10 @@ public class Patient {
     //get one shared id
     //id is patient id
     @GetMapping("/shared/{id}")
-    public String getSharedPatient(String id, @RequestHeader String review_id){
+    public com.oasis.ocrspring.model.Patient getSharedPatient(String id, @RequestHeader String review_id){
 
         //print patient id
-        return "/api/user/patient/shared/"+ id + review_id;
+        return patientService.sharedPatient(id, review_id);
     }
 
     //get available reviewers

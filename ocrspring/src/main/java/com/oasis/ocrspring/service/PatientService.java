@@ -1,6 +1,7 @@
 package com.oasis.ocrspring.service;
 
 import com.oasis.ocrspring.model.Patient;
+import com.oasis.ocrspring.model.TeleconEntry;
 import com.oasis.ocrspring.repository.PatientRepository;
 import com.oasis.ocrspring.repository.ReviewRepository;
 import com.oasis.ocrspring.repository.TeleconEntriesRepository;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PatientService {
@@ -35,7 +37,14 @@ public class PatientService {
     }
 
     public Patient sharedPatient(String id, String review_id){
+        Optional<TeleconEntry> entry = TeleconEntriesRepo.findByPatientAndReviewersIn(id, review_id);
+        Optional<Patient> patient = PatientRepo.findById(id);
 
-        return PatientRepo.findById(id).orElse(null);
+        if (entry.isPresent() && patient.isPresent()) {
+            return patient.get();
+        }
+        else {
+            return null;
+        }
     }
 }
