@@ -12,8 +12,11 @@ import java.util.List;
 public class HospitalService {
     @Autowired
     private HospitalRepository hospitalRepo;
+    @Autowired
+    private HospitalRepository hospitalReop;
     public List<Hospital> AllHospitalDetails(){
-        System.out.println("appeared in service layer");
+
         return hospitalRepo.findAll();
     }
+
 }
