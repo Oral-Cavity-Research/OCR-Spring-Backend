@@ -20,6 +20,8 @@ public class User {
     private String password;
     private boolean availability;
     private String role;
+    private String createdAt;
+    private String updatedAt;
 
     // Default constructor
     public User() {
@@ -41,6 +43,34 @@ public class User {
 
     // Getters and setters
 
+
+    public String getId() {
+        return id;
+    }
+
+    public String getContact_no() {
+        return contact_no;
+    }
+
+    public void setContact_no(String contact_no) {
+        this.contact_no = contact_no;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 
     public String getUsername() {
         return username;
