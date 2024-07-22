@@ -44,4 +44,8 @@ public class userService {
         return "Request is sent successfully. You will receive an Email on acceptance";
 
     }
+    public Optional<User> getUserById(String id){
+
+        return UserRepo.findById(id);
+    }
 }
