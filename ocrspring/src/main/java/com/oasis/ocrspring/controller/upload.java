@@ -1,15 +1,19 @@
 package com.oasis.ocrspring.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.oasis.ocrspring.dto.ReportsRequestDto;
 import com.oasis.ocrspring.dto.TeleconRequestDto;
+import com.oasis.ocrspring.dto.UploadReportResponse;
 import com.oasis.ocrspring.repository.ImageRepository;
 import com.oasis.ocrspring.repository.PatientRepository;
 import com.oasis.ocrspring.repository.ReportRepository;
 import com.oasis.ocrspring.repository.TeleconEntriesRepository;
 import com.oasis.ocrspring.service.ImageService;
+import com.oasis.ocrspring.service.ReportService;
 import com.oasis.ocrspring.service.TeleconEntriesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,6 +40,8 @@ public class upload {
     private ImageService imageService;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private ReportService reportServ;
 
     @PostMapping(value = "/images/{id}")
 //    @PreAuthorize("hasAuthority('ROLE_USER)")
@@ -49,10 +55,16 @@ public class upload {
         return ResponseEntity.status(HttpStatus.OK).body(imageService.uploadFiles(files));
     }
 
-        @PostMapping("/reports/{id}")
-    public String uploadReports(@PathVariable String id,@RequestBody String data) {
-        return "/api/user/upload/reports/" + id;
+    @PostMapping(value = "/reports/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UploadReportResponse> uploadReports(@PathVariable String id,
+                                                              @RequestPart("data") ReportsRequestDto data,
+                                                              @RequestPart("files") List<MultipartFile> files ) {
+
+        return reportServ.uploadReports(data,id,files);
     }
+//    public ResponseEntity<?> uploadReportFiles(@RequestParam MultipartFile files){
+//        return ResponseEntity.status(HttpStatus.OK).body(reportServ.uploadReports(files));
+//    }
 
     @PostMapping("/patient")
     public String addConsentForm() {

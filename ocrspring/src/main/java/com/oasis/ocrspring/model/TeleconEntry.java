@@ -30,6 +30,7 @@ public class TeleconEntry {
     private LocalDateTime createdAt;
     @LastModifiedDate
     private LocalDateTime updatedAt;
+    public TeleconEntry(){}
 
     public TeleconEntry( String patient, String clinician_id, String complaint, LocalDateTime start_time, LocalDateTime end_time, String findings, List<String> current_habits, boolean updated, List<String> reviewers, List<String> reviews, List<String> images, List<String> reports, LocalDateTime createdAt, LocalDateTime updatedAt) {
 
