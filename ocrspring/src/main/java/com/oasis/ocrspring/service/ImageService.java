@@ -1,6 +1,8 @@
 package com.oasis.ocrspring.service;
 
+import com.oasis.ocrspring.dto.ImageRequestDto;
 import com.oasis.ocrspring.dto.TeleconRequestDto;
+import com.oasis.ocrspring.dto.UploadImageResponse;
 import com.oasis.ocrspring.model.Image;
 import com.oasis.ocrspring.model.TeleconEntry;
 import com.oasis.ocrspring.repository.ImageRepository;
@@ -37,50 +39,89 @@ public class ImageService {
     }
 
 
-    public ResponseEntity<?> uploadImages(TeleconRequestDto data, String id) throws IOException {
+    public ResponseEntity<UploadImageResponse> uploadImages(ImageRequestDto data,
+                                                            String id,
+                                                            List<MultipartFile> files) throws IOException {
+        List<Image> uploadedImages = new ArrayList<>();
+        List<String> ImageIds = new ArrayList<>();
+        List<String> ImageURIs = new ArrayList<>();
         try{
             TeleconEntry teleconEntry  = teleconServices.findByID(id);
             if(teleconEntry != null && teleconEntry.getClinician_id().equals(getAuthenticatedUser())) {
-                System.out.println(id);
 
-                List<Image> uploadedImages = new ArrayList<>();
-                    //create new Image object for each file and copy the image data
-                    try {
 
-                        Image image = new Image();
-                        image.setTelecon_entry_id(data.getTelecon_entry_id());
-                        image.setImage_name(data.getImage_name());
-                        image.setLocation(data.getLocation());
-                        image.setClinical_diagnosis(data.getClinical_diagnosis());
-                        image.setLesions_appear(data.getLesions_appear());
-                        image.setAnnotation(data.getAnnotation());
-                        image.setPredicted_cat(data.getPredicted_cat());
-                        image.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-                        image.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+                try {
+                    for(MultipartFile file:files){
+                        //Save the image
+                        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+                        try {
+                            Path path = Paths.get(uploadDir + File.separator + fileName);
+                            if (!Files.exists(path)) {
+                                Files.createDirectories(path);
+                            }
+                            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+                            //useful for creating uri to check the report
+                            String fileDownUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                                    .path("/files")
+                                    .path(fileName)
+                                    .toUriString();
+                            ImageURIs.add(fileDownUri);
+                            //How the Naming convension of the files work
 
-                        //save images to database
-                        imageRepo.save(image);
-                        uploadedImages.add(image);
+
+                            //create new Image object for each file and copy the image data
+                            Image image = new Image();
+                            image.setTelecon_entry_id(data.getTeleconId());
+                            image.setImage_name(data.getImage_name());
+                            image.setLocation(data.getLocation());
+                            image.setClinical_diagnosis(data.getClinical_diagnosis());
+                            image.setLesions_appear(data.getLesions_appear());
+                            image.setAnnotation(data.getAnnotation());
+                            image.setPredicted_cat(data.getPredicted_cat());
+                            image.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+                            image.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+
+                            //save images to database
+                            imageRepo.save(image);
+                            ImageIds.add(image.getId());//Image ID list
+                            uploadedImages.add(image);//Image Model list
+
+                        }catch (Exception e){
+                            return ResponseEntity.status(500).body(new UploadImageResponse(uploadedImages
+                                    ,"Internal Server Error")); //Unable to save the file
+                        }
+                    }
+                    ImageIds = uploadedImages.stream().map(Image :: getId).toList();
+                    List<String> existedImageIds = teleconEntry.getImages();
+                    if(existedImageIds.isEmpty()){
+                        existedImageIds = new ArrayList<>();
+                    }
+
+                    existedImageIds.addAll(ImageIds);
+                    teleconEntry.setImages(existedImageIds);
+                    teleconEntry.setUpdatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
+
                     }catch(Exception e){
                         throw new RuntimeException("Failed to store file");
                     }
                 // Extract image IDs and add them to the teleconEntry
                 List<String> imageIds = uploadedImages.stream().map(Image::getId).toList();
                 teleconEntry.getImages().addAll(imageIds);
-
                 teleconServices.save(teleconEntry);
-                return ResponseEntity.status(200).body("Images Uploaded Successfully");
+
+                return ResponseEntity.status(200).body(new UploadImageResponse(uploadedImages,"Images Uploaded Successfully"));
+
             }else if(teleconEntry == null){
-                return ResponseEntity.status(404).body("Entry Not Found");
+                return ResponseEntity.status(404).body(new UploadImageResponse(null,"Entry Not Found"));
                 //throw new Exception("Entry Not found");
 
             }else{
-                return ResponseEntity.status(401).body("Unauthorized Access");
+                return ResponseEntity.status(401).body(new UploadImageResponse(null,"Unauthorized Access"));
             }
         }catch(Exception e){
             //return null;
             //throw new Exception("Internal Server Error",e);
-            return ResponseEntity.status(500).body("Internal Server Error");
+            return ResponseEntity.status(500).body(new UploadImageResponse(null,"Internal Server Error"));
         }
 
     }

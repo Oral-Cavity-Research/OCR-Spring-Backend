@@ -77,8 +77,16 @@ public class ReportService {
                     }
 
             }
+                //to make sure not to overwritten on the existing IDs
                 List<String> reportIds = uploadedReports.stream().map(Report :: getId).toList();
-                teleconEntry.setReports(reportIds);
+                List<String> existedReportIds = teleconEntry.getReports();
+                if(existedReportIds.isEmpty()){
+                    existedReportIds = new ArrayList<>();
+                }
+                //reportIds.addAll(existedReportIds);
+                existedReportIds.addAll(reportIds);
+                teleconEntry.setReports(existedReportIds);
+                teleconEntry.setUpdatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
                 teleconServ.save(teleconEntry);
 
                 return ResponseEntity.status(200).body(new UploadReportResponse(uploadedReports, "Reports Uploaded Successfully"));

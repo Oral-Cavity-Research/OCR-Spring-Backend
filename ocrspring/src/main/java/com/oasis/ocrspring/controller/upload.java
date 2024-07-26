@@ -1,6 +1,7 @@
 package com.oasis.ocrspring.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.oasis.ocrspring.dto.ImageRequestDto;
 import com.oasis.ocrspring.dto.ReportsRequestDto;
 import com.oasis.ocrspring.dto.TeleconRequestDto;
 import com.oasis.ocrspring.dto.UploadReportResponse;
@@ -47,8 +48,9 @@ public class upload {
 //    @PreAuthorize("hasAuthority('ROLE_USER)")
     public ResponseEntity<?> uploadImages(
             @PathVariable String id,
-            @RequestBody TeleconRequestDto data) throws IOException {
-        return imageService.uploadImages(data, id);
+            @RequestPart("data") ImageRequestDto data,
+            @RequestPart("files") List<MultipartFile> files) throws IOException {
+        return imageService.uploadImages(data, id,files);
     }
     @PostMapping("/files")
     public ResponseEntity<?> uploadFiles(@RequestParam("files") List<MultipartFile> files) throws  IOException{
@@ -62,9 +64,6 @@ public class upload {
 
         return reportServ.uploadReports(data,id,files);
     }
-//    public ResponseEntity<?> uploadReportFiles(@RequestParam MultipartFile files){
-//        return ResponseEntity.status(HttpStatus.OK).body(reportServ.uploadReports(files));
-//    }
 
     @PostMapping("/patient")
     public String addConsentForm() {
