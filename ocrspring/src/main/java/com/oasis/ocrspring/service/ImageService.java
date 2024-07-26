@@ -45,13 +45,11 @@ public class ImageService {
         List<Image> uploadedImages = new ArrayList<>();
         List<String> ImageIds = new ArrayList<>();
         List<String> ImageURIs = new ArrayList<>();
-        try{
-            TeleconEntry teleconEntry  = teleconServices.findByID(id);
-            if(teleconEntry != null && teleconEntry.getClinician_id().equals(getAuthenticatedUser())) {
-
-
+        try {
+            TeleconEntry teleconEntry = teleconServices.findByID(id);
+            if (teleconEntry != null && teleconEntry.getClinician_id().equals(getAuthenticatedUser())) {
                 try {
-                    for(MultipartFile file:files){
+                    for (MultipartFile file : files) {
                         //Save the image
                         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
                         try {
@@ -83,46 +81,45 @@ public class ImageService {
 
                             //save images to database
                             imageRepo.save(image);
-                            ImageIds.add(image.getId());//Image ID list
+                            //ImageIds.add(image.getId());//Image ID list
                             uploadedImages.add(image);//Image Model list
 
-                        }catch (Exception e){
-                            return ResponseEntity.status(500).body(new UploadImageResponse(uploadedImages
-                                    ,"Internal Server Error")); //Unable to save the file
+                        } catch (Exception e) {//1st
+                            return ResponseEntity.status(500).body(new UploadImageResponse(null
+                                    , "Internal Server Error")); //Unable to save the file
                         }
                     }
-                    ImageIds = uploadedImages.stream().map(Image :: getId).toList();
+                    // Extract image IDs and add them to the teleconEntry
+                    List<String> imageIds = uploadedImages.stream().map(Image::getId).toList();
                     List<String> existedImageIds = teleconEntry.getImages();
-                    if(existedImageIds.isEmpty()){
+                    if (existedImageIds.isEmpty()) {
                         existedImageIds = new ArrayList<>();
                     }
 
-                    existedImageIds.addAll(ImageIds);
+                    existedImageIds.addAll(imageIds);
                     teleconEntry.setImages(existedImageIds);
                     teleconEntry.setUpdatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
+                    teleconServices.save(teleconEntry);
 
-                    }catch(Exception e){
-                        throw new RuntimeException("Failed to store file");
-                    }
-                // Extract image IDs and add them to the teleconEntry
-                List<String> imageIds = uploadedImages.stream().map(Image::getId).toList();
-                teleconEntry.getImages().addAll(imageIds);
-                teleconServices.save(teleconEntry);
+                    return ResponseEntity.status(200).body(new UploadImageResponse(uploadedImages, "Images Uploaded Successfully"));
 
-                return ResponseEntity.status(200).body(new UploadImageResponse(uploadedImages,"Images Uploaded Successfully"));
+                } catch (Exception e) {//2nd
+                    return ResponseEntity.status(404).body(new UploadImageResponse(null, "Internal Server Error"));
+                }
 
-            }else if(teleconEntry == null){
-                return ResponseEntity.status(404).body(new UploadImageResponse(null,"Entry Not Found"));
+            } else if (teleconEntry == null) {
+                return ResponseEntity.status(500).body(new UploadImageResponse(null, "Entry Not Found"));
                 //throw new Exception("Entry Not found");
 
-            }else{
-                return ResponseEntity.status(401).body(new UploadImageResponse(null,"Unauthorized Access"));
+            } else {
+                return ResponseEntity.status(401).body(new UploadImageResponse(null, "Unauthorized Access"));
             }
-        }catch(Exception e){
+        }catch(Exception e)
+            {
             //return null;
             //throw new Exception("Internal Server Error",e);
             return ResponseEntity.status(500).body(new UploadImageResponse(null,"Internal Server Error"));
-        }
+            }
 
     }
     private String getAuthenticatedUser(){
