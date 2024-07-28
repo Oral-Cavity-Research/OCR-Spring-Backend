@@ -10,4 +10,5 @@ public interface TeleconEntriesRepository extends MongoRepository<TeleconEntry,S
     Optional<TeleconEntry> findByPatientAndReviewersIn(String patient, String reviewerId);
 
     Optional<TeleconEntry> findByPatientIn(String patient);
+    Optional<TeleconEntry> findByPatientAndClinicianId(String patient,String clinicianId);
 }

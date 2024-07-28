@@ -1,15 +1,13 @@
 package com.oasis.ocrspring.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.oasis.ocrspring.dto.ImageRequestDto;
-import com.oasis.ocrspring.dto.ReportsRequestDto;
-import com.oasis.ocrspring.dto.TeleconRequestDto;
-import com.oasis.ocrspring.dto.UploadReportResponse;
+import com.oasis.ocrspring.dto.*;
 import com.oasis.ocrspring.repository.ImageRepository;
 import com.oasis.ocrspring.repository.PatientRepository;
 import com.oasis.ocrspring.repository.ReportRepository;
 import com.oasis.ocrspring.repository.TeleconEntriesRepository;
 import com.oasis.ocrspring.service.ImageService;
+import com.oasis.ocrspring.service.PatientService;
 import com.oasis.ocrspring.service.ReportService;
 import com.oasis.ocrspring.service.TeleconEntriesService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +41,8 @@ public class upload {
     private ObjectMapper objectMapper;
     @Autowired
     private ReportService reportServ;
+    @Autowired
+    private PatientService patientService;
 
     @PostMapping(value = "/images/{id}")
 //    @PreAuthorize("hasAuthority('ROLE_USER)")
@@ -66,8 +66,12 @@ public class upload {
     }
 
     @PostMapping("/patient")
-    public String addConsentForm() {
-        return "/api/user/upload/patient";
+    public ResponseEntity<?> addConsentForm(
+            @RequestHeader("_id") String id,
+            @RequestPart("data")ConsentRequestDto data,
+            @RequestPart("files") MultipartFile files
+            ) throws IOException {
+        return patientService.addPatient(id,data,files);
     }
 
 }

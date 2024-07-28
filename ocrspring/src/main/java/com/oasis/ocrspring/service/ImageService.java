@@ -47,7 +47,7 @@ public class ImageService {
         List<String> ImageURIs = new ArrayList<>();
         try {
             TeleconEntry teleconEntry = teleconServices.findByID(id);
-            if (teleconEntry != null && teleconEntry.getClinician_id().equals(getAuthenticatedUser())) {
+            if (teleconEntry != null && teleconEntry.getClinicianId().equals(getAuthenticatedUser())) {
                 try {
                     for (MultipartFile file : files) {
                         //Save the image

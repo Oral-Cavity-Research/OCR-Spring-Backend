@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,7 +16,8 @@ public class TeleconEntry {
     private String id; // MongoDB typically uses String for IDs
 
     private String patient;
-    private String clinician_id;
+    @Field("clinician_id")
+    private String clinicianId;
     private String complaint;
     private LocalDateTime start_time;
     private LocalDateTime end_time;
@@ -35,7 +37,7 @@ public class TeleconEntry {
     public TeleconEntry( String patient, String clinician_id, String complaint, LocalDateTime start_time, LocalDateTime end_time, String findings, List<String> current_habits, boolean updated, List<String> reviewers, List<String> reviews, List<String> images, List<String> reports, LocalDateTime createdAt, LocalDateTime updatedAt) {
 
         this.patient = patient;
-        this.clinician_id = clinician_id;
+        this.clinicianId = clinician_id;
         this.complaint = complaint;
         this.start_time = start_time;
         this.end_time = end_time;
@@ -60,12 +62,12 @@ public class TeleconEntry {
         this.patient = patient;
     }
 
-    public String getClinician_id() {
-        return clinician_id;
+    public String getClinicianId() {
+        return clinicianId;
     }
 
-    public void setClinician_id(String clinician_id) {
-        this.clinician_id = clinician_id;
+    public void setClinicianId(String clinician_id) {
+        this.clinicianId = clinician_id;
     }
 
     public String getComplaint() {
@@ -169,7 +171,7 @@ public class TeleconEntry {
         return "TeleconEntry{" +
                 "id='" + id + '\'' +
                 ", patient='" + patient + '\'' +
-                ", clinician_id='" + clinician_id + '\'' +
+                ", clinician_id='" + clinicianId + '\'' +
                 ", complaint='" + complaint + '\'' +
                 ", start_time=" + start_time +
                 ", end_time=" + end_time +

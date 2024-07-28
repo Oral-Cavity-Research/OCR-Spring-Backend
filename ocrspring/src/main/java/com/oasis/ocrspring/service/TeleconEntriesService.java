@@ -20,6 +20,10 @@ public class TeleconEntriesService {
     public TeleconEntry findByID(String id){
         return TeleconEntriesRepo.findById(id).orElse(null);
     }
+    public TeleconEntry findOne(String patient_id, String clinician_id){
+        TeleconEntry patient =  TeleconEntriesRepo.findByPatientAndClinicianId(patient_id,clinician_id).orElse(null);
+        return patient;
+    }
     public void save(TeleconEntry teleconEntry){
         TeleconEntriesRepo.save(teleconEntry);
     }
