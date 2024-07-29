@@ -95,10 +95,14 @@ public class userAuth {
 
         // return "/api/auth/verify";
     }
-    @PostMapping("/refreshToken")
-    public String refreshToken(){
-        return "/api/auth/refreshToken";
-    }
+//    @PostMapping("/refreshToken")
+//    public ResponseEntity<?> refreshToken(HttpServletRequest httpServletRequest){
+//        String token = tokenService.getTokenFromCookie(httpServletRequest);
+//        if(token==null){
+//
+//        }
+//
+//    }
     @PostMapping("revokeToken")
     public String revokeToken(){
         return "/api/auth/revokeToken";
