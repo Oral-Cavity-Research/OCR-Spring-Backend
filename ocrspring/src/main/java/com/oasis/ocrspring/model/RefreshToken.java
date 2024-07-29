@@ -2,10 +2,11 @@ package com.oasis.ocrspring.model;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDateTime;
+
 
 @Document(collection = "refreshtokens")
 public class RefreshToken {
@@ -13,16 +14,16 @@ public class RefreshToken {
     private String id;
     private String user;
     private String token;
-    private LocalDateTime expiresAt;
+    private String expiresAt;
     private String createdByIP;
-    @CreatedDate
-    private LocalDateTime createdAt;
-    private LocalDateTime revokedAt;
+
+    private String createdAt;
+    private String revokedAt;
     private String revokedByIP;
-    private String replacedByToken;
+    private String replacedByToken;//
 
 
-    public RefreshToken(String user, String token, LocalDateTime expiresAt, String createdByIP, LocalDateTime createdAt, LocalDateTime revokedAt, String revokedByIP, String replacedByToken) {
+    public RefreshToken(String user, String token, String expiresAt, String createdByIP, String createdAt, String revokedAt, String revokedByIP, String replacedByToken) {
         this.user = user;
         this.token = token;
         this.expiresAt = expiresAt;
@@ -31,6 +32,9 @@ public class RefreshToken {
         this.revokedAt = revokedAt;
         this.revokedByIP = revokedByIP;
         this.replacedByToken = replacedByToken;
+    }
+    public RefreshToken( ) {
+
     }
 
     public String getUser() {
@@ -49,11 +53,11 @@ public class RefreshToken {
         this.token = token;
     }
 
-    public LocalDateTime getExpiresAt() {
+    public String getExpiresAt() {
         return expiresAt;
     }
 
-    public void setExpiresAt(LocalDateTime expiresAt) {
+    public void setExpiresAt(String expiresAt) {
         this.expiresAt = expiresAt;
     }
 
@@ -61,23 +65,23 @@ public class RefreshToken {
         return createdByIP;
     }
 
-    public void setcreatedByIPIP(String createdByIP) {
+    public void setcreatedByIP(String createdByIP) {
         createdByIP = createdByIP;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getRevokedAt() {
+    public String getRevokedAt() {
         return revokedAt;
     }
 
-    public void setRevokedAt(LocalDateTime revokedAt) {
+    public void setRevokedAt(String revokedAt) {
         this.revokedAt = revokedAt;
     }
 
@@ -97,18 +101,8 @@ public class RefreshToken {
         this.replacedByToken = replacedByToken;
     }
 
-    @Override
-    public String toString() {
-        return "RefreshToken{" +
-                "id=" + id +
-                ", user=" + user +
-                ", token='" + token + '\'' +
-                ", expiresAt=" + expiresAt +
-                ", createdByIP='" + createdByIP + '\'' +
-                ", createdAt=" + createdAt +
-                ", revokedAt=" + revokedAt +
-                ", revokedByIP='" + revokedByIP + '\'' +
-                ", replacedByToken='" + replacedByToken + '\'' +
-                '}';
-    }
+
+
+
+
 }
