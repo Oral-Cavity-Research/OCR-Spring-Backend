@@ -10,6 +10,7 @@ import com.oasis.ocrspring.repository.PatientRepository;
 import com.oasis.ocrspring.repository.ReviewRepository;
 import com.oasis.ocrspring.repository.TeleconEntriesRepository;
 import com.oasis.ocrspring.repository.UserRepository;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -92,8 +93,14 @@ public class PatientService {
 //        }
 //    }
 public Patient findOne(String patient_id, String clinician_id){
-    Patient patient =  PatientRepo.findByPatientIdAndClinicianId(patient_id,clinician_id).orElse(null);
+    Patient patient =  PatientRepo.findByPatientIdAndClinicianId(patient_id,new ObjectId(clinician_id)).orElse(null);
     return patient;
+}
+public  Patient findPatient(String id,String clinician_Id){
+        ObjectId id_ = new ObjectId(id);
+        ObjectId clinician_Id_ = new ObjectId(clinician_Id);
+        Patient newPatient = PatientRepo.findByIdAndClinicianId(id_,clinician_Id_).orElse(null);
+        return newPatient;
 }
     public ResponseEntity<?> addPatient(
             String id,
@@ -126,7 +133,7 @@ public Patient findOne(String patient_id, String clinician_id){
 
                 Patient newPatient = new Patient();
                 newPatient.setpatientId(data.getPatient_id());
-                newPatient.setclinicianId(data.getClinician_id());
+                newPatient.setclinicianId(new ObjectId(data.getClinician_id()));
                 newPatient.setpatient_name(data.getPatient_name());
                 newPatient.setrisk_factors(data.getRisk_factors());
                 newPatient.setDOB(data.getDOB());
@@ -156,6 +163,7 @@ public Patient findOne(String patient_id, String clinician_id){
             return ResponseEntity.status(500).body(new errorResponseDto("Internal Server Error",e.toString()));
         }
     }
+
 
 
 }

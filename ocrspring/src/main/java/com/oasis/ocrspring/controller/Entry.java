@@ -1,9 +1,10 @@
 package com.oasis.ocrspring.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.oasis.ocrspring.dto.patientTeleconRequest;
+import com.oasis.ocrspring.service.TeleconEntriesService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
@@ -12,6 +13,8 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/user/entry")
 public class Entry {
+    @Autowired
+    private TeleconEntriesService teleconService;
 
     // connect entry to the service layer
     @ApiIgnore
@@ -22,9 +25,11 @@ public class Entry {
 
     //add a teleconsultation entry
     @PostMapping("/add/{id}")
-    public String addTeleconsultationEntry(long id) {
+    public ResponseEntity<?> addTeleconsultationEntry(@PathVariable String id,
+                                                      @RequestHeader("_id") String clinician_id,
+                                                      @RequestBody patientTeleconRequest newPatient) {
         // add a teleconsultation entry
-        return "/api/user/entry/add/"+id;
+        return teleconService.patientTeleconEntry(id,clinician_id,newPatient);
     }
 
     //get all entries

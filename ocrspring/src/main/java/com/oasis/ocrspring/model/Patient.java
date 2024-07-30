@@ -1,5 +1,6 @@
 package com.oasis.ocrspring.model;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -14,14 +15,15 @@ import java.util.List;
 public class Patient {
 
     @Id
-    private String id;
+    @Field("_id")
+    private ObjectId id;
     @Field("patient_id")
 
     private String patientId;
 
 
     @Field("clinician_id")
-    private String clinicianId;
+    private ObjectId clinicianId;
 
     private String patient_name;
 
@@ -50,7 +52,7 @@ public class Patient {
     }
 
     // Constructor with parameters
-    public Patient(String patient_id, String clinician_id, String patient_name,
+    public Patient(String patient_id, ObjectId clinician_id, String patient_name,
                    List<String> risk_factors, Date DOB, String gender,
                    String histo_diagnosis, List<String> medical_history,
                    List<String> family_history, String systemic_disease,
@@ -98,11 +100,11 @@ public class Patient {
         this.patientId = patient_id;
     }
 
-    public String getclinicianId() {
+    public ObjectId getclinicianId() {
         return clinicianId;
     }
 
-    public void setclinicianId(String clinician_id) {
+    public void setclinicianId(ObjectId clinician_id) {
         this.clinicianId = clinician_id;
     }
 
@@ -186,6 +188,9 @@ public class Patient {
         this.consent_form = consent_form;
     }
 
+    public ObjectId getId() {
+        return id;
+    }
 
     @Override
     public String toString() {

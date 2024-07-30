@@ -1,26 +1,20 @@
-package com.oasis.ocrspring.model;
+package com.oasis.ocrspring.dto;
 
-import com.oasis.ocrspring.dto.HabitDto;
+import com.oasis.ocrspring.model.TeleconEntry;
 import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Document(collection = "teleconentries")
-public class TeleconEntry {
+public class patientTeleconResponse {
+    private String _id; // MongoDB typically uses String for IDs
 
-    @Id
-    @Field("_id")
-    private ObjectId  id; // MongoDB typically uses String for IDs
-
-    private ObjectId patient;
-    @Field("clinician_id")
-    private ObjectId clinicianId;
+    private String patient;
+    private String clinician_id;
     private String complaint;
     private LocalDateTime start_time;
     private LocalDateTime end_time;
@@ -31,52 +25,49 @@ public class TeleconEntry {
     private List<String> reviews;
     private List<String> images;
     private List<String> reports;
-    @CreatedDate
     private LocalDateTime createdAt;
-    @LastModifiedDate
     private LocalDateTime updatedAt;
-    public TeleconEntry(){}
 
-    public TeleconEntry(ObjectId id, ObjectId patient, ObjectId clinicianId, String complaint,
-                        LocalDateTime start_time, LocalDateTime end_time, String findings,
-                        List<HabitDto> current_habits, boolean updated,
-                        List<String> reviewers, List<String> reviews, List<String> images,
-                        List<String> reports, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
-        this.patient = patient;
-        this.clinicianId = clinicianId;
-        this.complaint = complaint;
-        this.start_time = start_time;
-        this.end_time = end_time;
-        this.findings = findings;
-        this.current_habits = current_habits;
-        this.updated = updated;
-        this.reviewers = reviewers;
-        this.reviews = reviews;
-        this.images = images;
-        this.reports = reports;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+    public patientTeleconResponse(TeleconEntry teleconEntry) {
+        this._id = teleconEntry.getId().toString();
+        this.patient = teleconEntry.getPatient().toString();
+        this.clinician_id = teleconEntry.getClinicianId().toString();
+        this.complaint = teleconEntry.getComplaint();
+        this.start_time = teleconEntry.getStart_time();
+        this.end_time = teleconEntry.getEnd_time();
+        this.findings = teleconEntry.getFindings();
+        this.current_habits = teleconEntry.getCurrent_habits();
+        this.updated = teleconEntry.isUpdated();
+        this.reviewers = teleconEntry.getReviewers();
+        this.reviews = teleconEntry.getReviews();
+        this.images = teleconEntry.getImages();
+        this.reports = teleconEntry.getReports();
+        this.createdAt = teleconEntry.getCreatedAt();
+        this.updatedAt = teleconEntry.getUpdatedAt();
     }
 
-    public ObjectId getId() {
-        return id;
+    public String get_id() {
+        return _id;
     }
 
-    public ObjectId getPatient() {
+    public void set_id(String _id) {
+        this._id = _id;
+    }
+
+    public String getPatient() {
         return patient;
     }
 
-    public void setPatient(ObjectId patient) {
+    public void setPatient(String patient) {
         this.patient = patient;
     }
 
-    public ObjectId getClinicianId() {
-        return clinicianId;
+    public String getClinician_id() {
+        return clinician_id;
     }
 
-    public void setClinicianId(ObjectId clinicianId) {
-        this.clinicianId = clinicianId;
+    public void setClinician_id(String clinician_id) {
+        this.clinician_id = clinician_id;
     }
 
     public String getComplaint() {
@@ -126,7 +117,6 @@ public class TeleconEntry {
     public void setUpdated(boolean updated) {
         this.updated = updated;
     }
-
 
     public List<String> getReviewers() {
         return reviewers;
@@ -178,10 +168,10 @@ public class TeleconEntry {
 
     @Override
     public String toString() {
-        return "TeleconEntry{" +
-                "id=" + id.toString() +
-                ", patient=" + patient.toString() +
-                ", clinicianId=" + clinicianId.toString() +
+        return "patientTeleconResponse{" +
+                "_id='" + _id + '\'' +
+                ", patient='" + patient + '\'' +
+                ", clinician_id='" + clinician_id + '\'' +
                 ", complaint='" + complaint + '\'' +
                 ", start_time=" + start_time +
                 ", end_time=" + end_time +
