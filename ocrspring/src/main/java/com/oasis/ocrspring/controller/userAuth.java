@@ -6,6 +6,8 @@ import com.oasis.ocrspring.model.Request;
 import com.oasis.ocrspring.model.Role;
 import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.repository.RequestRepository;
+import com.oasis.ocrspring.service.RefreshtokenService;
+import com.oasis.ocrspring.service.ResponseMessages.ErrorResponse;
 import com.oasis.ocrspring.service.RoleService;
 import com.oasis.ocrspring.service.auth.TokenService;
 import com.oasis.ocrspring.service.userService;
@@ -22,10 +24,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -38,6 +37,8 @@ public class userAuth {
     private TokenService tokenService;
     @Autowired
     private RoleService roleService;
+    @Autowired
+    private RefreshtokenService refreshtokenService;
     @Value("${jwt.refresh-time}")
     private String refreshTime;
     @ApiIgnore
@@ -65,10 +66,11 @@ public class userAuth {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(messageBody);
         }
         String accessToken = tokenService.generateAccessToken(user.get());
-      //  System.out.println(accessToken);
+        //System.out.println(accessToken);
         RefreshToken refreshToken =tokenService.generateRefreshToken(user.get(),httpServletRequest.getRemoteAddr());//saving the refreshtoken to the database
-      //  System.out.println(refreshToken.getToken());
+
         tokenService.setTokenCookie(response, refreshToken.getToken());
+
        //System.out.println("hello");
         Optional<Role> RolePermission =roleService.getRoleByrole(user.get().getRole());
         //System.out.println(RolePermission.get().getPermissions());
@@ -95,14 +97,41 @@ public class userAuth {
 
         // return "/api/auth/verify";
     }
-//    @PostMapping("/refreshToken")
-//    public ResponseEntity<?> refreshToken(HttpServletRequest httpServletRequest){
-//        String token = tokenService.getTokenFromCookie(httpServletRequest);
-//        if(token==null){
-//
-//        }
-//
-//    }
+    @PostMapping("/refreshToken")
+    public ResponseEntity<?> refreshToken(HttpServletRequest httpServletRequest, HttpServletResponse response){
+
+        String token = tokenService.getTokenFromCookie(httpServletRequest);
+       // System.out.println(token);
+        if(token==null || token.isEmpty()){
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(false,"Token is Required"));
+        }
+
+        String ipaddress = httpServletRequest.getRemoteAddr();
+       // System.out.println(ipaddress);
+        Map<String, Object>tokenBody = tokenService.refreshToken(token,ipaddress);
+
+        String accessToken =  (String)tokenBody.get("accessToken");
+
+        String refreshToken = (String)tokenBody.get("refreshToken");
+
+        User ref = (User)tokenBody.get("ref");
+
+        List<String> Permissions = (List<String>)tokenBody.get("permissions");
+
+
+        tokenService.setTokenCookie(response,refreshToken);
+
+        Map<String, Object>responseBody = new HashMap<>();
+        responseBody.put("success",true);
+        responseBody.put("message","Token Refreshed Successfully");
+        responseBody.put("ref",ref);
+        responseBody.put("permissions",Permissions);
+        responseBody.put("accessToken",Map.of("token",accessToken,"expiry",refreshTime));
+
+        return ResponseEntity.ok(responseBody);
+
+    }
     @PostMapping("revokeToken")
     public String revokeToken(){
         return "/api/auth/revokeToken";
