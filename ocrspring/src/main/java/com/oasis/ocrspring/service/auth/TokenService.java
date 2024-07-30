@@ -1,11 +1,15 @@
 package com.oasis.ocrspring.service.auth;
 
 import com.oasis.ocrspring.model.RefreshToken;
+import com.oasis.ocrspring.model.Role;
 import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.repository.RefreshtokenRepsitory;
+import com.oasis.ocrspring.service.RoleService;
+import com.oasis.ocrspring.service.userService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -35,7 +39,10 @@ public class TokenService {
 
     @Autowired
     RefreshtokenRepsitory refreshTokenRepository;
-
+    @Autowired
+    private userService userservice;
+    @Autowired
+    private RoleService roleService;
     private long parseExpirationTime(String expiration) {
         if (expiration.endsWith("h")) {
             int hours = Integer.parseInt(expiration.replace("h", ""));
@@ -67,19 +74,26 @@ public class TokenService {
                 .compact();
     }
     public RefreshToken generateRefreshToken(User user,String ipaddress){
+
         RefreshToken refreshToken =new RefreshToken();
-        refreshToken.setUser(user.getId());
+        refreshToken.setUser(new ObjectId(user.getId()));
         refreshToken.setToken(generateRandomToken(256));
-        refreshToken.setExpiresAt((OffsetDateTime.now(ZoneOffset.UTC).plusDays(1).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
+        refreshToken.setExpiresAt(LocalDateTime.parse((LocalDateTime.now().plusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))));
+        refreshToken.setCreatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
         refreshToken.setcreatedByIP(ipaddress);
         return refreshTokenRepository.save(refreshToken);
     }
     public void setTokenCookie(HttpServletResponse response, String token) {
-        Cookie cookie = new Cookie("refrshToken", token);
+        Cookie cookie = new Cookie("refreshToken", token);
         cookie.setHttpOnly(true);
-        cookie.setMaxAge(24*60*60);
+
+        // Set the expiration time as 24 hours from the current time
+        Date expiryDate = new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(24));
+        cookie.setMaxAge((int) (expiryDate.getTime() / 1000)); // Convert to seconds
+
         cookie.setPath("/");
-        cookie.setSecure(true);
+        cookie.setSecure(false); // Set this to true if you're using HTTPS
+
         response.addCookie(cookie);
     }
 
@@ -94,6 +108,46 @@ public class TokenService {
         }
         return null;
     }
+
+    public RefreshToken getRefreshTokenByToken(String token){
+        Optional<RefreshToken> refreshToken =refreshTokenRepository.findByToken(token);
+        if(!refreshToken.isPresent()){
+            throw new RuntimeException("Refresh Token not found");
+        }
+        if(refreshToken.get().getRevokedAt()!=null || refreshToken.get().isExpired() ){
+            throw new RuntimeException("Refresh Token is not valid");
+        }
+        return refreshToken.get();
+    }
+
+    //refreshing the refreshtoken
+    public Map<String,Object> refreshToken(String token,String ipaddress){
+        RefreshToken refreshToken =getRefreshTokenByToken(token);
+
+        User user =userservice.getUserById(refreshToken.getUser().toString()).orElseThrow(()->new RuntimeException("User not found"));
+
+        Role rolePermissions= roleService.getRoleByrole(user.getRole()).orElseThrow(()->new RuntimeException("Role not found"));
+
+        RefreshToken newRefreshToken =generateRefreshToken(user,ipaddress);
+        System.out.println(newRefreshToken.getcreatedByIP());//////////////////
+        refreshToken.setRevokedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+        refreshToken.setReplacedByToken(newRefreshToken.getToken());
+
+        refreshTokenRepository.save(refreshToken);
+        refreshTokenRepository.save(newRefreshToken);
+
+        String accessToken =generateAccessToken(user);
+
+        Map<String,Object> tokens=new HashMap<>();
+        tokens.put("accessToken",accessToken);
+        tokens.put("refreshToken",newRefreshToken.getToken());
+        tokens.put("ref",user);
+        tokens.put("permissions",rolePermissions.getPermissions());
+
+        return tokens;
+
+    }
+
 
 
 
