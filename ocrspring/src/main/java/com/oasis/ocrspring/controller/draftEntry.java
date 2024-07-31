@@ -1,9 +1,11 @@
 package com.oasis.ocrspring.controller;
 
+import com.oasis.ocrspring.model.draftModels.DraftEntry;
 import com.oasis.ocrspring.repository.PatientRepository;
 import com.oasis.ocrspring.repository.draftRepos.DraftEntryRepository;
 import com.oasis.ocrspring.repository.draftRepos.DraftReportRepository;
 import com.oasis.ocrspring.repository.draftRepos.DraftimageRepository;
+import com.oasis.ocrspring.service.draftServices.DraftEntryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,10 +15,13 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user/draftentry")
 public class draftEntry {
+    @Autowired
+    private DraftEntryService draftEntryService;
     @Autowired
     private PatientRepository PatientRepo;
     @Autowired
@@ -35,12 +40,12 @@ public class draftEntry {
          return "/api/user/draftentry/add/" +id;
     }
     @GetMapping("/get")
-    public String getAllDraftEntries(){
-        return "/api/user/draftentry/get";
+    public List<DraftEntry> getAllDraftEntries(){
+        return draftEntryService.AllDraftEntryDetails();
     }
     @GetMapping("/get/patient/:id")
-    public String getPtientEntries(String id){
-        return "/api/user/draftentry/get/patient" +id;
+    public DraftEntry getPatientEntries(String id){
+        return draftEntryService.GetPatientDraftEntry(id);
     }
     @GetMapping("/get/id")
     public String getEntryDetails(String id){

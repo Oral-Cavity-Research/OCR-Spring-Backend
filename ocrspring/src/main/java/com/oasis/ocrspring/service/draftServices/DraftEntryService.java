@@ -16,4 +16,8 @@ public class DraftEntryService {
         System.out.println("appeared in service layer");
         return draftEntryRepo.findAll();
     }
+
+    public DraftEntry GetPatientDraftEntry(String id){
+        return draftEntryRepo.findById(id).orElse(null);
+    }
 }
