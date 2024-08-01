@@ -43,6 +43,10 @@ public class TokenService {
     private userService userservice;
     @Autowired
     private RoleService roleService;
+
+    private boolean checkPermissions( List<String> permissions,List<String> allowed){
+        return permissions.stream().anyMatch(allowed::contains);
+    }
     private long parseExpirationTime(String expiration) {
         if (expiration.endsWith("h")) {
             int hours = Integer.parseInt(expiration.replace("h", ""));
