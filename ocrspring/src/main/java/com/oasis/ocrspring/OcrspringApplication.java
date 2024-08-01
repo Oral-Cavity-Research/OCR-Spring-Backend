@@ -28,7 +28,9 @@ public class OcrspringApplication {
 		return builder.build();
 	}
 	public static void main(String[] args) {
+
 		SpringApplication.run(OcrspringApplication.class, args);
+
 	}
 
 }
