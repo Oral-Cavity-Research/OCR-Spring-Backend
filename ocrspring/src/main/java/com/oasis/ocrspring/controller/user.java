@@ -89,7 +89,7 @@ public class user {
                         "_id", updatedUser.getId(),
                    "username", updatedUser.getUsername(),
                         "hospital", updatedUser.getHospital(),
-                        "contact_no", updatedUser.getcontact_no(),
+                        "contact_no", updatedUser.getContactNo(),
                         "availability", updatedUser.isAvailability(),
                         "message", "User details updated successfully"
                 ));
