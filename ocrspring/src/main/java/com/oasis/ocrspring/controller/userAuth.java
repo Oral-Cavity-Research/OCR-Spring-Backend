@@ -1,14 +1,17 @@
 package com.oasis.ocrspring.controller;
 
 import com.oasis.ocrspring.dto.EmailDto;
+import com.oasis.ocrspring.dto.TokenRequest;
 import com.oasis.ocrspring.model.RefreshToken;
 import com.oasis.ocrspring.model.Request;
 import com.oasis.ocrspring.model.Role;
 import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.repository.RequestRepository;
 import com.oasis.ocrspring.service.RefreshtokenService;
+import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
 import com.oasis.ocrspring.service.ResponseMessages.ErrorResponse;
 import com.oasis.ocrspring.service.RoleService;
+import com.oasis.ocrspring.service.auth.AuthenticationToken;
 import com.oasis.ocrspring.service.auth.TokenService;
 import com.oasis.ocrspring.service.userService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +42,9 @@ public class userAuth {
     private RoleService roleService;
     @Autowired
     private RefreshtokenService refreshtokenService;
+    @Autowired
+    private AuthenticationToken authenticationToken;
+
     @Value("${jwt.refresh-time}")
     private String refreshTime;
     @ApiIgnore
@@ -57,8 +63,9 @@ public class userAuth {
     }
     @PostMapping("/verify")
     public ResponseEntity<?> userVerify(@RequestBody EmailDto emailbody, HttpServletRequest httpServletRequest, HttpServletResponse response){
+        System.out.println("dgdeg");
         String email= emailbody.getEmail();
-      //  System.out.println(email);
+
         Optional<User> user =userservice.getUserByEmail(email);
         if(!user.isPresent()){
             Map<String,String> messageBody = new HashMap<>();
@@ -132,9 +139,27 @@ public class userAuth {
         return ResponseEntity.ok(responseBody);
 
     }
-    @PostMapping("revokeToken")
-    public String revokeToken(){
-        return "/api/auth/revokeToken";
+    @PostMapping("/revokeToken")
+    public ResponseEntity<?> revokeToken(HttpServletRequest request, HttpServletResponse response, @RequestBody(required = false) TokenRequest tokenRequest) throws IOException {
+        authenticationToken.authenticateRequest(request, response);
+
+        String token = tokenService.getTokenFromCookie(request);
+        if (token == null || token.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(false, "Token is Required"));
+        }
+
+        AuthenticationToken.TokenOwner ownsToken = (AuthenticationToken.TokenOwner) request.getAttribute("ownsToken");
+        if (!ownsToken.ownsToken(token)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(false, "You are not authorized to revoke this token"));
+        }
+
+        String ipAddress = request.getRemoteAddr();
+        try {
+            tokenService.revokeTokenbyToken(token, ipAddress);
+            return ResponseEntity.ok(new ErrorResponse(true, "Token Revoked Successfully"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(false, e.getMessage()));
+        }
     }
 
 }

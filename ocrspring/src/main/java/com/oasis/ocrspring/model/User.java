@@ -1,5 +1,6 @@
 package com.oasis.ocrspring.model;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -8,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class User {
 
     @Id
-    private String id; // ObjectId field
+    private ObjectId id; // ObjectId field
 
     private String username;
     private String email;
@@ -45,7 +46,7 @@ public class User {
     // Getters and setters
 
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 

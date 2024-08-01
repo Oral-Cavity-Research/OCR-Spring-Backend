@@ -73,10 +73,19 @@ public class TokenService {
                 .signWith(getSigningKey(),SignatureAlgorithm.HS256)
                 .compact();
     }
+
+    public Map<String,Object> decodeAccessToken(String token){
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
     public RefreshToken generateRefreshToken(User user,String ipaddress){
 
         RefreshToken refreshToken =new RefreshToken();
-        refreshToken.setUser(new ObjectId(user.getId()));
+        refreshToken.setUser(user.getId());
         refreshToken.setToken(generateRandomToken(256));
         refreshToken.setExpiresAt(LocalDateTime.parse((LocalDateTime.now().plusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))));
         refreshToken.setCreatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
@@ -148,6 +157,12 @@ public class TokenService {
 
     }
 
+    public void revokeTokenbyToken (String token,String ipaddress){
+        RefreshToken refreshToken =getRefreshTokenByToken(token);
+        refreshToken.setRevokedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+        refreshToken.setRevokedByIP(ipaddress);
+        refreshTokenRepository.save(refreshToken);
+    }
 
 
 
