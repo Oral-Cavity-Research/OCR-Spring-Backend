@@ -1,4 +1,4 @@
-package com.oasis.ocrspring.dto;
+package com.oasis.ocrspring.model.subModels;
 
 public class HabitDto {
     private String habit;
@@ -23,5 +23,13 @@ public class HabitDto {
 
     public void setFrequency(String frequency) {
         this.frequency = frequency;
+    }
+
+    @Override
+    public String toString() {
+        return "HabitDto{" +
+                "habit='" + habit + '\'' +
+                ", frequency='" + frequency + '\'' +
+                '}';
     }
 }

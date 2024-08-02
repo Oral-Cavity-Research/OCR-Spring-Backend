@@ -1,8 +1,10 @@
 package com.oasis.ocrspring.controller;
 
 import com.oasis.ocrspring.dto.patientTeleconRequest;
+import com.oasis.ocrspring.model.TeleconEntry;
 import com.oasis.ocrspring.service.TeleconEntriesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -34,9 +36,13 @@ public class Entry {
 
     //get all entries
     @GetMapping("/get")
-    public String getAllEntries() {
+    public ResponseEntity<?> getAllEntries(@RequestHeader("id") String id,
+                                                            @RequestParam(name = "page",required = false,defaultValue = "1" ) Integer page,
+                                                            @RequestParam(name = "filter",required = false,defaultValue = "Created Date") String filter) { //id is clinician Id
         // get all teleconsultation entries
-        return "/api/user/entry/get";
+        int pageSize = 20;
+
+        return teleconService.getAllUserEntries(id,page,filter,pageSize);
     }
 
     //get patient entries

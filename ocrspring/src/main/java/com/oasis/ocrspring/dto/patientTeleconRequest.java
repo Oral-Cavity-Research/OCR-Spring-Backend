@@ -1,6 +1,7 @@
 package com.oasis.ocrspring.dto;
 
-import java.time.LocalDateTime;
+import com.oasis.ocrspring.model.subModels.HabitDto;
+
 import java.util.List;
 
 public class patientTeleconRequest {
