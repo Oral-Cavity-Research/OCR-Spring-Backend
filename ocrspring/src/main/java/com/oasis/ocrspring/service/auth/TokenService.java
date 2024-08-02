@@ -44,7 +44,7 @@ public class TokenService {
     @Autowired
     private RoleService roleService;
 
-    private boolean checkPermissions( List<String> permissions,List<String> allowed){
+    public boolean checkPermissions( List<String> permissions,List<String> allowed){
         return permissions.stream().anyMatch(allowed::contains);
     }
     private long parseExpirationTime(String expiration) {
@@ -167,8 +167,6 @@ public class TokenService {
         refreshToken.setRevokedByIP(ipaddress);
         refreshTokenRepository.save(refreshToken);
     }
-
-
 
 
 

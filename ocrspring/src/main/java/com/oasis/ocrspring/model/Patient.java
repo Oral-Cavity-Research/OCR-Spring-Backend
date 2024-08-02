@@ -1,101 +1,124 @@
 package com.oasis.ocrspring.model;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Document(collection = "patients")
 public class Patient {
 
     @Id
-    private String id;
+    private ObjectId id;
+    @Field("patient_id")
+    private String patientId;
+    @Field("clinician_id")
+    private ObjectId clinicianId;
 
-    private String patient_id;
+    @Field("patient_name")
+    private String patientName;
 
-    private String clinician_id;
+    @Field("risk_factors")
+    private List<String> riskFactors;
 
-    private String patient_name;
-
-    private List<String> risk_factors;
-
-    private Date DOB; // changed to camelCase
+    private LocalDateTime DOB; // changed to camelCase
 
     private String gender;
 
-    private String histo_diagnosis;
+    @Field("histo_diagnosis")
+    private String histoDiagnosis;
 
-    private List<String> medical_history;
+    @Field("medical_history")
+    private List<String> medicalHistory;
 
-    private List<String> family_history;
+    @Field("family_history")
+    private List<String> familyHistory;
 
-    private String systemic_disease;
+    @Field("systemic_disease")
+    private String systemicDisease;
 
-    private String contact_no;
+    @Field("contact_no")
+    private String contactNo;
 
-    private String consent_form;
+    @Field("consent_form")
+    private String consentForm;
 
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     // Default constructor
     public Patient() {
     }
 
-    // Constructor with parameters
-    public Patient(String patient_id, String clinician_id, String patient_name, List<String> risk_factors, Date DOB, String gender, String histo_diagnosis, List<String> medical_history, List<String> family_history, String systemic_disease, String contact_no, String consent_form) {
-        this.patient_id = patient_id;
-        this.clinician_id = clinician_id;
-        this.patient_name = patient_name;
-        this.risk_factors = risk_factors;
+    public Patient(String patientId, ObjectId clinicianId, String patientName, List<String> riskFactors, LocalDateTime DOB, String gender, String histoDiagnosis, List<String> medicalHistory, List<String> familyHistory, String systemicDisease, String contactNo, String consentForm) {
+        this.patientId = patientId;
+        this.clinicianId = clinicianId;
+        this.patientName = patientName;
+        this.riskFactors = riskFactors;
         this.DOB = DOB;
         this.gender = gender;
-        this.histo_diagnosis = histo_diagnosis;
-        this.medical_history = medical_history;
-        this.family_history = family_history;
-        this.systemic_disease = systemic_disease;
-        this.contact_no = contact_no;
-        this.consent_form = consent_form;
+        this.histoDiagnosis = histoDiagnosis;
+        this.medicalHistory = medicalHistory;
+        this.familyHistory = familyHistory;
+        this.systemicDisease = systemicDisease;
+        this.contactNo = contactNo;
+        this.consentForm = consentForm;
     }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+// Constructor with parameters
 
     // Getters and Setters
 
-    public String getpatient_id() {
-        return patient_id;
+    public String getPatientId() {
+        return patientId;
     }
 
-    public void setpatient_id(String patient_id) {
-        this.patient_id = patient_id;
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
     }
 
-    public String getclinician_id() {
-        return clinician_id;
+    public ObjectId getClinicianId() {
+        return clinicianId;
     }
 
-    public void setclinician_id(String clinician_id) {
-        this.clinician_id = clinician_id;
+    public void setClinicianId(ObjectId clinicianId) {
+        this.clinicianId = clinicianId;
     }
 
-    public String getpatient_name() {
-        return patient_name;
+    public String getPatientName() {
+        return patientName;
     }
 
-    public void setpatient_name(String patient_name) {
-        this.patient_name = patient_name;
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
     }
 
-    public List<String> getrisk_factors() {
-        return risk_factors;
+    public List<String> getRiskFactors() {
+        return riskFactors;
     }
 
-    public void setrisk_factors(List<String> risk_factors) {
-        this.risk_factors = risk_factors;
+    public void setRiskFactors(List<String> riskFactors) {
+        this.riskFactors = riskFactors;
     }
 
-    public Date getDOB() {
+    public LocalDateTime getDOB() {
         return DOB;
     }
 
-    public void setDOB(Date DOB) {
+    public void setDOB(LocalDateTime DOB) {
         this.DOB = DOB;
     }
 
@@ -107,70 +130,75 @@ public class Patient {
         this.gender = gender;
     }
 
-    public String gethisto_diagnosis() {
-        return histo_diagnosis;
+    public String getHistoDiagnosis() {
+        return histoDiagnosis;
     }
 
-    public void sethisto_diagnosis(String histo_diagnosis) {
-        this.histo_diagnosis = histo_diagnosis;
+    public void setHistoDiagnosis(String histoDiagnosis) {
+        this.histoDiagnosis = histoDiagnosis;
     }
 
-    public List<String> getmedical_history() {
-        return medical_history;
+    public List<String> getMedicalHistory() {
+        return medicalHistory;
     }
 
-    public void setmedical_history(List<String> medical_history) {
-        this.medical_history = medical_history;
+    public void setMedicalHistory(List<String> medicalHistory) {
+        this.medicalHistory = medicalHistory;
     }
 
-    public List<String> getfamily_history() {
-        return family_history;
+    public List<String> getFamilyHistory() {
+        return familyHistory;
     }
 
-    public void setfamily_history(List<String> family_history) {
-        this.family_history = family_history;
+    public void setFamilyHistory(List<String> familyHistory) {
+        this.familyHistory = familyHistory;
     }
 
-    public String getsystemic_disease() {
-        return systemic_disease;
+    public String getSystemicDisease() {
+        return systemicDisease;
     }
 
-    public void setsystemic_disease(String systemic_disease) {
-        this.systemic_disease = systemic_disease;
+    public void setSystemicDisease(String systemicDisease) {
+        this.systemicDisease = systemicDisease;
     }
 
-    public String getcontact_no() {
-        return contact_no;
+    public String getContactNo() {
+        return contactNo;
     }
 
-    public void setcontact_no(String contact_no) {
-        this.contact_no = contact_no;
+    public void setContactNo(String contactNo) {
+        this.contactNo = contactNo;
     }
 
-    public String getconsent_form() {
-        return consent_form;
+    public String getConsentForm() {
+        return consentForm;
     }
 
-    public void setconsent_form(String consent_form) {
-        this.consent_form = consent_form;
+    public void setConsentForm(String consentForm) {
+        this.consentForm = consentForm;
     }
 
-    @Override
-    public String toString() {
-        return "Patient{" +
-                "id='" + id + '\'' +
-                ", patient_id='" + patient_id + '\'' +
-                ", clinician_id=" + clinician_id +
-                ", patient_name='" + patient_name + '\'' +
-                ", risk_factors=" + risk_factors +
-                ", DOB=" + DOB +
-                ", gender='" + gender + '\'' +
-                ", histo_diagnosis='" + histo_diagnosis + '\'' +
-                ", medical_history=" + medical_history +
-                ", family_history=" + family_history +
-                ", systemic_disease='" + systemic_disease + '\'' +
-                ", contact_no='" + contact_no + '\'' +
-                ", consent_form='" + consent_form + '\'' +
-                '}';
+    public ObjectId getId() {
+        return id;
+    }
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("_id", this.getId());
+        map.put("patient_id", this.getPatientId());
+        map.put("clinician_id", this.getClinicianId());
+        map.put("patient_name", this.getPatientName());
+        map.put("risk_factors", this.getRiskFactors());
+        map.put("DOB", this.getDOB());
+        map.put("gender", this.getGender());
+        map.put("histo_diagnosis", this.getHistoDiagnosis());
+        map.put("medical_history", this.getMedicalHistory());
+        map.put("family_history", this.getFamilyHistory());
+        map.put("systemic_disease", this.getSystemicDisease());
+        map.put("contact_no", this.getContactNo());
+        map.put("consent_form", this.getConsentForm());
+        map.put("createdAt", this.getCreatedAt());
+        map.put("updatedAt", this.getUpdatedAt());
+        return map;
     }
 }
