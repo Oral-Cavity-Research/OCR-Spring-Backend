@@ -15,7 +15,7 @@ public interface TeleconEntriesRepository extends MongoRepository<TeleconEntry,S
     Optional<TeleconEntry> findByPatientAndReviewersIn(String patient, String reviewerId);
 
     Optional<TeleconEntry> findByPatientIn(String patient);
-    Optional<TeleconEntry> findByPatientAndClinicianId(ObjectId patient,String clinicianId);
+    Optional<TeleconEntry> findByPatientAndClinicianId(ObjectId patient,ObjectId clinicianId);
     Page<TeleconEntry> findByClinicianId(ObjectId clinicianId, Pageable pageable);
     Page<TeleconEntry> findByClinicianIdAndReviewersIsNotNull(ObjectId clinicianId,Pageable pageable);
     Page<TeleconEntry> findByClinicianIdAndReviewersIsEmpty(ObjectId clinicianId,Pageable pageable);

@@ -50,7 +50,8 @@ public class TeleconEntriesService {
     }
     public TeleconEntry findOne(String patient_id, String clinician_id){
         ObjectId patientId = new ObjectId(patient_id);
-        TeleconEntry patient =  TeleconEntriesRepo.findByPatientAndClinicianId(patientId,clinician_id).orElse(null);
+        ObjectId clinicianId = new ObjectId(clinician_id);
+        TeleconEntry patient =  TeleconEntriesRepo.findByPatientAndClinicianId(patientId,clinicianId).orElse(null);
         return patient;
     }
     public void save(TeleconEntry teleconEntry){
@@ -147,6 +148,11 @@ public class TeleconEntriesService {
         }
 
     }
+//    public ResponseEntity<?> getUserEntryById(String id,Integer page, String filter, Integer pageSize){
+//        Pageable pageable = PageRequest.of(page-1,pageSize,Sort.by(Sort.Direction.DESC,getSortField(filter)));
+//
+//    }
+
     private String getSortField(String filter){
         if(filter.equals("Updated At")){
             return "updatedAt";
