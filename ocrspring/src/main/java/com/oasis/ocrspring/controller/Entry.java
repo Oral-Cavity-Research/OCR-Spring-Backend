@@ -1,9 +1,7 @@
 package com.oasis.ocrspring.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.bson.types.ObjectId;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
@@ -22,7 +20,8 @@ public class Entry {
 
     //add a teleconsultation entry
     @PostMapping("/add/{id}")
-    public String addTeleconsultationEntry(long id) {
+    public String addTeleconsultationEntry(@PathVariable String id) {
+        ObjectId id_ = new ObjectId(id);
         // add a teleconsultation entry
         return "/api/user/entry/add/"+id;
     }

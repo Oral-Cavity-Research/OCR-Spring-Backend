@@ -1,9 +1,10 @@
 package com.oasis.ocrspring.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.oasis.ocrspring.service.RequestService;
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
@@ -13,7 +14,8 @@ import java.io.IOException;
 @RequestMapping("/api/admin")
 public class Admin {
     // connect admin to the service layer
-
+    @Autowired
+    private RequestService requestservice;
     @ApiIgnore
     @RequestMapping(value ="/")
     public void redirect(HttpServletResponse response) throws IOException {
@@ -22,16 +24,17 @@ public class Admin {
 
     //get all requests
     @GetMapping("/requests")
-    public String getAllRequests() {
+    public ResponseEntity getAllRequests() {
         // get all requests
-        return "/api/admin/requests";
+        return requestservice.AllRequestDetails();
     }
 
     //get one request
     @GetMapping("/requests/{id}")
-    public String getRequest(long id) {
+    public ResponseEntity<?> getRequest(@PathVariable String id) {
+        ObjectId id_ = new ObjectId(id);
         // get one request
-        return "/api/admin/requests/"+id;
+        return requestservice.GetOneRequest(id_);
     }
 
     //reject a request

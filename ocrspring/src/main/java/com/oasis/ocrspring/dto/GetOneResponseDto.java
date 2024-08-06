@@ -1,15 +1,11 @@
-package com.oasis.ocrspring.model;
+package com.oasis.ocrspring.dto;
 
+import com.oasis.ocrspring.model.Request;
 import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document(collection = "requests")
-public class Request {
-    @Id
-    @Field("_id")
-    private ObjectId id;
+public class GetOneResponseDto {
+    private String id;
     private String username;
     private String email;
     @Field("reg_no")
@@ -18,21 +14,21 @@ public class Request {
     private String designation;
     private String contact_no;
 
-    public Request(ObjectId id, String username, String email, String regNo, String hospital, String designation, String contact_no) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.regNo = regNo;
-        this.hospital = hospital;
-        this.designation = designation;
-        this.contact_no = contact_no;
+    public GetOneResponseDto(Request request) {
+        this.id = request.getId().toString() ;
+        this.username = request.getUsername();
+        this.email = request.getEmail();
+        this.regNo = request.getRegNo();
+        this.hospital = request.getHospital();
+        this.designation = request.getDesignation();
+        this.contact_no = request.getContact_no();
     }
 
-    public ObjectId getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(ObjectId id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -82,18 +78,5 @@ public class Request {
 
     public void setContact_no(String contact_no) {
         this.contact_no = contact_no;
-    }
-
-    @Override
-    public String toString() {
-        return "Request{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", regNo='" + regNo + '\'' +
-                ", hospital='" + hospital + '\'' +
-                ", designation='" + designation + '\'' +
-                ", contact_no='" + contact_no + '\'' +
-                '}';
     }
 }
