@@ -1,9 +1,12 @@
 package com.oasis.ocrspring.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.oasis.ocrspring.dto.patientTeleconRequest;
+import com.oasis.ocrspring.model.TeleconEntry;
+import com.oasis.ocrspring.service.TeleconEntriesService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
@@ -12,6 +15,8 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/user/entry")
 public class Entry {
+    @Autowired
+    private TeleconEntriesService teleconService;
 
     // connect entry to the service layer
     @ApiIgnore
@@ -22,16 +27,22 @@ public class Entry {
 
     //add a teleconsultation entry
     @PostMapping("/add/{id}")
-    public String addTeleconsultationEntry(long id) {
+    public ResponseEntity<?> addTeleconsultationEntry(@PathVariable String id,
+                                                      @RequestHeader("_id") String clinician_id,
+                                                      @RequestBody patientTeleconRequest newPatient) {
         // add a teleconsultation entry
-        return "/api/user/entry/add/"+id;
+        return teleconService.patientTeleconEntry(id,clinician_id,newPatient);
     }
 
     //get all entries
     @GetMapping("/get")
-    public String getAllEntries() {
+    public ResponseEntity<?> getAllEntries(@RequestHeader("id") String id,
+                                                            @RequestParam(name = "page",required = false,defaultValue = "1" ) Integer page,
+                                                            @RequestParam(name = "filter",required = false,defaultValue = "Created Date") String filter) { //id is clinician Id
         // get all teleconsultation entries
-        return "/api/user/entry/get";
+        int pageSize = 20;
+
+        return teleconService.getAllUserEntries(id,page,filter,pageSize);
     }
 
     //get patient entries

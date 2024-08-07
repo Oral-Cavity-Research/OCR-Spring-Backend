@@ -1,5 +1,8 @@
 package com.oasis.ocrspring.service;
 
+import com.oasis.ocrspring.dto.ConsentRequestDto;
+import com.oasis.ocrspring.dto.ConsentResponseDto;
+import com.oasis.ocrspring.dto.errorResponseDto;
 import com.oasis.ocrspring.model.Patient;
 import com.oasis.ocrspring.model.TeleconEntry;
 import com.oasis.ocrspring.model.User;
@@ -7,9 +10,25 @@ import com.oasis.ocrspring.repository.PatientRepository;
 import com.oasis.ocrspring.repository.ReviewRepository;
 import com.oasis.ocrspring.repository.TeleconEntriesRepository;
 import com.oasis.ocrspring.repository.UserRepository;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartException;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +42,10 @@ public class PatientService {
 
     @Autowired
     private UserRepository UserRepo;
+    @Autowired
+    private TeleconEntriesService teleconServ;
+    @Value("src/main/Storage/ConsentForms")
+    private String consentFormUploadDir;
 
     public List<Patient> AllPatientDetails(){
 
@@ -69,5 +92,78 @@ public class PatientService {
 //            return null;
 //        }
 //    }
+public Patient findOne(String patient_id, String clinician_id){
+    Patient patient =  PatientRepo.findByPatientIdAndClinicianId(patient_id,new ObjectId(clinician_id)).orElse(null);
+    return patient;
+}
+public  Patient findPatient(String id,String clinician_Id){
+        ObjectId id_ = new ObjectId(id);
+        ObjectId clinician_Id_ = new ObjectId(clinician_Id);
+        Patient newPatient = PatientRepo.findByIdAndClinicianId(id_,clinician_Id_).orElse(null);
+        return newPatient;
+}
+    public ResponseEntity<?> addPatient(
+            String id,
+            ConsentRequestDto data,
+            MultipartFile files) throws IOException
+    {
+        List<String> uploadedURIs = new ArrayList<>();
+
+        //permission check
+//        if(!checkPermissions(req.permissions, [300])){
+//            return res.status(401).json({ message: "Unauthorized access"});
+//        }
+        try{
+            Patient patient = findOne(data.getPatient_id(),id);
+            if(patient != null){
+                return ResponseEntity.status(401).body("Patient ID already exists");
+            }
+            String fileName = StringUtils.cleanPath(files.getOriginalFilename());
+            try{
+                Path path = Paths.get(consentFormUploadDir + File.separator + fileName);
+                if(!Files.exists(path)){
+                    Files.createDirectories(path);
+                }
+                Files.copy(files.getInputStream(),path, StandardCopyOption.REPLACE_EXISTING);
+                String fileDownUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                        .path("/files")
+                        .path(fileName)
+                        .toUriString();
+                uploadedURIs.add(fileDownUri);
+
+                Patient newPatient = new Patient();
+                newPatient.setpatientId(data.getPatient_id());
+                newPatient.setclinicianId(new ObjectId(data.getClinician_id()));
+                newPatient.setpatient_name(data.getPatient_name());
+                newPatient.setrisk_factors(data.getRisk_factors());
+                newPatient.setDOB(data.getDOB());
+                newPatient.setGender(data.getGender());
+                newPatient.sethisto_diagnosis(data.getHisto_diagnosis());
+                newPatient.setmedical_history(data.getMedical_history());
+                newPatient.setfamily_history(data.getFamily_history());
+                newPatient.setsystemic_disease(data.getSystemic_disease());
+                newPatient.setcontact_no(data.getContact_no());
+                newPatient.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+                newPatient.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+
+                PatientRepo.save(newPatient);
+                return  ResponseEntity.status(200).body(new ConsentResponseDto(newPatient));
+
+
+            }catch(MultipartException ex){
+                return ResponseEntity.status(500).body(new errorResponseDto("Internal Server Error!",ex.toString()));
+
+            }catch(Exception e){
+                return ResponseEntity.status(500).body(new errorResponseDto("Internal Server Error!",e.toString()));
+            }
+
+
+
+        }catch(Exception e){
+            return ResponseEntity.status(500).body(new errorResponseDto("Internal Server Error",e.toString()));
+        }
+    }
+
+
 
 }

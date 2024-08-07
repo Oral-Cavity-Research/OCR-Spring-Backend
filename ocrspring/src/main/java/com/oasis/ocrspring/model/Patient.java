@@ -1,9 +1,13 @@
 package com.oasis.ocrspring.model;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
@@ -11,11 +15,15 @@ import java.util.List;
 public class Patient {
 
     @Id
-    private String id;
+    @Field("_id")
+    private ObjectId id;
+    @Field("patient_id")
 
-    private String patient_id;
+    private String patientId;
 
-    private String clinician_id;
+
+    @Field("clinician_id")
+    private ObjectId clinicianId;
 
     private String patient_name;
 
@@ -36,15 +44,21 @@ public class Patient {
     private String contact_no;
 
     private String consent_form;
+    private String createdAt;
+    private String updatedAt;
 
     // Default constructor
     public Patient() {
     }
 
     // Constructor with parameters
-    public Patient(String patient_id, String clinician_id, String patient_name, List<String> risk_factors, Date DOB, String gender, String histo_diagnosis, List<String> medical_history, List<String> family_history, String systemic_disease, String contact_no, String consent_form) {
-        this.patient_id = patient_id;
-        this.clinician_id = clinician_id;
+    public Patient(String patient_id, ObjectId clinician_id, String patient_name,
+                   List<String> risk_factors, Date DOB, String gender,
+                   String histo_diagnosis, List<String> medical_history,
+                   List<String> family_history, String systemic_disease,
+                   String contact_no, String consent_form,String createdAt,String updatedAt ) {
+        this.patientId = patient_id;
+        this.clinicianId = clinician_id;
         this.patient_name = patient_name;
         this.risk_factors = risk_factors;
         this.DOB = DOB;
@@ -55,24 +69,43 @@ public class Patient {
         this.systemic_disease = systemic_disease;
         this.contact_no = contact_no;
         this.consent_form = consent_form;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     // Getters and Setters
 
-    public String getpatient_id() {
-        return patient_id;
+
+    public String getCreatedAt() {
+        return createdAt;
     }
 
-    public void setpatient_id(String patient_id) {
-        this.patient_id = patient_id;
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public String getclinician_id() {
-        return clinician_id;
+    public String getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setclinician_id(String clinician_id) {
-        this.clinician_id = clinician_id;
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getpatientId() {
+        return patientId;
+    }
+
+    public void setpatientId(String patient_id) {
+        this.patientId = patient_id;
+    }
+
+    public ObjectId getclinicianId() {
+        return clinicianId;
+    }
+
+    public void setclinicianId(ObjectId clinician_id) {
+        this.clinicianId = clinician_id;
     }
 
     public String getpatient_name() {
@@ -155,12 +188,16 @@ public class Patient {
         this.consent_form = consent_form;
     }
 
+    public ObjectId getId() {
+        return id;
+    }
+
     @Override
     public String toString() {
         return "Patient{" +
                 "id='" + id + '\'' +
-                ", patient_id='" + patient_id + '\'' +
-                ", clinician_id=" + clinician_id +
+                ", patientId='" + patientId + '\'' +
+                ", clinicianId='" + clinicianId + '\'' +
                 ", patient_name='" + patient_name + '\'' +
                 ", risk_factors=" + risk_factors +
                 ", DOB=" + DOB +
@@ -171,6 +208,8 @@ public class Patient {
                 ", systemic_disease='" + systemic_disease + '\'' +
                 ", contact_no='" + contact_no + '\'' +
                 ", consent_form='" + consent_form + '\'' +
+                ", createdAt='" + createdAt + '\'' +
+                ", updatedAt='" + updatedAt + '\'' +
                 '}';
     }
 }
