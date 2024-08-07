@@ -1,5 +1,6 @@
 package com.oasis.ocrspring.model;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -8,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class User {
 
     @Id
-    private String id; // ObjectId field
+    private ObjectId id; // ObjectId field
 
     private String username;
     private String email;
@@ -16,7 +17,8 @@ public class User {
     private String regNo; // Updated variable name
     private String hospital;
     private String designation;
-    private String contact_no;
+    @Field("contact_no")
+    private String contactNo;
     private String password;
     private boolean availability;
     private String role;
@@ -28,14 +30,14 @@ public class User {
     }
 
     // Constructor with parameters
-    public User( String username, String email, String regNo, String hospital, String designation, String contact_no, String password, boolean availability, String role) {
+    public User( String username, String email, String regNo, String hospital, String designation, String contactNo, String password, boolean availability, String role) {
 
         this.username = username;
         this.email = email;
         this.regNo = regNo; // Updated variable name
         this.hospital = hospital;
         this.designation = designation;
-        this.contact_no = contact_no;
+        this.contactNo = contactNo;
         this.password = password;
         this.availability = availability;
         this.role = role;
@@ -44,16 +46,16 @@ public class User {
     // Getters and setters
 
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 
-    public String getContact_no() {
-        return contact_no;
+    public String getContactNo() {
+        return contactNo;
     }
 
-    public void setContact_no(String contact_no) {
-        this.contact_no = contact_no;
+    public void setContactNo(String contactNo) {
+        this.contactNo = contactNo;
     }
 
     public String getCreatedAt() {
@@ -112,13 +114,9 @@ public class User {
         this.designation = designation;
     }
 
-    public String getcontact_no() {
-        return contact_no;
-    }
 
-    public void setcontact_no(String contact_no) {
-        this.contact_no = contact_no;
-    }
+
+
 
     public String getPassword() {
         return password;
@@ -153,7 +151,7 @@ public class User {
                 ", regNo='" + regNo + '\'' + // Updated variable name
                 ", hospital='" + hospital + '\'' +
                 ", designation='" + designation + '\'' +
-                ", contact_no='" + contact_no + '\'' +
+                ", contactNo='" + contactNo + '\'' +
                 ", password='" + password + '\'' +
                 ", availability=" + availability +
                 ", role='" + role + '\'' +

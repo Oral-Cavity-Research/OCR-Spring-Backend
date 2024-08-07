@@ -49,11 +49,16 @@ public class userService {
 
         return UserRepo.findById(id);
     }
+
+    public Optional<User> getUserByEmail(String id){
+
+        return UserRepo.findByEmail(id);
+    }
     public User updateUser(String id, UserDto userReqBody){
         User user = UserRepo.findById(id).orElseThrow(()->new RuntimeException("User not found"));
         user.setUsername(userReqBody.getUsername());
         user.setHospital(userReqBody.getHospital());
-        user.setContact_no(userReqBody.getContact_no());
+        user.setContactNo(userReqBody.getContact_no());
         user.setAvailability(userReqBody.isAvailability());
         return UserRepo.save(user);
 
