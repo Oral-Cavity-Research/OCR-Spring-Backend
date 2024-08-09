@@ -2,6 +2,7 @@ package com.oasis.ocrspring.dto;
 
 import com.oasis.ocrspring.model.TeleconEntry;
 import com.oasis.ocrspring.model.subModels.HabitDto;
+import org.bson.types.ObjectId;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,10 +18,10 @@ public class patientTeleconResponse {
     private String findings;
     private List<HabitDto> current_habits;
     private boolean updated;
-    private List<String> reviewers;
+    private List<ObjectId> reviewers;
     private List<String> reviews;
-    private List<String> images;
-    private List<String> reports;
+    private List<ObjectId> images;
+    private List<ObjectId> reports;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -114,11 +115,11 @@ public class patientTeleconResponse {
         this.updated = updated;
     }
 
-    public List<String> getReviewers() {
+    public List<ObjectId> getReviewers() {
         return reviewers;
     }
 
-    public void setReviewers(List<String> reviewers) {
+    public void setReviewers(List<ObjectId> reviewers) {
         this.reviewers = reviewers;
     }
 
@@ -130,19 +131,19 @@ public class patientTeleconResponse {
         this.reviews = reviews;
     }
 
-    public List<String> getImages() {
+    public List<ObjectId> getImages() {
         return images;
     }
 
-    public void setImages(List<String> images) {
+    public void setImages(List<ObjectId> images) {
         this.images = images;
     }
 
-    public List<String> getReports() {
+    public List<ObjectId> getReports() {
         return reports;
     }
 
-    public void setReports(List<String> reports) {
+    public void setReports(List<ObjectId> reports) {
         this.reports = reports;
     }
 

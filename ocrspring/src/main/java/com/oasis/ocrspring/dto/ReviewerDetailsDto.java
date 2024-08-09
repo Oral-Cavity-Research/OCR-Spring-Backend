@@ -6,7 +6,7 @@ public class ReviewerDetailsDto {
     private String _id;
     private String username;
     public  ReviewerDetailsDto(User Reviewer){
-        this._id = Reviewer.getId();
+        this._id = Reviewer.getId().toString();
         this.username = Reviewer.getUsername();
     }
 

@@ -5,6 +5,8 @@ import com.oasis.ocrspring.dto.UploadReportResponse;
 import com.oasis.ocrspring.model.Report;
 import com.oasis.ocrspring.model.TeleconEntry;
 import com.oasis.ocrspring.repository.ReportRepository;
+import com.oasis.ocrspring.repository.TeleconEntriesRepository;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,8 @@ public class ReportService {
     private ReportRepository reportRepo;
     @Autowired
     private TeleconEntriesService teleconServ;
+    @Autowired
+    private TeleconEntriesRepository teleconRepo;
     @Value("src/main/Storage/Reports")
     private String reportUploadDir;
 
@@ -40,9 +44,9 @@ public class ReportService {
                                                               List<MultipartFile> files){
         List<Report> uploadedReports = new ArrayList<>();//Report model list
         List<String> uploadFiles = new ArrayList<>();//List of file uri's
-        List<String> ReportIds = new ArrayList<>();
+        List<ObjectId> ReportIds = new ArrayList<>();
 
-        TeleconEntry teleconEntry = teleconServ.findByID(id);
+        TeleconEntry teleconEntry = teleconRepo.findById(new ObjectId(id));
         if (teleconEntry != null ){ //auth part should be added
             try{
                 for(MultipartFile file: files) {
@@ -63,7 +67,7 @@ public class ReportService {
 
                         // creating a report instance and saving it on the database
                         Report report = new Report();
-                        report.setTelecon_id(data.getTeleconId());
+                        report.setTelecon_entry_id(data.getTeleconId());
                         report.setReport_name(data.getReportName());
                         report.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
                         report.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
@@ -78,8 +82,8 @@ public class ReportService {
 
             }
                 //to make sure not to overwritten on the existing IDs
-                List<String> reportIds = uploadedReports.stream().map(Report :: getId).toList();
-                List<String> existedReportIds = teleconEntry.getReports();
+                List<ObjectId> reportIds = uploadedReports.stream().map(Report :: getId).toList();
+                List<ObjectId> existedReportIds = teleconEntry.getReports();
                 if(existedReportIds.isEmpty()){
                     existedReportIds = new ArrayList<>();
                 }

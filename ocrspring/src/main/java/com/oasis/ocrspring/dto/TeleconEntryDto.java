@@ -2,12 +2,14 @@ package com.oasis.ocrspring.dto;
 
 import com.oasis.ocrspring.model.TeleconEntry;
 import com.oasis.ocrspring.model.subModels.HabitDto;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 
 public class TeleconEntryDto {
     private String  _id; // MongoDB typically uses String for IDs
@@ -22,8 +24,8 @@ public class TeleconEntryDto {
     private boolean updated;
     private List<ReviewerDetailsDto> reviewers;
     private List<String> reviews;
-    private List<String> images;
-    private List<String> reports;
+    private List<ObjectId> images;
+    private List<ObjectId> reports;
     @CreatedDate
     private LocalDateTime createdAt;
     @LastModifiedDate
@@ -134,19 +136,19 @@ public class TeleconEntryDto {
         this.reviews = reviews;
     }
 
-    public List<String> getImages() {
+    public List<ObjectId> getImages() {
         return images;
     }
 
-    public void setImages(List<String> images) {
+    public void setImages(List<ObjectId> images) {
         this.images = images;
     }
 
-    public List<String> getReports() {
+    public List<ObjectId> getReports() {
         return reports;
     }
 
-    public void setReports(List<String> reports) {
+    public void setReports(List<ObjectId> reports) {
         this.reports = reports;
     }
 

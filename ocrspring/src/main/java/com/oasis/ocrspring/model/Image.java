@@ -1,11 +1,15 @@
 package com.oasis.ocrspring.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.bson.types.ObjectId;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -16,8 +20,19 @@ import java.util.List;
 @Document(collection="images")
 public class Image {
     @Id
-    private String id;
-    private String telecon_entry_id;
+    @Field("_id")
+    @JsonIgnore
+    private ObjectId id;
+    @JsonIgnore
+    private ObjectId telecon_entry_id;
+    @JsonProperty("_id")
+    public String getIdString() {
+        return id != null ? id.toHexString() : null;
+    }
+    @JsonProperty("telecon_entry_id")
+    public String getTeleconEntryIdString() {
+        return telecon_entry_id != null ? telecon_entry_id.toHexString() : null;
+    }
     private String image_name;
     private String location;
     private String clinical_diagnosis;
@@ -31,7 +46,7 @@ public class Image {
     public Image(){}
 
 
-    public Image(String telecon_entry_id, String image_name, String location, String clinical_diagnosis, Boolean lesions_appear, List<String> annotation, String predicted_cat) {
+    public Image(ObjectId telecon_entry_id, String image_name, String location, String clinical_diagnosis, Boolean lesions_appear, List<String> annotation, String predicted_cat) {
         this.telecon_entry_id = telecon_entry_id;
         this.image_name = image_name;
         this.location = location;
@@ -40,22 +55,12 @@ public class Image {
         this.annotation = annotation;
         this.predicted_cat = predicted_cat;
     }
-//    @PrePersist
-//    public void onCreate(){
-//        String now = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
-//        this.createdAt = now;
-//        this.updatedAt = now;
-//    }
-//    @PreUpdate
-//    public void onUpdate(){
-//        this.updatedAt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
-//    }
 
-    public String getTelecon_entry_id() {
+    public ObjectId getTelecon_entry_id() {
         return telecon_entry_id;
     }
 
-    public void setTelecon_entry_id(String telecon_entry_id) {
+    public void setTelecon_entry_id(ObjectId telecon_entry_id) {
         this.telecon_entry_id = telecon_entry_id;
     }
 
@@ -107,7 +112,7 @@ public class Image {
         this.predicted_cat = predicted_cat;
     }
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
     public String getCreatedAt() {
@@ -129,8 +134,8 @@ public class Image {
     @Override
     public String toString() {
         return "Image{" +
-                "id='" + id + '\'' +
-                ", telecon_entry_id='" + telecon_entry_id + '\'' +
+                "_id='" + getIdString() + '\'' +
+                ", telecon_entry_id='" + getTeleconEntryIdString() + '\'' +
                 ", image_name='" + image_name + '\'' +
                 ", location='" + location + '\'' +
                 ", clinical_diagnosis='" + clinical_diagnosis + '\'' +

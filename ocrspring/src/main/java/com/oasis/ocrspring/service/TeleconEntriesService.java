@@ -132,26 +132,51 @@ public class TeleconEntriesService {
             for(TeleconEntry entry: entryPageList){
                 Patient patient = patientRepo.findById(entry.getPatient());
                 patientDetailsDto patientDetails =new patientDetailsDto(patient);
-                List<String> ReviewerList = entry.getReviewers() ;
+                List<ObjectId> ReviewerList = entry.getReviewers() ;
                 List<ReviewerDetailsDto> reviewerObjectList = new ArrayList<>();
-                for(String Reviewer : ReviewerList){
-                    User user = userRepo.findById(new ObjectId(Reviewer));
+                for(ObjectId Reviewer : ReviewerList){
+                    User user = userRepo.findById(Reviewer);
                     ReviewerDetailsDto reviewerDetails = new ReviewerDetailsDto(user);
                     reviewerObjectList.add(reviewerDetails);
                 }
                 response.add(new TeleconEntryDto(entry,patientDetails,reviewerObjectList));
             }
-            //Page<TeleconEntryDto> userDetailList = (Page<TeleconEntryDto>) response;
             return ResponseEntity.status(200).body(response);
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new errorResponseDto("Internal Server Error!",e.toString()));
         }
 
     }
-//    public ResponseEntity<?> getUserEntryById(String id,Integer page, String filter, Integer pageSize){
-//        Pageable pageable = PageRequest.of(page-1,pageSize,Sort.by(Sort.Direction.DESC,getSortField(filter)));
-//
-//    }
+    public ResponseEntity<?> getUserEntryById(String clinicianId,String patient,
+                                              Integer page, String filter, Integer pageSize){
+        Pageable pageable = PageRequest.of(page-1,pageSize,Sort.by(Sort.Direction.DESC,getSortField(filter)));
+        ObjectId patientId = new ObjectId(patient);
+        ObjectId clinician_Id = new ObjectId(clinicianId);
+        Page<TeleconEntry> EntryPage ;
+        List<TeleconEntry> EntryPageList;
+        List<TeleconEntryDto> response = new ArrayList<>();
+        try{
+            EntryPage = TeleconEntriesRepo.findByPatientAndClinicianId(patientId,clinician_Id,pageable);
+            EntryPageList = EntryPage.getContent();
+
+            for(TeleconEntry entry:EntryPageList){
+//                List<ObjectId> reviewerIdList = new ArrayList<>();
+                Patient patientProfile = patientRepo.findById(entry.getPatient());
+                patientDetailsDto patientDetails = new patientDetailsDto(patientProfile);
+                List<ObjectId> reviewerIdList = entry.getReviewers();
+                List<ReviewerDetailsDto> reviewerList = new ArrayList<>();
+                for (ObjectId reviewer: reviewerIdList){
+                    User Reviewer = userRepo.findById(reviewer);
+                    reviewerList.add(new ReviewerDetailsDto(Reviewer));
+                }
+                response.add(new TeleconEntryDto(entry,patientDetails,reviewerList));
+            }
+
+            return  ResponseEntity.status(200).body(response);
+        }catch(Exception e){
+            return ResponseEntity.status(500).body(new errorResponseDto("Internal Server Error!",e.toString()));
+        }
+    }
 
     private String getSortField(String filter){
         if(filter.equals("Updated At")){
