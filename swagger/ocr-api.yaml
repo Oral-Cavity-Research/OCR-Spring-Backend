@@ -2053,6 +2053,7 @@ paths:
                     type: string
         "404":
           description: "Entry Not Found"
+  
   /api/user/upload/reports/{id}:
     post:
       tags:
@@ -2120,6 +2121,7 @@ paths:
                     type: string
         "404":
           description: "Entry Not Found"
+  
   /api/user/upload/patient:
     post:
       tags:
@@ -2194,6 +2196,7 @@ paths:
               schema:
                 type: string
                 format: binary
+  
   /Storage/images:
     get:
       tags:
@@ -2208,6 +2211,7 @@ paths:
               schema:
                 type: string
                 format: binary
+  
   /Storage/reports:
     get:
       tags:
@@ -2222,6 +2226,7 @@ paths:
               schema:
                 type: string
                 format: binary
+
 components:
   schemas:
     User:
