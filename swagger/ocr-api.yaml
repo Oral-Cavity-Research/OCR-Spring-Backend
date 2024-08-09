@@ -33,6 +33,8 @@ tags:
     description: Operations related to the dashboard
   - name: Images
     description: Operations related to images
+  - name: Storage
+    description: Operations related to storage
     
 paths:
   /api/auth/signup:
@@ -1113,6 +1115,12 @@ paths:
     post: 
       tags: 
         - Images
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageUpdateRequest'
       summary: update image
       description: >
         This endpoint updates the details of an image. If the image is not found, it returns an error message.
@@ -2045,6 +2053,7 @@ paths:
                     type: string
         "404":
           description: "Entry Not Found"
+  
   /api/user/upload/reports/{id}:
     post:
       tags:
@@ -2112,6 +2121,7 @@ paths:
                     type: string
         "404":
           description: "Entry Not Found"
+  
   /api/user/upload/patient:
     post:
       tags:
@@ -2172,6 +2182,51 @@ paths:
                   error:
                     type: string
 
+  /Storage:
+    get:
+      tags:
+        - Storage
+      summary: Serve static files from the /Storage directory
+      description: Serves static files located in the /Storage directory.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  
+  /Storage/images:
+    get:
+      tags:
+        - Storage
+      summary: Serve static files from the /Storage/images directory
+      description: Serves static files located in the /Storage/images directory.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  
+  /Storage/reports:
+    get:
+      tags:
+        - Storage
+      summary: Serve static files from the /Storage/reports directory
+      description: Serves static files located in the /Storage/reports directory.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
 components:
   schemas:
     User:
@@ -2193,6 +2248,7 @@ components:
           type: string
         role:
           type: string
+    
     hospital:
       type: object
       properties:
@@ -2335,6 +2391,7 @@ components:
           type: string
           description: Detailed error information
           example: "Detailed error information here."
+    
     userref:
           type: object
           description: User reference details
@@ -2700,7 +2757,6 @@ components:
         contact_no:
           type: string
       
-    
     Role:
       type: object
       properties:
@@ -2740,8 +2796,6 @@ components:
           type: string
           default: "user deleted successfully"
       
-
-
     hospitaldeleted:
       type: object
       properties:
@@ -2778,7 +2832,6 @@ components:
         message:
           type: string
           default: "option is saved"
-
 
     SuccessResponse:
       type: object
@@ -2910,8 +2963,6 @@ components:
             Example: If there are 100 patients and 20 of them have the 'Smoking' habit, the percentage is 20%.
           example: 20
 
-
-
     TotalCounts:
       type: object
       properties:
@@ -2927,6 +2978,7 @@ components:
           type: integer
           description: Total number of images
           example: 100    
+    
     Image:
       type: object
       properties:
@@ -2944,6 +2996,7 @@ components:
           default: []
         predicted_vat:
           type: string
+    
     Report:
       type: object
       properties:
@@ -2951,8 +3004,7 @@ components:
           type: string
         report_name:
           type: string
-
-        
+    
     DraftEntry:
       type: object
       properties:
@@ -2986,6 +3038,7 @@ components:
         updatedAt:
           type: string
           format: date-time
+    
     TeleConEntry:
       type: object
       properties:
@@ -3041,6 +3094,7 @@ components:
       required:
         - patient
         - clinician_id
+   
     Review:
       type: object
       properties:
@@ -3055,6 +3109,7 @@ components:
         review_date:
           type: string
           format: date-time
+   
     TeleConEntryWithAssignment:
       allOf:
         - $ref: '#/components/schemas/TeleConEntry'
@@ -3090,6 +3145,7 @@ components:
           type: string
         draft_entry:
           type: string
+    
     imageUploadResponse:
       type: object
       properties:
@@ -3123,6 +3179,7 @@ components:
         updatedAt: 
           type: string
           example: "2024-07-12T02:32:40.650Z"
+    
     reportUploadResponse:
       type: object
       properties:
@@ -3141,6 +3198,7 @@ components:
         updatedAt: 
           type: string
           example: "2024-07-12T02:32:40.650Z"
+    
     consentFormUploadResponse:
       type: object
       properties:
@@ -3183,3 +3241,28 @@ components:
         updatedAt:
           type: string
           format: date-time
+
+    ImageUpdateRequest:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: The ID of the image entry
+          example: "60d21b4667d0d8992e610c85"
+        location:
+          type: string
+          description: The location of the image
+          example: "New York"
+        clinical_diagnosis:
+          type: string
+          description: The clinical diagnosis related to the image
+          example: "Diagnosis example"
+        lesions_appear:
+          type: string
+          description: Description of lesions appearance
+          example: "Lesions description"
+        annotation:
+          type: string
+          description: Annotations for the image
+          example: "Annotation example"
+    
