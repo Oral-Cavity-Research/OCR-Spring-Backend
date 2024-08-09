@@ -33,6 +33,8 @@ tags:
     description: Operations related to the dashboard
   - name: Images
     description: Operations related to images
+  - name: Storage
+    description: Operations related to storage
     
 paths:
   /api/auth/signup:
@@ -2172,6 +2174,48 @@ paths:
                   error:
                     type: string
 
+  /Storage:
+    get:
+      tags:
+        - Storage
+      summary: Serve static files from the /Storage directory
+      description: Serves static files located in the /Storage directory.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  /Storage/images:
+    get:
+      tags:
+        - Storage
+      summary: Serve static files from the /Storage/images directory
+      description: Serves static files located in the /Storage/images directory.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  /Storage/reports:
+    get:
+      tags:
+        - Storage
+      summary: Serve static files from the /Storage/reports directory
+      description: Serves static files located in the /Storage/reports directory.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
 components:
   schemas:
     User:
