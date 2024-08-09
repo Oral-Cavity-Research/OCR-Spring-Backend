@@ -1,5 +1,7 @@
 package com.oasis.ocrspring.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -16,14 +18,23 @@ public class Patient {
 
     @Id
     @Field("_id")
+    @JsonIgnore
     private ObjectId id;
+    @JsonProperty("_id")
+    public String getIdString(){
+        return (id != null)?id.toHexString():null;
+    }
     @Field("patient_id")
-
     private String patientId;
 
 
     @Field("clinician_id")
+    @JsonIgnore
     private ObjectId clinicianId;
+    @JsonProperty("clinician_id")
+    public String getPatientIdString(){
+        return (clinicianId != null)?clinicianId.toHexString():null;
+    }
 
     private String patient_name;
 
@@ -195,8 +206,8 @@ public class Patient {
     @Override
     public String toString() {
         return "Patient{" +
-                "id='" + id + '\'' +
-                ", patientId='" + patientId + '\'' +
+                "id='" + getIdString() + '\'' +
+                ", patientId='" + getPatientIdString() + '\'' +
                 ", clinicianId='" + clinicianId + '\'' +
                 ", patient_name='" + patient_name + '\'' +
                 ", risk_factors=" + risk_factors +

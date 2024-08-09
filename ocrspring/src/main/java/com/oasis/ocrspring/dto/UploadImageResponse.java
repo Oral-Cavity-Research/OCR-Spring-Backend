@@ -27,4 +27,12 @@ public class UploadImageResponse {
     public void setMessage(String message) {
         this.message = message;
     }
+
+    @Override
+    public String toString() {
+        return "UploadImageResponse{" +
+                "docs=" + docs +
+                ", message='" + message + '\'' +
+                '}';
+    }
 }

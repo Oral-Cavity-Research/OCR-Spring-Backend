@@ -76,22 +76,6 @@ public class PatientService {
         }
     }
 
-//    public List<User> getReviewer(String id){
-//        Optional<TeleconEntry> entry = TeleconEntriesRepo.findByPatientIn(id);
-//        List<User> reviewers = null;
-//        if (entry.isPresent()) {
-//            for (String reviewerId : entry.get().getReviewers()) {
-//                Optional<User> reviewer = UserRepo.findById(reviewerId);
-//                if (reviewer.isPresent()) {
-//                    reviewers.add(reviewer.get());
-//                }
-//            }
-//            return reviewers;
-//        }
-//        else {
-//            return null;
-//        }
-//    }
 public Patient findOne(String patient_id, String clinician_id){
     Patient patient =  PatientRepo.findByPatientIdAndClinicianId(patient_id,new ObjectId(clinician_id)).orElse(null);
     return patient;

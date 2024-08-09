@@ -47,9 +47,13 @@ public class Entry {
 
     //get patient entries
     @GetMapping("/get/patient/{id}")
-    public String getPatientEntries(long id) {
+    public ResponseEntity<?> getPatientEntries(@RequestHeader("_id") String clinicianId,
+                                    @PathVariable String id,
+                                    @RequestParam(name = "page",required = false,defaultValue ="1") Integer page,
+                                    @RequestParam(name = "filter",required = false,defaultValue = "1") String filter) {
+        int pageSize = 20;
         // get patient entries
-        return "/api/user/entry/get/patient/"+id;
+        return teleconService.getUserEntryById(clinicianId,id,page,filter,pageSize);
     }
 
     //get shared patient entries (view only data)
@@ -69,7 +73,7 @@ public class Entry {
     }
 
     //get new review count
-    @GetMapping("/vount/newreviews")
+    @GetMapping("/count/newreviews")
     public String getNewReviewCount() {
         // get new review count
         return "/api/user/entry/vount/newreviews";

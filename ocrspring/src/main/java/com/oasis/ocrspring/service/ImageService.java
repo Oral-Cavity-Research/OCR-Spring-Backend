@@ -6,6 +6,8 @@ import com.oasis.ocrspring.dto.UploadImageResponse;
 import com.oasis.ocrspring.model.Image;
 import com.oasis.ocrspring.model.TeleconEntry;
 import com.oasis.ocrspring.repository.ImageRepository;
+import com.oasis.ocrspring.repository.TeleconEntriesRepository;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -31,23 +33,21 @@ public class ImageService {
     private ImageRepository imageRepo;
     @Autowired
     private TeleconEntriesService teleconServices;
+    @Autowired
+    private TeleconEntriesRepository teleconRepo;
     @Value("src/main/Storage/images")
     private String uploadDir;
-    public List<Image> AllImageDetails(){
-        System.out.println("appeared in service layer");
-        return imageRepo.findAll();
-    }
 
 
     public ResponseEntity<UploadImageResponse> uploadImages(ImageRequestDto data,
                                                             String id,
                                                             List<MultipartFile> files) throws IOException {
         List<Image> uploadedImages = new ArrayList<>();
-        List<String> ImageIds = new ArrayList<>();
+        List<ObjectId> ImageIds = new ArrayList<>();
         List<String> ImageURIs = new ArrayList<>();
         try {
-            TeleconEntry teleconEntry = teleconServices.findByID(id);
-            if (teleconEntry != null && teleconEntry.getClinicianId().equals(getAuthenticatedUser())) {
+            TeleconEntry teleconEntry = teleconRepo.findById(new ObjectId(id));
+            if (teleconEntry != null && teleconEntry.getClinicianId() != null) {
                 try {
                     for (MultipartFile file : files) {
                         //Save the image
@@ -69,7 +69,7 @@ public class ImageService {
 
                             //create new Image object for each file and copy the image data
                             Image image = new Image();
-                            image.setTelecon_entry_id(data.getTeleconId());
+                            image.setTelecon_entry_id(new ObjectId(data.getTeleconId()));
                             image.setImage_name(data.getImage_name());
                             image.setLocation(data.getLocation());
                             image.setClinical_diagnosis(data.getClinical_diagnosis());
@@ -90,8 +90,8 @@ public class ImageService {
                         }
                     }
                     // Extract image IDs and add them to the teleconEntry
-                    List<String> imageIds = uploadedImages.stream().map(Image::getId).toList();
-                    List<String> existedImageIds = teleconEntry.getImages();
+                    List<ObjectId> imageIds = uploadedImages.stream().map(Image::getId).toList();
+                    List<ObjectId> existedImageIds = teleconEntry.getImages();
                     if (existedImageIds.isEmpty()) {
                         existedImageIds = new ArrayList<>();
                     }

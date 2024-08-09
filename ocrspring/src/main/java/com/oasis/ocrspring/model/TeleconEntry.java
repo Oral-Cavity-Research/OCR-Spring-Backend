@@ -27,10 +27,10 @@ public class TeleconEntry {
     private String findings;
     private List<HabitDto> current_habits;
     private boolean updated;
-    private List<String> reviewers;
+    private List<ObjectId> reviewers;
     private List<String> reviews;
-    private List<String> images;
-    private List<String> reports;
+    private List<ObjectId> images;
+    private List<ObjectId> reports;
     @CreatedDate
     private LocalDateTime createdAt;
     @LastModifiedDate
@@ -40,8 +40,8 @@ public class TeleconEntry {
     public TeleconEntry(ObjectId id, ObjectId patient, ObjectId clinicianId, String complaint,
                         LocalDateTime start_time, LocalDateTime end_time, String findings,
                         List<HabitDto> current_habits, boolean updated,
-                        List<String> reviewers, List<String> reviews, List<String> images,
-                        List<String> reports, LocalDateTime createdAt, LocalDateTime updatedAt) {
+                        List<ObjectId> reviewers, List<String> reviews, List<ObjectId> images,
+                        List<ObjectId> reports, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.patient = patient;
         this.clinicianId = clinicianId;
@@ -61,6 +61,10 @@ public class TeleconEntry {
 
     public ObjectId getId() {
         return id;
+    }
+
+    public void setId(ObjectId id) {
+        this.id = id;
     }
 
     public ObjectId getPatient() {
@@ -127,12 +131,11 @@ public class TeleconEntry {
         this.updated = updated;
     }
 
-
-    public List<String> getReviewers() {
+    public List<ObjectId> getReviewers() {
         return reviewers;
     }
 
-    public void setReviewers(List<String> reviewers) {
+    public void setReviewers(List<ObjectId> reviewers) {
         this.reviewers = reviewers;
     }
 
@@ -144,19 +147,19 @@ public class TeleconEntry {
         this.reviews = reviews;
     }
 
-    public List<String> getImages() {
+    public List<ObjectId> getImages() {
         return images;
     }
 
-    public void setImages(List<String> images) {
+    public void setImages(List<ObjectId> images) {
         this.images = images;
     }
 
-    public List<String> getReports() {
+    public List<ObjectId> getReports() {
         return reports;
     }
 
-    public void setReports(List<String> reports) {
+    public void setReports(List<ObjectId> reports) {
         this.reports = reports;
     }
 
@@ -179,9 +182,9 @@ public class TeleconEntry {
     @Override
     public String toString() {
         return "TeleconEntry{" +
-                "id=" + id.toString() +
-                ", patient=" + patient.toString() +
-                ", clinicianId=" + clinicianId.toString() +
+                "id=" + id +
+                ", patient=" + patient +
+                ", clinicianId=" + clinicianId +
                 ", complaint='" + complaint + '\'' +
                 ", start_time=" + start_time +
                 ", end_time=" + end_time +

@@ -1,18 +1,19 @@
 package com.oasis.ocrspring.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.bson.types.ObjectId;
 
 public class ReportsRequestDto {
     @JsonProperty("telecon_entry_id")
-    private String teleconId;
+    private ObjectId teleconId;
     @JsonProperty("report_name")
     private String reportName;
 
-    public String getTeleconId() {
+    public ObjectId getTeleconId() {
         return teleconId;
     }
 
-    public void setTeleconId(String teleconId) {
+    public void setTeleconId(ObjectId teleconId) {
         this.teleconId = teleconId;
     }
 
