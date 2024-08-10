@@ -2,12 +2,10 @@ package com.oasis.ocrspring.service;
 
 import com.oasis.ocrspring.dto.ConsentRequestDto;
 import com.oasis.ocrspring.dto.ConsentResponseDto;
-import com.oasis.ocrspring.dto.errorResponseDto;
+import com.oasis.ocrspring.dto.ErrorResponseDto;
 import com.oasis.ocrspring.model.Patient;
 import com.oasis.ocrspring.model.TeleconEntry;
-import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.repository.PatientRepository;
-import com.oasis.ocrspring.repository.ReviewRepository;
 import com.oasis.ocrspring.repository.TeleconEntriesRepository;
 import com.oasis.ocrspring.repository.UserRepository;
 import org.bson.types.ObjectId;
@@ -132,17 +130,15 @@ public  Patient findPatient(String id,String clinician_Id){
                 uploadedURIs.add(fileDownUri);
 
                 Patient newPatient = new Patient();
-                newPatient.setpatientId(data.getPatient_id());
-                newPatient.setclinicianId(new ObjectId(data.getClinician_id()));
-                newPatient.setpatient_name(data.getPatient_name());
-                newPatient.setrisk_factors(data.getRisk_factors());
-                newPatient.setDOB(data.getDOB());
-                newPatient.setGender(data.getGender());
-                newPatient.sethisto_diagnosis(data.getHisto_diagnosis());
-                newPatient.setmedical_history(data.getMedical_history());
-                newPatient.setfamily_history(data.getFamily_history());
-                newPatient.setsystemic_disease(data.getSystemic_disease());
-                newPatient.setcontact_no(data.getContact_no());
+                newPatient.setPatientId(data.getPatient_id());
+                newPatient.setClinicianId(new ObjectId(data.getClinician_id()));
+                newPatient.setPatientName(data.getPatient_name());
+                newPatient.setRiskFactors(data.getRisk_factors());
+                newPatient.setHistoDiagnosis(data.getHisto_diagnosis());
+                newPatient.setMedicalHistory(data.getMedical_history());
+                newPatient.setFamilyHistory(data.getFamily_history());
+                newPatient.setSystemicDisease(data.getSystemic_disease());
+                newPatient.setContactNo(data.getContact_no());
                 newPatient.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
                 newPatient.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
 
@@ -151,16 +147,19 @@ public  Patient findPatient(String id,String clinician_Id){
 
 
             }catch(MultipartException ex){
-                return ResponseEntity.status(500).body(new errorResponseDto("Internal Server Error!",ex.toString()));
+                return ResponseEntity.status(500).body(new ErrorResponseDto("Internal " +
+                        "Server Error!",ex.toString()));
 
             }catch(Exception e){
-                return ResponseEntity.status(500).body(new errorResponseDto("Internal Server Error!",e.toString()));
+                return ResponseEntity.status(500).body(new ErrorResponseDto("Internal " +
+                        "Server Error!",e.toString()));
             }
 
 
 
         }catch(Exception e){
-            return ResponseEntity.status(500).body(new errorResponseDto("Internal Server Error",e.toString()));
+            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal " +
+                    "Server Error",e.toString()));
         }
     }
 

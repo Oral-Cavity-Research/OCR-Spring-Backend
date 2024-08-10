@@ -1,7 +1,7 @@
 package com.oasis.ocrspring.dto;
 
 import com.oasis.ocrspring.model.TeleconEntry;
-import com.oasis.ocrspring.model.subModels.HabitDto;
+import com.oasis.ocrspring.dto.subdto.HabitDto;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -33,10 +33,10 @@ public class TeleconEntryDto {
         this.patient = patient;
         this.clinician_id = teleconEntry.getClinicianId().toString();
         this.complaint = teleconEntry.getComplaint();
-        this.start_time = teleconEntry.getStart_time();
-        this.end_time = teleconEntry.getEnd_time();
+        this.start_time = teleconEntry.getStartTime();
+        this.end_time = teleconEntry.getEndTime();
         this.findings = teleconEntry.getFindings();
-        this.current_habits = teleconEntry.getCurrent_habits();
+        this.current_habits = teleconEntry.getCurrentHabits();
         this.updated =teleconEntry.isUpdated();
         this.reviewers = Reviewer;
         this.reviews =teleconEntry.getReviews();

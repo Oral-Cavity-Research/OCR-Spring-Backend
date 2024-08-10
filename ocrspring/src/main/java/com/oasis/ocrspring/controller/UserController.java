@@ -3,11 +3,8 @@ package com.oasis.ocrspring.controller;
 import com.oasis.ocrspring.dto.UserDto;
 import com.oasis.ocrspring.model.Hospital;
 import com.oasis.ocrspring.model.User;
-import com.oasis.ocrspring.repository.HospitalRepository;
-import com.oasis.ocrspring.repository.UserRepository;
-
 import com.oasis.ocrspring.service.HospitalService;
-import com.oasis.ocrspring.service.userService;
+import com.oasis.ocrspring.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,11 +19,12 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/user/self")
-public class user {
+public class UserController
+{
 
 
     @Autowired
-    private userService userservice;
+    private UserService userservice;
     @Autowired
     private HospitalService hospitalService;
 

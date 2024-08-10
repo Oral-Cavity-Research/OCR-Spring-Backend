@@ -8,12 +8,11 @@ import com.oasis.ocrspring.model.Role;
 import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.repository.RequestRepository;
 import com.oasis.ocrspring.service.RefreshtokenService;
-import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
 import com.oasis.ocrspring.service.ResponseMessages.ErrorResponse;
 import com.oasis.ocrspring.service.RoleService;
 import com.oasis.ocrspring.service.auth.AuthenticationToken;
 import com.oasis.ocrspring.service.auth.TokenService;
-import com.oasis.ocrspring.service.userService;
+import com.oasis.ocrspring.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -31,11 +30,12 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/auth")
-public class userAuth {
+public class UserAuthController
+{
     @Autowired
     private RequestRepository RequestRepo;
     @Autowired
-    private userService userservice;
+    private UserService userservice;
     @Autowired
     private TokenService tokenService;
     @Autowired

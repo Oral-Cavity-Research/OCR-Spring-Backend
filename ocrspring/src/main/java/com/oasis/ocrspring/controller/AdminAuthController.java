@@ -12,7 +12,8 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/admin/auth")
-public class adminAuth {
+public class AdminAuthController
+{
     @Autowired
     private UserRepository UserRepo;
     @ApiIgnore

@@ -5,11 +5,10 @@ import com.oasis.ocrspring.model.Role;
 import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.repository.RefreshtokenRepsitory;
 import com.oasis.ocrspring.service.RoleService;
-import com.oasis.ocrspring.service.userService;
+import com.oasis.ocrspring.service.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,10 +17,7 @@ import javax.crypto.SecretKey;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +36,7 @@ public class TokenService {
     @Autowired
     RefreshtokenRepsitory refreshTokenRepository;
     @Autowired
-    private userService userservice;
+    private UserService userservice;
     @Autowired
     private RoleService roleService;
 
@@ -93,7 +89,7 @@ public class TokenService {
         refreshToken.setToken(generateRandomToken(256));
         refreshToken.setExpiresAt(LocalDateTime.parse((LocalDateTime.now().plusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))));
         refreshToken.setCreatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
-        refreshToken.setcreatedByIP(ipaddress);
+        refreshToken.setCreatedByIP(ipaddress);
         return refreshTokenRepository.save(refreshToken);
     }
     public void setTokenCookie(HttpServletResponse response, String token) {
@@ -142,7 +138,7 @@ public class TokenService {
         Role rolePermissions= roleService.getRoleByrole(user.getRole()).orElseThrow(()->new RuntimeException("Role not found"));
 
         RefreshToken newRefreshToken =generateRefreshToken(user,ipaddress);
-        System.out.println(newRefreshToken.getcreatedByIP());//////////////////
+        System.out.println(newRefreshToken.getCreatedByIP());//////////////////
         refreshToken.setRevokedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
         refreshToken.setReplacedByToken(newRefreshToken.getToken());
 

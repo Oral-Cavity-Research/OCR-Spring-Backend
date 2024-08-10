@@ -14,7 +14,8 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/dashboard")
-public class Dashboard {
+public class DashboardController
+{
 
     @Autowired
     private UserRepository UserRepo;

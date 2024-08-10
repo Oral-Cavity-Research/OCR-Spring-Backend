@@ -6,7 +6,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/image")
-public class Image {
+public class ImageController
+{
 
     // id is entry _id
     @PostMapping("/update")

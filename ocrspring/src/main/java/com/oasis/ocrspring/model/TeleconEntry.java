@@ -1,55 +1,81 @@
 package com.oasis.ocrspring.model;
 
-import com.oasis.ocrspring.model.subModels.HabitDto;
+import com.oasis.ocrspring.dto.subdto.HabitDto;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Document(collection = "teleconentries")
-public class TeleconEntry {
-
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+public class TeleconEntry
+{
     @Id
     @Field("_id")
-    private ObjectId  id; // MongoDB typically uses String for IDs
+    private ObjectId id;
 
     private ObjectId patient;
+
     @Field("clinician_id")
     private ObjectId clinicianId;
+
     private String complaint;
-    private LocalDateTime start_time;
-    private LocalDateTime end_time;
+
+    @Field("start_time")
+    private LocalDateTime startTime;
+
+    @Field("end_time")
+    private LocalDateTime endTime;
+
     private String findings;
-    private List<HabitDto> current_habits;
+
+    @Field("current_habits")
+    private List<HabitDto> currentHabits;
+
     private boolean updated;
+
     private List<String> reviewers;
+
     private List<String> reviews;
+
     private List<String> images;
+
     private List<String> reports;
+
     @CreatedDate
     private LocalDateTime createdAt;
+
     @LastModifiedDate
     private LocalDateTime updatedAt;
-    public TeleconEntry(){}
 
-    public TeleconEntry(ObjectId id, ObjectId patient, ObjectId clinicianId, String complaint,
-                        LocalDateTime start_time, LocalDateTime end_time, String findings,
-                        List<HabitDto> current_habits, boolean updated,
+    public TeleconEntry(ObjectId id, ObjectId patient, ObjectId clinicianId,
+                        String complaint,
+                        LocalDateTime startTime, LocalDateTime endTime, String findings,
+                        List<HabitDto> currentHabits, boolean updated,
                         List<String> reviewers, List<String> reviews, List<String> images,
-                        List<String> reports, LocalDateTime createdAt, LocalDateTime updatedAt) {
+                        List<String> reports, LocalDateTime createdAt,
+                        LocalDateTime updatedAt)
+    {
         this.id = id;
         this.patient = patient;
         this.clinicianId = clinicianId;
         this.complaint = complaint;
-        this.start_time = start_time;
-        this.end_time = end_time;
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.findings = findings;
-        this.current_habits = current_habits;
+        this.currentHabits = currentHabits;
         this.updated = updated;
         this.reviewers = reviewers;
         this.reviews = reviews;
@@ -57,143 +83,5 @@ public class TeleconEntry {
         this.reports = reports;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-    }
-
-    public ObjectId getId() {
-        return id;
-    }
-
-    public ObjectId getPatient() {
-        return patient;
-    }
-
-    public void setPatient(ObjectId patient) {
-        this.patient = patient;
-    }
-
-    public ObjectId getClinicianId() {
-        return clinicianId;
-    }
-
-    public void setClinicianId(ObjectId clinicianId) {
-        this.clinicianId = clinicianId;
-    }
-
-    public String getComplaint() {
-        return complaint;
-    }
-
-    public void setComplaint(String complaint) {
-        this.complaint = complaint;
-    }
-
-    public LocalDateTime getStart_time() {
-        return start_time;
-    }
-
-    public void setStart_time(LocalDateTime start_time) {
-        this.start_time = start_time;
-    }
-
-    public LocalDateTime getEnd_time() {
-        return end_time;
-    }
-
-    public void setEnd_time(LocalDateTime end_time) {
-        this.end_time = end_time;
-    }
-
-    public String getFindings() {
-        return findings;
-    }
-
-    public void setFindings(String findings) {
-        this.findings = findings;
-    }
-
-    public List<HabitDto> getCurrent_habits() {
-        return current_habits;
-    }
-
-    public void setCurrent_habits(List<HabitDto> current_habits) {
-        this.current_habits = current_habits;
-    }
-
-    public boolean isUpdated() {
-        return updated;
-    }
-
-    public void setUpdated(boolean updated) {
-        this.updated = updated;
-    }
-
-
-    public List<String> getReviewers() {
-        return reviewers;
-    }
-
-    public void setReviewers(List<String> reviewers) {
-        this.reviewers = reviewers;
-    }
-
-    public List<String> getReviews() {
-        return reviews;
-    }
-
-    public void setReviews(List<String> reviews) {
-        this.reviews = reviews;
-    }
-
-    public List<String> getImages() {
-        return images;
-    }
-
-    public void setImages(List<String> images) {
-        this.images = images;
-    }
-
-    public List<String> getReports() {
-        return reports;
-    }
-
-    public void setReports(List<String> reports) {
-        this.reports = reports;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    @Override
-    public String toString() {
-        return "TeleconEntry{" +
-                "id=" + id.toString() +
-                ", patient=" + patient.toString() +
-                ", clinicianId=" + clinicianId.toString() +
-                ", complaint='" + complaint + '\'' +
-                ", start_time=" + start_time +
-                ", end_time=" + end_time +
-                ", findings='" + findings + '\'' +
-                ", current_habits=" + current_habits +
-                ", updated=" + updated +
-                ", reviewers=" + reviewers +
-                ", reviews=" + reviews +
-                ", images=" + images +
-                ", reports=" + reports +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
     }
 }

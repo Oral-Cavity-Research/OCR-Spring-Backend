@@ -1,9 +1,6 @@
 package com.oasis.ocrspring.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
@@ -11,7 +8,8 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/admin")
-public class Admin {
+public class AdminController
+{
     // connect admin to the service layer
 
     @ApiIgnore
@@ -93,7 +91,7 @@ public class Admin {
 
     //update a user
     @PostMapping("update/users/{id}")
-    public String updateUser(long id) {
+    public String updateUser(@PathVariable long id) {
         // update a user
         return "/api/admin/update/users/"+id;
     }

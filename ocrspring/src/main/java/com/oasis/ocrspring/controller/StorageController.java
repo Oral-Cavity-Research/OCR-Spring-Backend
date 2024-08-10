@@ -11,7 +11,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/Storage")
-public class Storage
+public class StorageController
 {
 
     @ApiIgnore
