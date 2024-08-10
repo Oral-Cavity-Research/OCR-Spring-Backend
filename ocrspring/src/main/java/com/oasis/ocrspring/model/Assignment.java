@@ -1,63 +1,39 @@
 package com.oasis.ocrspring.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "assignments")
-public class Assignment {
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+public class Assignment
+{
     @Id
     private String id;
-    private String reviewer_id;
-    private String telecon_entry;
+
+    @Field("reviewer_id")
+    private String reviewerId;
+
+    @Field("telecon_entry")
+    private String teleconEntry;
+
     private Boolean checked;
+
     private Boolean reviewed;
 
-    public Assignment(String reviewer_id, String telecon_entry, Boolean checked, Boolean reviewed) {
-        this.reviewer_id = reviewer_id;
-        this.telecon_entry = telecon_entry;
+    public Assignment(String reviewerId, String teleconEntry, Boolean checked,
+                      Boolean reviewed)
+    {
+        this.reviewerId = reviewerId;
+        this.teleconEntry = teleconEntry;
         this.checked = checked;
         this.reviewed = reviewed;
-    }
-
-    public String getReviewer_id() {
-        return reviewer_id;
-    }
-
-    public void setReviewer_id(String reviewer_id) {
-        this.reviewer_id = reviewer_id;
-    }
-
-    public String getTelecon_entry() {
-        return telecon_entry;
-    }
-
-    public void setTelecon_entry(String telecon_entry) {
-        this.telecon_entry = telecon_entry;
-    }
-
-    public Boolean getChecked() {
-        return checked;
-    }
-
-    public void setChecked(Boolean checked) {
-        this.checked = checked;
-    }
-
-    public Boolean getReviewed() {
-        return reviewed;
-    }
-
-    public void setReviewed(Boolean reviewed) {
-        this.reviewed = reviewed;
-    }
-
-    @Override
-    public String toString() {
-        return "Assignment{" +
-                "reviewer_id=" + reviewer_id +
-                ", telecon_entry=" + telecon_entry +
-                ", checked=" + checked +
-                ", reviewed=" + reviewed +
-                '}';
     }
 }

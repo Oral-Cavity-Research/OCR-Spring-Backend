@@ -4,7 +4,7 @@ import com.oasis.ocrspring.dto.UserDto;
 import com.oasis.ocrspring.model.Hospital;
 import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.service.HospitalService;
-import com.oasis.ocrspring.service.userService;
+import com.oasis.ocrspring.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class UserController
 
 
     @Autowired
-    private userService userservice;
+    private UserService userservice;
     @Autowired
     private HospitalService hospitalService;
 

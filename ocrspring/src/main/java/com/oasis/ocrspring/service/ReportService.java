@@ -63,8 +63,8 @@ public class ReportService {
 
                         // creating a report instance and saving it on the database
                         Report report = new Report();
-                        report.setTelecon_id(data.getTeleconId());
-                        report.setReport_name(data.getReportName());
+                        report.setTeleconId(data.getTeleconId());
+                        report.setReportName(data.getReportName());
                         report.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
                         report.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
                         reportRepo.save(report);

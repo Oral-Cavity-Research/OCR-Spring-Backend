@@ -8,8 +8,8 @@ public class patientDetailsDto {
     private String patient_name;
     public patientDetailsDto(Patient patient){
         this._id = patient.getId().toString();
-        this.patient_id = patient.getpatientId();
-        this.patient_name = patient.getpatient_name();
+        this.patient_id = patient.getPatientId();
+        this.patient_name = patient.getPatientName();
 
     }
 

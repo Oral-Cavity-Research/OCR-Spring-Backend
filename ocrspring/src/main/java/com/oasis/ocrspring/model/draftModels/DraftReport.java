@@ -1,41 +1,32 @@
 package com.oasis.ocrspring.model.draftModels;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "draftreports")
-public class DraftReport {
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+public class DraftReport
+{
     @Id
     private String id;
-    private String telecon_entry_id;
-    private String report_name;
 
-    public DraftReport(String telecon_entry_id, String report_name) {
-        this.telecon_entry_id = telecon_entry_id;
-        this.report_name = report_name;
-    }
+    @Field("telecon_entry_id")
+    private String teleconEntryId;
 
-    public String getTelecon_entry_id() {
-        return telecon_entry_id;
-    }
+    @Field("report_name")
+    private String reportName;
 
-    public void setTelecon_entry_id(String telecon_entry_id) {
-        this.telecon_entry_id = telecon_entry_id;
-    }
-
-    public String getReport_name() {
-        return report_name;
-    }
-
-    public void setReport_name(String report_name) {
-        this.report_name = report_name;
-    }
-
-    @Override
-    public String toString() {
-        return "DraftReport{" +
-                "telecon_entry_id=" + telecon_entry_id +
-                ", report_name='" + report_name + '\'' +
-                '}';
+    public DraftReport(String teleconEntryId, String reportName)
+    {
+        this.teleconEntryId = teleconEntryId;
+        this.reportName = reportName;
     }
 }

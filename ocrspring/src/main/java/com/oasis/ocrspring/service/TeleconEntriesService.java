@@ -58,12 +58,12 @@ public class TeleconEntriesService {
             if(patient != null){
                 TeleconEntry newEntry = new TeleconEntry();
                 newEntry.setPatient(patient.getId());
-                newEntry.setClinicianId(patient.getclinicianId());
-                newEntry.setStart_time(LocalDateTime.parse(newPatient.getStart_time(), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-                newEntry.setEnd_time(LocalDateTime.parse(newPatient.getEnd_time(), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+                newEntry.setClinicianId(patient.getClinicianId());
+                newEntry.setStartTime(LocalDateTime.parse(newPatient.getStart_time(), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+                newEntry.setEndTime(LocalDateTime.parse(newPatient.getEnd_time(), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
                 newEntry.setComplaint(newPatient.getComplaint());
                 newEntry.setFindings(newPatient.getFindings());
-                newEntry.setCurrent_habits(newPatient.getCurrent_habits());
+                newEntry.setCurrentHabits(newPatient.getCurrent_habits());
                 newEntry.setReviewers(new ArrayList<>());
                 newEntry.setReviews(new ArrayList<>());
                 newEntry.setImages(new ArrayList<>());
