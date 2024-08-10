@@ -1,6 +1,6 @@
 package com.oasis.ocrspring.controller;
 
-import com.oasis.ocrspring.dto.patientTeleconRequest;
+import com.oasis.ocrspring.dto.PatientTeleconRequest;
 import com.oasis.ocrspring.service.TeleconEntriesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +28,7 @@ public class EntryController
     @PostMapping("/add/{id}")
     public ResponseEntity<?> addTeleconsultationEntry(@PathVariable String id,
                                                       @RequestHeader("_id") String clinician_id,
-                                                      @RequestBody patientTeleconRequest newPatient) {
+                                                      @RequestBody PatientTeleconRequest newPatient) {
         // add a teleconsultation entry
         return teleconService.patientTeleconEntry(id,clinician_id,newPatient);
     }

@@ -51,7 +51,7 @@ public class TeleconEntriesService {
     }
     public ResponseEntity<?> patientTeleconEntry(String patient_id,
                                                  String clinician_id,
-                                                 patientTeleconRequest newPatient ){ //path patient id
+                                                 PatientTeleconRequest newPatient ){ //path patient id
 
         try{
             Patient patient = patientService.findPatient(patient_id,clinician_id);//patient_id, String clinician_id
@@ -59,11 +59,11 @@ public class TeleconEntriesService {
                 TeleconEntry newEntry = new TeleconEntry();
                 newEntry.setPatient(patient.getId());
                 newEntry.setClinicianId(patient.getClinicianId());
-                newEntry.setStartTime(LocalDateTime.parse(newPatient.getStart_time(), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-                newEntry.setEndTime(LocalDateTime.parse(newPatient.getEnd_time(), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+                newEntry.setStartTime(LocalDateTime.parse(newPatient.getStartTime(), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+                newEntry.setEndTime(LocalDateTime.parse(newPatient.getEndTime(), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
                 newEntry.setComplaint(newPatient.getComplaint());
                 newEntry.setFindings(newPatient.getFindings());
-                newEntry.setCurrentHabits(newPatient.getCurrent_habits());
+                newEntry.setCurrentHabits(newPatient.getCurrentHabits());
                 newEntry.setReviewers(new ArrayList<>());
                 newEntry.setReviews(new ArrayList<>());
                 newEntry.setImages(new ArrayList<>());
@@ -76,14 +76,14 @@ public class TeleconEntriesService {
                     return ResponseEntity.status(200).body(new patientTeleconResponse(newEntry));
                 }
                 catch(Exception ex){
-                    return ResponseEntity.status(500).body(new messageDto("Tele consultation entry failed"));
+                    return ResponseEntity.status(500).body(new MessageDto("Tele consultation entry failed"));
                 }
             }
             else{
-                return ResponseEntity.status(404).body(new messageDto("Patient is not registered" ));
+                return ResponseEntity.status(404).body(new MessageDto("Patient is not registered" ));
             }
         }catch(Exception e){
-            return ResponseEntity.status(500).body(new errorResponseDto("Internal Server Error!",e.toString()));
+            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
         }
 
     }
@@ -136,7 +136,7 @@ public class TeleconEntriesService {
             //Page<TeleconEntryDto> userDetailList = (Page<TeleconEntryDto>) response;
             return ResponseEntity.status(200).body(response);
         }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new errorResponseDto("Internal Server Error!",e.toString()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
         }
 
     }

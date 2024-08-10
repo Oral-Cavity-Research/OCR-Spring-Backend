@@ -1,6 +1,6 @@
 package com.oasis.ocrspring.model;
 
-import com.oasis.ocrspring.model.subModels.HabitDto;
+import com.oasis.ocrspring.dto.subdto.HabitDto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

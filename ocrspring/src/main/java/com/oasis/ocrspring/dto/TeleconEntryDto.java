@@ -1,7 +1,7 @@
 package com.oasis.ocrspring.dto;
 
 import com.oasis.ocrspring.model.TeleconEntry;
-import com.oasis.ocrspring.model.subModels.HabitDto;
+import com.oasis.ocrspring.dto.subdto.HabitDto;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 

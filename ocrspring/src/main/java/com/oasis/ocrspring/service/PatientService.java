@@ -2,7 +2,7 @@ package com.oasis.ocrspring.service;
 
 import com.oasis.ocrspring.dto.ConsentRequestDto;
 import com.oasis.ocrspring.dto.ConsentResponseDto;
-import com.oasis.ocrspring.dto.errorResponseDto;
+import com.oasis.ocrspring.dto.ErrorResponseDto;
 import com.oasis.ocrspring.model.Patient;
 import com.oasis.ocrspring.model.TeleconEntry;
 import com.oasis.ocrspring.repository.PatientRepository;
@@ -147,16 +147,19 @@ public  Patient findPatient(String id,String clinician_Id){
 
 
             }catch(MultipartException ex){
-                return ResponseEntity.status(500).body(new errorResponseDto("Internal Server Error!",ex.toString()));
+                return ResponseEntity.status(500).body(new ErrorResponseDto("Internal " +
+                        "Server Error!",ex.toString()));
 
             }catch(Exception e){
-                return ResponseEntity.status(500).body(new errorResponseDto("Internal Server Error!",e.toString()));
+                return ResponseEntity.status(500).body(new ErrorResponseDto("Internal " +
+                        "Server Error!",e.toString()));
             }
 
 
 
         }catch(Exception e){
-            return ResponseEntity.status(500).body(new errorResponseDto("Internal Server Error",e.toString()));
+            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal " +
+                    "Server Error",e.toString()));
         }
     }
 
