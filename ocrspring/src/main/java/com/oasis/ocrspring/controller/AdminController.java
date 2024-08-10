@@ -11,7 +11,8 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/admin")
-public class Admin {
+public class AdminController
+{
     // connect admin to the service layer
 
     @ApiIgnore

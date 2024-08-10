@@ -16,7 +16,8 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/user/draftentry")
-public class draftEntry {
+public class DraftEntryController
+{
     @Autowired
     private PatientRepository PatientRepo;
     @Autowired

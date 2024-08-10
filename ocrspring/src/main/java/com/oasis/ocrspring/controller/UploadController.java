@@ -24,7 +24,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/user/upload")
-public class upload {
+public class UploadController
+{
     @Autowired
     private PatientRepository PatientRepo;
     @Autowired

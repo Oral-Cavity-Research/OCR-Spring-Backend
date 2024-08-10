@@ -14,7 +14,8 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/user/draftupload")
-public class draftUpload {
+public class DraftUploadController
+{
     @Autowired
     private DraftReportRepository draftReportRepo;
     @Autowired
