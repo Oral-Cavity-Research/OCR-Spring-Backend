@@ -15,53 +15,53 @@ import java.util.Optional;
 public class UserService
 {
     @Autowired
-    private UserRepository UserRepo;
+    private UserRepository userRepo;
     @Autowired
-    private RequestRepository RequestRepo;
+    private RequestRepository requestRepo;
 
-    public List<User> AllUserDetails(){
+    public List<User> allUserDetails(){
 
-        return UserRepo.findAll();
+        return userRepo.findAll();
     }
 
     public User createUser(User user){
-        return UserRepo.save(user);
+        return userRepo.save(user);
     }
     public String signup(Request request){
-        Optional<User> userByReg_No = UserRepo.findByRegNo(request.getRegNo());
-        Optional<User> userByEmail = UserRepo.findByEmail(request.getEmail());
-        Optional<Request> requestByReg_No = RequestRepo.findByRegNo(request.getRegNo());
-        Optional<Request> requestByEmail = RequestRepo.findByEmail(request.getEmail());
+        Optional<User> userRepoByRegNo = userRepo.findByRegNo(request.getRegNo());
+        Optional<User> userByEmail = userRepo.findByEmail(request.getEmail());
+        Optional<Request> requestByRegNo = requestRepo.findByRegNo(request.getRegNo());
+        Optional<Request> requestByEmail = requestRepo.findByEmail(request.getEmail());
 
-        if(userByReg_No.isPresent()){
+        if(userRepoByRegNo.isPresent()){
             return "User reg no already exist";
         }
         if(userByEmail.isPresent()){
             return "User Email is already registered";
         }
-        if (requestByReg_No.isPresent()||requestByEmail.isPresent() ){
+        if (requestByRegNo.isPresent()||requestByEmail.isPresent() ){
             return "A request for registration is already exists";
         }
-        RequestRepo.save(request);
+        requestRepo.save(request);
         return "Request is sent successfully. You will receive an Email on acceptance";
 
     }
     public Optional<User> getUserById(String id){
 
-        return UserRepo.findById(id);
+        return userRepo.findById(id);
     }
 
     public Optional<User> getUserByEmail(String id){
 
-        return UserRepo.findByEmail(id);
+        return userRepo.findByEmail(id);
     }
     public User updateUser(String id, UserDto userReqBody){
-        User user = UserRepo.findById(id).orElseThrow(()->new RuntimeException("User not found"));
+        User user = userRepo.findById(id).orElseThrow(()->new RuntimeException("User not found"));
         user.setUsername(userReqBody.getUsername());
         user.setHospital(userReqBody.getHospital());
-        user.setContactNo(userReqBody.getContact_no());
+        user.setContactNo(userReqBody.getContactNo());
         user.setAvailability(userReqBody.isAvailability());
-        return UserRepo.save(user);
+        return userRepo.save(user);
 
     }
 }

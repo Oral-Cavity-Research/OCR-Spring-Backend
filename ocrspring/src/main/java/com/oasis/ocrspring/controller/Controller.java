@@ -20,7 +20,7 @@ import java.util.List;
 public class Controller {
     @Autowired
     private UserService userservice;
-//    @Autowired
+    //    @Autowired
 //    private PatientService patientService;
     @Autowired
     private RoleService roleService;
@@ -52,28 +52,30 @@ public class Controller {
 
 
     @ApiIgnore
-    @RequestMapping(value ="/")
+    @RequestMapping(value = "/")
     public void redirect(HttpServletResponse response) throws IOException {
         response.sendRedirect("/swagger-ui.html");
     }
+
     @GetMapping("/allUserDetails")
-    public List<User> getAllUserDetails(){
+    public List<User> getAllUserDetails() {
 
 
-        return userservice.AllUserDetails();
+        return userservice.allUserDetails();
 
     }
-//    @GetMapping("/allPatientDetails")
-//    public List<Patient> AllPatientDetails(){
+
+    //    @GetMapping("/allPatientDetails")
+//    public List<Patient> allPatientDetails(){
 //
 //        System.out.println("Get all user details");
-//        return patientService.AllPatientDetails();
+//        return patientService.allPatientDetails();
 //    }
     @GetMapping("/allRoleDetails")
-    public List<Role> AllRoleDetails(){
+    public List<Role> AllRoleDetails() {
 
         System.out.println("Get all user details");
-        return  roleService.AllRoleDetails();
+        return roleService.allRoleDetails();
     }
 
     @GetMapping("/allRequestDetails")
@@ -85,64 +87,70 @@ public class Controller {
     @GetMapping("/allTeleconEntryDetails")
     public List<TeleconEntry> AllTeleconEntryDetails() {
 
-        return teleconEntriesService.AllTeleconEntriesDetails();
+        return teleconEntriesService.allTeleconEntriesDetails();
     }
+
     @GetMapping("/allReviewDetails")
     public List<Review> AllReviewDetails() {
 
-        return reviewService.AllReviewDetails();
+        return reviewService.allReviewDetails();
     }
+
     @GetMapping("/allReportDetails")
     public List<Report> AllReportDetails() {
 
-        return reportService.AllReportDetails();
+        return reportService.allReportDetails();
     }
 
     @GetMapping("/allRefreshTokenDetails")
     public List<RefreshToken> AllRefreshTokenDetails() {
 
-        return refreshTokenService.AllRefreshtokenDetails();
+        return refreshTokenService.allRefreshtokenDetails();
     }
+
     @GetMapping("/allOptionDetails")
     public List<Option> AllOptionDetails() {
 
-        return optionService.AllOptionDetails();
+        return optionService.allOptionDetails();
     }
 
-//    @GetMapping("/allImageDetails")
-//    public List<Image> AllImageDetails() {
+    //    @GetMapping("/allImageDetails")
+//    public List<Image> allImageDetails() {
 //
-//        return imageService.AllImageDetails();
+//        return imageService.allImageDetails();
 //    }
     @GetMapping("/allHospitalDetails")
     public List<Hospital> AllHospitalDetails() {
 
-        return hospitalService.AllHospitalDetails();
+        return hospitalService.allHospitalDetails();
     }
+
     @GetMapping("/allAssignmentDetails")
     public List<Assignment> AllAssignmentDetails() {
 
-        return assignmentService.AllAssignmentDetails();
+        return assignmentService.allAssignmentDetails();
     }
 
     @GetMapping("/allDraftEntryDetails")
     public List<DraftEntry> AllDraftEntryDetails() {
 
-        return draftEntryService.AllDraftEntryDetails();
+        return draftEntryService.allDraftEntryDetails();
     }
+
     @GetMapping("/allDraftImageDetails")
     public List<DraftImage> AllDraftImageDetails() {
 
-        return draftImageService.AllDraftImageDetails();
+        return draftImageService.allDraftImageDetails();
     }
 
     @GetMapping("/allDraftReportDetails")
     public List<DraftReport> AllDraftReportDetails() {
 
-        return draftReportService.AllDraftReportDetails();
+        return draftReportService.allDraftReportDetails();
     }
+
     @PostMapping("/postUserDetails")
-    public User postUserDetails(@RequestBody User user){
+    public User postUserDetails(@RequestBody User user) {
         return userservice.createUser(user);
     }
 //    @PostMapping("/signup")

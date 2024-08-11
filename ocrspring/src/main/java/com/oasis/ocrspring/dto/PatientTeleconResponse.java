@@ -5,20 +5,16 @@ import com.oasis.ocrspring.model.TeleconEntry;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TeleconEntryDto {
+public class PatientTeleconResponse {
     private String id; // MongoDB typically uses String for IDs
-
-    private PatientDetailsDto patient;
+    private String patient;
     private String clinicianId;
     private String complaint;
     private LocalDateTime startTime;
@@ -26,18 +22,16 @@ public class TeleconEntryDto {
     private String findings;
     private List<HabitDto> currentHabits;
     private boolean updated;
-    private List<ReviewerDetailsDto> reviewers;
+    private List<String> reviewers;
     private List<String> reviews;
     private List<String> images;
     private List<String> reports;
-    @CreatedDate
     private LocalDateTime createdAt;
-    @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public TeleconEntryDto(TeleconEntry teleconEntry, PatientDetailsDto patient, List<ReviewerDetailsDto> reviewer) {
+    public PatientTeleconResponse(TeleconEntry teleconEntry) {
         this.id = teleconEntry.getId().toString();
-        this.patient = patient;
+        this.patient = teleconEntry.getPatient().toString();
         this.clinicianId = teleconEntry.getClinicianId().toString();
         this.complaint = teleconEntry.getComplaint();
         this.startTime = teleconEntry.getStartTime();
@@ -45,11 +39,11 @@ public class TeleconEntryDto {
         this.findings = teleconEntry.getFindings();
         this.currentHabits = teleconEntry.getCurrentHabits();
         this.updated = teleconEntry.isUpdated();
-        this.reviewers = reviewer;
+        this.reviewers = teleconEntry.getReviewers();
         this.reviews = teleconEntry.getReviews();
         this.images = teleconEntry.getImages();
         this.reports = teleconEntry.getReports();
-        this.createdAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        this.updatedAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        this.createdAt = teleconEntry.getCreatedAt();
+        this.updatedAt = teleconEntry.getUpdatedAt();
     }
 }

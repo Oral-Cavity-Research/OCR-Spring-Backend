@@ -32,8 +32,8 @@ public class ImageService {
     private TeleconEntriesService teleconServices;
     @Value("src/main/Storage/images")
     private String uploadDir;
-    public List<Image> AllImageDetails(){
-        System.out.println("appeared in service layer");
+
+    public List<Image> allImageDetails() {
         return imageRepo.findAll();
     }
 
@@ -42,8 +42,8 @@ public class ImageService {
                                                             String id,
                                                             List<MultipartFile> files) throws IOException {
         List<Image> uploadedImages = new ArrayList<>();
-        List<String> ImageIds = new ArrayList<>();
-        List<String> ImageURIs = new ArrayList<>();
+        List<String> imageIds_ = new ArrayList<>();
+        List<String> imageURIs = new ArrayList<>();
         try {
             TeleconEntry teleconEntry = teleconServices.findByID(id);
             if (teleconEntry != null && teleconEntry.getClinicianId().equals(getAuthenticatedUser())) {
@@ -62,25 +62,25 @@ public class ImageService {
                                     .path("/files")
                                     .path(fileName)
                                     .toUriString();
-                            ImageURIs.add(fileDownUri);
+                            imageURIs.add(fileDownUri);
                             //How the Naming convension of the files work
 
 
                             //create new Image object for each file and copy the image data
                             Image image = new Image();
                             image.setTeleconEntryId(data.getTeleconId());
-                            image.setImageName(data.getImage_name());
+                            image.setImageName(data.getImageName());
                             image.setLocation(data.getLocation());
-                            image.setClinicalDiagnosis(data.getClinical_diagnosis());
-                            image.setLesionsAppear(data.getLesions_appear());
+                            image.setClinicalDiagnosis(data.getClinicalDiagnosis());
+                            image.setLesionsAppear(data.getLesionsAppear());
                             image.setAnnotation(data.getAnnotation());
-                            image.setPredictedCat(data.getPredicted_cat());
+                            image.setPredictedCat(data.getPredictedCat());
                             image.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
                             image.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
 
                             //save images to database
                             imageRepo.save(image);
-                            //ImageIds.add(image.getId());//Image ID list
+                            //imageIds_.add(image.getId());//Image ID list
                             uploadedImages.add(image);//Image Model list
 
                         } catch (Exception e) {//1st
@@ -113,15 +113,15 @@ public class ImageService {
             } else {
                 return ResponseEntity.status(401).body(new UploadImageResponse(null, "Unauthorized Access"));
             }
-        }catch(Exception e)
-            {
+        } catch (Exception e) {
             //return null;
             //throw new Exception("Internal Server Error",e);
-            return ResponseEntity.status(500).body(new UploadImageResponse(null,"Internal Server Error"));
-            }
+            return ResponseEntity.status(500).body(new UploadImageResponse(null, "Internal Server Error"));
+        }
 
     }
-    private String getAuthenticatedUser(){
+
+    private String getAuthenticatedUser() {
         return "641060a61530810142e045de";
     }
 
@@ -139,7 +139,7 @@ public class ImageService {
                 uploadedFiles.add(fileDownloadUri);
 
             } catch (IOException ex) {
-               throw new IOException("Couldn't save file: "+fileName);
+                throw new IOException("Couldn't save file: " + fileName);
             }
         }
         return uploadedFiles;

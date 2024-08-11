@@ -15,7 +15,5 @@ public class TokenGenerator {
     public static void main(String[] args) {
         // Generate a 256-byte random token
         String randomToken = generateRandomToken(256);
-        System.out.println("Generated Token: " + randomToken);
-        System.out.println("Token Length: " + randomToken.length() * 4); // length in bits
     }
 }

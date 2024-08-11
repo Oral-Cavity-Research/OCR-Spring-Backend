@@ -2,9 +2,9 @@ package com.oasis.ocrspring.dto;
 
 import com.oasis.ocrspring.dto.subdto.HabitDto;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -12,8 +12,7 @@ import java.util.List;
 @Setter
 @ToString
 @NoArgsConstructor
-public class PatientTeleconRequest
-{
+public class PatientTeleconRequest {
     private String startTime;
     private String endTime;
     private String complaint;

@@ -8,6 +8,7 @@ public class ErrorResponse {
         this.success = success;
         this.message = message;
     }
+
     // Getters and setters
     public boolean isSuccess() {
         return success;

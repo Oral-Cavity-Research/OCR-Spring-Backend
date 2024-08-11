@@ -1,4 +1,5 @@
 package com.oasis.ocrspring.service.ResponseMessages;
+
 public class ErrorMessage {
 
     private String message;
