@@ -11,9 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ImageRequestDto {
-    @JsonProperty("telecon_entry_id")
     private String teleconId;
-    @JsonProperty("image_name")
     private String imageName;
     private String location;
     private String clinicalDiagnosis;

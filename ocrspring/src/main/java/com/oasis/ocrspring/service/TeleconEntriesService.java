@@ -41,11 +41,10 @@ public class TeleconEntriesService {
         return teleconEntriesRepo.findById(id).orElse(null);
     }
 
-    public TeleconEntry findOne(String patientId_, String clinicianId_) {
-        ObjectId patientId = new ObjectId(patientId_);
-        ObjectId clinicianId = new ObjectId(clinicianId_);
-        TeleconEntry patient = teleconEntriesRepo.findByPatientAndClinicianId(patientId, clinicianId).orElse(null);
-        return patient;
+    public TeleconEntry findOne(String patientIdString, String clinicianIdString) {
+        ObjectId patientId = new ObjectId(patientIdString);
+        ObjectId clinicianId = new ObjectId(clinicianIdString);
+        return teleconEntriesRepo.findByPatientAndClinicianId(patientId, clinicianId).orElse(null);
     }
 
     public void save(TeleconEntry teleconEntry) {
@@ -54,10 +53,9 @@ public class TeleconEntriesService {
 
     public ResponseEntity<?> patientTeleconEntry(String patientId,
                                                  String clinicianId,
-                                                 PatientTeleconRequest newPatient) { //path patient id
-
+                                                 PatientTeleconRequest newPatient) {
         try {
-            Patient patient = patientService.findPatient(patientId, clinicianId);//patient_id, String clinician_id
+            Patient patient = patientService.findPatient(patientId, clinicianId);
             if (patient != null) {
                 TeleconEntry newEntry = new TeleconEntry();
                 newEntry.setPatient(patient.getId());
@@ -92,17 +90,17 @@ public class TeleconEntriesService {
     public ResponseEntity<?> getAllUserEntries(String id, Integer page, String filter, Integer pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by(Sort.Direction.DESC, getSortField(filter)));//page-1 cuz Page numbers in Spring Data are zero-based
         //pageSize is the number of items you want to retrieve per page
-        ObjectId id_ = new ObjectId(id);
+        ObjectId objectId = new ObjectId(id);
         Page<TeleconEntry> entryPage;
         List<TeleconEntry> entryPageList;
         try {
             entryPage = switch (filter) {
-                case "Assigned" -> teleconEntriesRepo.findByClinicianIdAndReviewersIsNotNull(id_, pageable);
-                case "Unassigned" -> teleconEntriesRepo.findByClinicianIdAndReviewersIsEmpty(id_, pageable);
-                case "Reviewed" -> teleconEntriesRepo.findByClinicianIdAndReviewsIsNotNull(id_, pageable);
-                case "Unreviewed" -> teleconEntriesRepo.findByClinicianIdAndReviewsIsEmpty(id_, pageable);
-                case "Newly Reviewed" -> teleconEntriesRepo.findByClinicianIdAndUpdatedTrue(id_, pageable);
-                default -> teleconEntriesRepo.findByClinicianId(id_, pageable);
+                case "Assigned" -> teleconEntriesRepo.findByClinicianIdAndReviewersIsNotNull(objectId, pageable);
+                case "Unassigned" -> teleconEntriesRepo.findByClinicianIdAndReviewersIsEmpty(objectId, pageable);
+                case "Reviewed" -> teleconEntriesRepo.findByClinicianIdAndReviewsIsNotNull(objectId, pageable);
+                case "Unreviewed" -> teleconEntriesRepo.findByClinicianIdAndReviewsIsEmpty(objectId, pageable);
+                case "Newly Reviewed" -> teleconEntriesRepo.findByClinicianIdAndUpdatedTrue(objectId, pageable);
+                default -> teleconEntriesRepo.findByClinicianId(objectId, pageable);
             };
             entryPageList = entryPage.getContent();
             List<TeleconEntryDto> response = new ArrayList<>();

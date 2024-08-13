@@ -6,9 +6,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.Optional;
 
 public interface RequestRepository extends MongoRepository<Request, String> {
-    Optional<Request> findByRegNo(String reg_no);
-
+    Optional<Request> findByRegNo(String regNo);
     Optional<Request> findByEmail(String email);
-//    Optional<Request> findByRegNo(String regNo);
-
 }

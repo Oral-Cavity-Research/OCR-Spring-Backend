@@ -27,7 +27,6 @@ public class PatientController {
     public String updatePatient(long id) {
         //print patient id
         return "/api/user/patient/update/" + id;
-
     }
 
     //get all patients
@@ -56,8 +55,6 @@ public class PatientController {
     //id is patient id
     @GetMapping("/shared/{id}")
     public com.oasis.ocrspring.model.Patient getSharedPatient(String id, @RequestHeader String reviewId) {
-
-        //print patient id
         return patientService.sharedPatient(id, reviewId);
     }
 
@@ -68,5 +65,4 @@ public class PatientController {
         //todo : should complete role service
         return "/api/user/patient/reviewer/all";
     }
-
 }

@@ -49,9 +49,9 @@ public class UserController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<?> getUser(String _id) {
+    public ResponseEntity<?> getUser(String id) {
 
-        Optional<User> user = userservice.getUserById(_id);
+        Optional<User> user = userservice.getUserById(id);
         if (user.isPresent()) {
             return new ResponseEntity<>(user.get(), HttpStatus.OK);
         } else {
@@ -71,7 +71,8 @@ public class UserController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<?> updateUserDetail(String id, @RequestBody UserDto userBody) {////////////////////////////need to get id part through authentication
+    public ResponseEntity<?> updateUserDetail(String id, @RequestBody UserDto userBody) {
+        //todo : need to get id part through authentication generate
         try {
             Optional<User> existingUser = userservice.getUserById(id);
             if (existingUser.isPresent()) {

@@ -42,7 +42,6 @@ public class ImageService {
                                                             String id,
                                                             List<MultipartFile> files) throws IOException {
         List<Image> uploadedImages = new ArrayList<>();
-        List<String> imageIds_ = new ArrayList<>();
         List<String> imageURIs = new ArrayList<>();
         try {
             TeleconEntry teleconEntry = teleconServices.findByID(id);
@@ -108,14 +107,11 @@ public class ImageService {
 
             } else if (teleconEntry == null) {
                 return ResponseEntity.status(500).body(new UploadImageResponse(null, "Entry Not Found"));
-                //throw new Exception("Entry Not found");
 
             } else {
                 return ResponseEntity.status(401).body(new UploadImageResponse(null, "Unauthorized Access"));
             }
         } catch (Exception e) {
-            //return null;
-            //throw new Exception("Internal Server Error",e);
             return ResponseEntity.status(500).body(new UploadImageResponse(null, "Internal Server Error"));
         }
 

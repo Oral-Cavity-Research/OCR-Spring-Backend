@@ -46,7 +46,6 @@ public class UploadController {
     private PatientService patientService;
 
     @PostMapping(value = "/images/{id}")
-//    @PreAuthorize("hasAuthority('ROLE_USER)")
     public ResponseEntity<?> uploadImages(
             @PathVariable String id,
             @RequestPart("data") ImageRequestDto data,
