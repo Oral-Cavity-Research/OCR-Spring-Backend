@@ -1,14 +1,11 @@
 package com.oasis.ocrspring.repository;
 
 import com.oasis.ocrspring.model.Request;
-import com.oasis.ocrspring.model.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;
 
-public interface RequestRepository extends MongoRepository<Request, String>{
-    Optional<Request> findByRegNo(String reg_no);
+public interface RequestRepository extends MongoRepository<Request, String> {
+    Optional<Request> findByRegNo(String regNo);
     Optional<Request> findByEmail(String email);
-//    Optional<Request> findByRegNo(String regNo);
-
 }

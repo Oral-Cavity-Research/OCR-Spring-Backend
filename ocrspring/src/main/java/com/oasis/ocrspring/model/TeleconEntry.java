@@ -2,12 +2,12 @@ package com.oasis.ocrspring.model;
 
 import com.oasis.ocrspring.dto.subdto.HabitDto;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -20,8 +20,7 @@ import java.util.List;
 @Setter
 @ToString
 @NoArgsConstructor
-public class TeleconEntry
-{
+public class TeleconEntry {
     @Id
     @Field("_id")
     private ObjectId id;
@@ -66,8 +65,7 @@ public class TeleconEntry
                         List<HabitDto> currentHabits, boolean updated,
                         List<String> reviewers, List<String> reviews, List<String> images,
                         List<String> reports, LocalDateTime createdAt,
-                        LocalDateTime updatedAt)
-    {
+                        LocalDateTime updatedAt) {
         this.id = id;
         this.patient = patient;
         this.clinicianId = clinicianId;

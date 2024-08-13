@@ -1,9 +1,9 @@
 package com.oasis.ocrspring.model.draftModels;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -16,8 +16,7 @@ import java.util.List;
 @Setter
 @ToString
 @NoArgsConstructor
-public class DraftEntry
-{
+public class DraftEntry {
     @Id
     private String id;
 
@@ -44,8 +43,7 @@ public class DraftEntry
 
     public DraftEntry(String patientId, String clinicianId, String complaint,
                       LocalDateTime startTime, LocalDateTime endTime, String findings,
-                      List<String> currentHabits, boolean updated)
-    {
+                      List<String> currentHabits, boolean updated) {
         this.patientId = patientId;
         this.clinicianId = clinicianId;
         this.complaint = complaint;

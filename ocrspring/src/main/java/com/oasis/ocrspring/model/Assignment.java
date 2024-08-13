@@ -13,8 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Setter
 @ToString
 @NoArgsConstructor
-public class Assignment
-{
+public class Assignment {
     @Id
     private String id;
 
@@ -29,8 +28,7 @@ public class Assignment
     private Boolean reviewed;
 
     public Assignment(String reviewerId, String teleconEntry, Boolean checked,
-                      Boolean reviewed)
-    {
+                      Boolean reviewed) {
         this.reviewerId = reviewerId;
         this.teleconEntry = teleconEntry;
         this.checked = checked;

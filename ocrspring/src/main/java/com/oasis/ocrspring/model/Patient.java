@@ -1,9 +1,9 @@
 package com.oasis.ocrspring.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -36,7 +36,7 @@ public class Patient {
     private List<String> riskFactors;
 
     @Field("DOB")
-    private Date dob;
+    private Date dateOfBirth;
 
     private String gender;
 
@@ -63,7 +63,7 @@ public class Patient {
     private String updatedAt;
 
     public Patient(String patientId, ObjectId clinicianId, String patientName,
-                   List<String> riskFactors, Date dob, String gender,
+                   List<String> riskFactors, Date dateOfBirth, String gender,
                    String histoDiagnosis, List<String> medicalHistory,
                    List<String> familyHistory, String systemicDisease,
                    String contactNo, String consentForm, String createdAt, String updatedAt) {
@@ -71,7 +71,7 @@ public class Patient {
         this.clinicianId = clinicianId;
         this.patientName = patientName;
         this.riskFactors = riskFactors;
-        this.dob = dob;
+        this.dateOfBirth = dateOfBirth;
         this.gender = gender;
         this.histoDiagnosis = histoDiagnosis;
         this.medicalHistory = medicalHistory;

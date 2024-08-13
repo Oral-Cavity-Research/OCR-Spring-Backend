@@ -16,35 +16,38 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/user/draftentry")
-public class DraftEntryController
-{
+public class DraftEntryController {
     @Autowired
-    private PatientRepository PatientRepo;
+    private PatientRepository patientRepo;
     @Autowired
     private DraftReportRepository draftReportRepo;
     @Autowired
     private DraftimageRepository draftImageRepo;
     @Autowired
     private DraftEntryRepository draftEntryRepo;
+
     @ApiIgnore
     public void redirect(HttpServletResponse response) throws IOException {
         response.sendRedirect("/swagger-ui.html");
     }
 
     @PostMapping("/add/{:id}")
-    public String addDraftTeleconEntry(String id){
-         return "/api/user/draftentry/add/" +id;
+    public String addDraftTeleconEntry(String id) {
+        return "/api/user/draftentry/add/" + id;
     }
+
     @GetMapping("/get")
-    public String getAllDraftEntries(){
+    public String getAllDraftEntries() {
         return "/api/user/draftentry/get";
     }
+
     @GetMapping("/get/patient/:id")
-    public String getPtientEntries(String id){
-        return "/api/user/draftentry/get/patient" +id;
+    public String getPtientEntries(String id) {
+        return "/api/user/draftentry/get/patient" + id;
     }
+
     @GetMapping("/get/id")
-    public String getEntryDetails(String id){
-        return "/api/user/draftentry/get" +id;
+    public String getEntryDetails(String id) {
+        return "/api/user/draftentry/get" + id;
     }
 }

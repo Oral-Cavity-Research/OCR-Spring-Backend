@@ -11,18 +11,18 @@ import java.util.Optional;
 @Service
 public class RoleService {
     @Autowired
-    private RoleRepository RoleRepo;
-    public List<Role> AllRoleDetails(){
+    private RoleRepository roleRepo;
 
-        return RoleRepo.findAll();
+    public List<Role> allRoleDetails() {
+        return roleRepo.findAll();
     }
-    public Role createRole(Role Role){
 
-        return RoleRepo.save(Role);
+    public Role createRole(Role role) {
+        return roleRepo.save(role);
     }
-    public Optional<Role> getRoleByrole(String role){
 
-        return RoleRepo.findByRole(role);
+    public Optional<Role> getRoleByrole(String role) {
+        return roleRepo.findByRole(role);
     }
 }
 
