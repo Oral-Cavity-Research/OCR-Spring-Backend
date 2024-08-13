@@ -3,6 +3,7 @@ package com.oasis.ocrspring.service;
 import com.oasis.ocrspring.dto.ConsentRequestDto;
 import com.oasis.ocrspring.dto.ConsentResponseDto;
 import com.oasis.ocrspring.dto.ErrorResponseDto;
+import com.oasis.ocrspring.dto.UpdatePatientDto;
 import com.oasis.ocrspring.model.Patient;
 import com.oasis.ocrspring.model.TeleconEntry;
 import com.oasis.ocrspring.repository.PatientRepository;
@@ -74,22 +75,36 @@ public class PatientService {
         }
     }
 
-//    public List<User> getReviewer(String id){
-//        Optional<TeleconEntry> entry = TeleconEntriesRepo.findByPatientIn(id);
-//        List<User> reviewers = null;
-//        if (entry.isPresent()) {
-//            for (String reviewerId : entry.get().getReviewers()) {
-//                Optional<User> reviewer = UserRepo.findById(reviewerId);
-//                if (reviewer.isPresent()) {
-//                    reviewers.add(reviewer.get());
-//                }
-//            }
-//            return reviewers;
-//        }
-//        else {
-//            return null;
-//        }
-//    }
+    public Optional<Patient> getPaitentByIdAndClinicianId(String id, String clinicianId){
+        return   PatientRepo.findByIdAndClinicianId(new ObjectId(id), new ObjectId(clinicianId));
+
+    }
+    public Patient findAndUpdate (String id, String clinicianId , UpdatePatientDto updatePatientDto){
+        Optional<Patient> patient =PatientRepo.findByIdAndClinicianId(new ObjectId(id), new ObjectId(clinicianId));
+        if(patient.isPresent()){
+            Patient currentPatient=patient.get();
+            currentPatient.setPatientName(updatePatientDto.getPatient_name());
+            currentPatient.setGender(updatePatientDto.getGender());
+
+            currentPatient.setDob(updatePatientDto.getDOB());
+            currentPatient.setRiskFactors(updatePatientDto.getRisk_factors());
+            currentPatient.setHistoDiagnosis(updatePatientDto.getHisto_diagnosis());
+            currentPatient.setContactNo(updatePatientDto.getContact_no());
+            currentPatient.setSystemicDisease(updatePatientDto.getSystemic_desease());
+            currentPatient.setFamilyHistory(updatePatientDto.getFamily_history());
+            currentPatient.setMedicalHistory(updatePatientDto.getMedical_history());
+            return PatientRepo.save(currentPatient);
+
+        }else{
+            return null;
+        }
+
+
+    }
+
+
+
+
 public Patient findOne(String patient_id, String clinician_id){
     Patient patient =  PatientRepo.findByPatientIdAndClinicianId(patient_id,new ObjectId(clinician_id)).orElse(null);
     return patient;

@@ -40,9 +40,22 @@ public class TokenService {
     @Autowired
     private RoleService roleService;
 
-    private boolean checkPermissions( List<String> permissions,List<String> allowed){
-        return permissions.stream().anyMatch(allowed::contains);
+    public boolean checkPermissions(HttpServletRequest request, List<String> requiredPermissions) {
+        Object permissionsAttribute = request.getAttribute("permissions");
+
+        if (permissionsAttribute instanceof List) {
+            List<String> permissions = (List<String>) permissionsAttribute;
+
+            for (String permission : permissions) {
+                if (requiredPermissions.contains(permission)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
+
     private long parseExpirationTime(String expiration) {
         if (expiration.endsWith("h")) {
             int hours = Integer.parseInt(expiration.replace("h", ""));
