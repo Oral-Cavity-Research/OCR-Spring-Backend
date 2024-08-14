@@ -57,7 +57,7 @@ public class PatientController
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage("Unauthorized Access"));
         }
 
-        Map<String, Object> finalRes = new HashMap<>(patient.get().toMap()); // Assuming you have a method to convert Patient to Map
+        Map<String, Object> finalRes = new HashMap<>(updatedPatent.toMap()); // Assuming you have a method to convert Patient to Map
         finalRes.put("message", "Successfully added");
 
         return ResponseEntity.ok(finalRes);

@@ -14,11 +14,11 @@ import java.util.List;
 public class UpdatePatientDto {
     private String patient_name;
     private String gender;
-    private LocalDateTime DOB;
+    private String dob;
     private List<Risk_factors> risk_factors;
     private String histo_diagnosis;
     private String contact_no;
-    private String systemic_desease;
+    private String systemic_disease;
     private List<String> family_history;
     private List<String> medical_history;
 }

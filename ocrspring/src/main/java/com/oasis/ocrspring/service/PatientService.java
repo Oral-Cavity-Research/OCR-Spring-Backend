@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,11 +87,14 @@ public class PatientService {
             currentPatient.setPatientName(updatePatientDto.getPatient_name());
             currentPatient.setGender(updatePatientDto.getGender());
 
-            currentPatient.setDob(updatePatientDto.getDOB());
+            OffsetDateTime offsetDateTime = OffsetDateTime.parse(updatePatientDto.getDob());
+            LocalDateTime localDateTime = offsetDateTime.toLocalDateTime();
+            currentPatient.setDob(localDateTime);
+
             currentPatient.setRiskFactors(updatePatientDto.getRisk_factors());
             currentPatient.setHistoDiagnosis(updatePatientDto.getHisto_diagnosis());
             currentPatient.setContactNo(updatePatientDto.getContact_no());
-            currentPatient.setSystemicDisease(updatePatientDto.getSystemic_desease());
+            currentPatient.setSystemicDisease(updatePatientDto.getSystemic_disease());
             currentPatient.setFamilyHistory(updatePatientDto.getFamily_history());
             currentPatient.setMedicalHistory(updatePatientDto.getMedical_history());
             currentPatient.setUpdatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
