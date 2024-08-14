@@ -40,6 +40,7 @@ public class TokenService {
     @Autowired
     private RoleService roleService;
 
+
     public boolean checkPermissions(HttpServletRequest request, List<String> requiredPermissions) {
         Object permissionsAttribute = request.getAttribute("permissions");
 
@@ -54,6 +55,7 @@ public class TokenService {
         }
 
         return false;
+
     }
 
     private long parseExpirationTime(String expiration) {
@@ -70,24 +72,25 @@ public class TokenService {
             return Long.parseLong(expiration); // Assuming it's in milliseconds
         }
     }
+
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(accessSecret.getBytes());
     }
-    public String generateAccessToken(User user){
-        System.out.println(parseExpirationTime(refreshTime));
-        Map<String, Object> claims=new HashMap<>();
-        claims.put("sub",user.getEmail());
-        claims.put("role",user.getRole());
+
+    public String generateAccessToken(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("sub", user.getEmail());
+        claims.put("role", user.getRole());
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT")
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + parseExpirationTime(refreshTime)))
-                .signWith(getSigningKey(),SignatureAlgorithm.HS256)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public Map<String,Object> decodeAccessToken(String token){
+    public Map<String, Object> decodeAccessToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
@@ -95,9 +98,9 @@ public class TokenService {
                 .getBody();
     }
 
-    public RefreshToken generateRefreshToken(User user,String ipaddress){
+    public RefreshToken generateRefreshToken(User user, String ipaddress) {
 
-        RefreshToken refreshToken =new RefreshToken();
+        RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUser(user.getId());
         refreshToken.setToken(generateRandomToken(256));
         refreshToken.setExpiresAt(LocalDateTime.parse((LocalDateTime.now().plusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))));
@@ -105,6 +108,7 @@ public class TokenService {
         refreshToken.setCreatedByIP(ipaddress);
         return refreshTokenRepository.save(refreshToken);
     }
+
     public void setTokenCookie(HttpServletResponse response, String token) {
         Cookie cookie = new Cookie("refreshToken", token);
         cookie.setHttpOnly(true);
@@ -112,18 +116,17 @@ public class TokenService {
         // Set the expiration time as 24 hours from the current time
         Date expiryDate = new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(24));
         cookie.setMaxAge((int) (expiryDate.getTime() / 1000)); // Convert to seconds
-
         cookie.setPath("/");
         cookie.setSecure(false); // Set this to true if you're using HTTPS
 
         response.addCookie(cookie);
     }
 
-    public String getTokenFromCookie(HttpServletRequest request){
+    public String getTokenFromCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
-        if(cookies != null){
-            for(Cookie cookie : cookies){
-                if("refreshToken".equals(cookie.getName())){
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
                     return cookie.getValue();
                 }
             }
@@ -131,54 +134,46 @@ public class TokenService {
         return null;
     }
 
-    public RefreshToken getRefreshTokenByToken(String token){
-        Optional<RefreshToken> refreshToken =refreshTokenRepository.findByToken(token);
-        if(!refreshToken.isPresent()){
+    public RefreshToken getRefreshTokenByToken(String token) {
+        Optional<RefreshToken> refreshToken = refreshTokenRepository.findByToken(token);
+        if (!refreshToken.isPresent()) {
             throw new RuntimeException("Refresh Token not found");
         }
-        if(refreshToken.get().getRevokedAt()!=null || refreshToken.get().isExpired() ){
+        if (refreshToken.get().getRevokedAt() != null || refreshToken.get().isExpired()) {
             throw new RuntimeException("Refresh Token is not valid");
         }
         return refreshToken.get();
     }
 
     //refreshing the refreshtoken
-    public Map<String,Object> refreshToken(String token,String ipaddress){
-        RefreshToken refreshToken =getRefreshTokenByToken(token);
-
-        User user =userservice.getUserById(refreshToken.getUser().toString()).orElseThrow(()->new RuntimeException("User not found"));
-
-        Role rolePermissions= roleService.getRoleByrole(user.getRole()).orElseThrow(()->new RuntimeException("Role not found"));
-
-        RefreshToken newRefreshToken =generateRefreshToken(user,ipaddress);
-        System.out.println(newRefreshToken.getCreatedByIP());//////////////////
+    public Map<String, Object> refreshToken(String token, String ipaddress) {
+        RefreshToken refreshToken = getRefreshTokenByToken(token);
+        User user = userservice.getUserById(refreshToken.getUser().toString()).orElseThrow(() -> new RuntimeException("User not found"));
+        Role rolePermissions = roleService.getRoleByrole(user.getRole()).orElseThrow(() -> new RuntimeException("Role not found"));
+        RefreshToken newRefreshToken = generateRefreshToken(user, ipaddress);
         refreshToken.setRevokedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
         refreshToken.setReplacedByToken(newRefreshToken.getToken());
 
         refreshTokenRepository.save(refreshToken);
         refreshTokenRepository.save(newRefreshToken);
 
-        String accessToken =generateAccessToken(user);
+        String accessToken = generateAccessToken(user);
 
-        Map<String,Object> tokens=new HashMap<>();
-        tokens.put("accessToken",accessToken);
-        tokens.put("refreshToken",newRefreshToken.getToken());
-        tokens.put("ref",user);
-        tokens.put("permissions",rolePermissions.getPermissions());
+        Map<String, Object> tokens = new HashMap<>();
+        tokens.put("accessToken", accessToken);
+        tokens.put("refreshToken", newRefreshToken.getToken());
+        tokens.put("ref", user);
+        tokens.put("permissions", rolePermissions.getPermissions());
 
         return tokens;
-
     }
 
-    public void revokeTokenbyToken (String token,String ipaddress){
-        RefreshToken refreshToken =getRefreshTokenByToken(token);
+    public void revokeTokenbyToken(String token, String ipaddress) {
+        RefreshToken refreshToken = getRefreshTokenByToken(token);
         refreshToken.setRevokedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
         refreshToken.setRevokedByIP(ipaddress);
         refreshTokenRepository.save(refreshToken);
     }
-
-
-
 
 
 }

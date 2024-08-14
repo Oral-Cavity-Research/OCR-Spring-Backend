@@ -1,9 +1,9 @@
 package com.oasis.ocrspring.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,8 +16,7 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @NoArgsConstructor
-public class RefreshToken
-{
+public class RefreshToken {
     @Id
     @Field("_id")
     private ObjectId id;
@@ -40,8 +39,7 @@ public class RefreshToken
 
     public RefreshToken(ObjectId user, String token, String createdByIP,
                         LocalDateTime revokedAt, String revokedByIP,
-                        String replacedByToken)
-    {
+                        String replacedByToken) {
         this.user = user;
         this.token = token;
         this.createdByIP = createdByIP;
@@ -50,8 +48,7 @@ public class RefreshToken
         this.replacedByToken = replacedByToken;
     }
 
-    public boolean isExpired()
-    {
+    public boolean isExpired() {
         return this.expiresAt.isBefore(LocalDateTime.now());
     }
 }

@@ -12,18 +12,18 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/admin/auth")
-public class AdminAuthController
-{
+public class AdminAuthController {
     @Autowired
-    private UserRepository UserRepo;
+    private UserRepository userRepo;
+
     @ApiIgnore
     public void redirrect(HttpServletResponse response) throws IOException {
         response.sendRedirect("/swaggr-ui.html");
     }
-    @PostMapping("/signup")
-    public String adminSignUp(){
-        return "/api/admin/auth/signup ";
 
+    @PostMapping("/signup")
+    public String adminSignUp() {
+        return "/api/admin/auth/signup ";
     }
 }
 

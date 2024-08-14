@@ -8,7 +8,6 @@ public class ErrorResponse {
         this.success = success;
         this.message = message;
     }
-    // Getters and setters
     public boolean isSuccess() {
         return success;
     }
@@ -24,6 +23,4 @@ public class ErrorResponse {
     public void setMessage(String message) {
         this.message = message;
     }
-
-
 }

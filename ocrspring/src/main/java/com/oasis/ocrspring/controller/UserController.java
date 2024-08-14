@@ -19,8 +19,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/user/self")
-public class UserController
-{
+public class UserController {
 
 
     @Autowired
@@ -48,53 +47,48 @@ public class UserController
     public void redirrect(HttpServletResponse response) throws IOException {
         response.sendRedirect("/swaggr-ui.html");
     }
+
     @GetMapping("/")
-    public ResponseEntity<?> getUser(String _id)
-    {
+    public ResponseEntity<?> getUser(String id) {
 
-        Optional<User> user = userservice.getUserById(_id);
-
-        if(user.isPresent()){
-
+        Optional<User> user = userservice.getUserById(id);
+        if (user.isPresent()) {
             return new ResponseEntity<>(user.get(), HttpStatus.OK);
-
-        }else{
-
+        } else {
             return new ResponseEntity<>(new ErrorResponse("User not found"), HttpStatus.NOT_FOUND);
         }
-
     }
-    @GetMapping("/hospitals")
-    public ResponseEntity<?> getHospitalList()
-    {
 
-        try{
-            List<Hospital> hospitals = hospitalService.AllHospitalDetails();
+    @GetMapping("/hospitals")
+    public ResponseEntity<?> getHospitalList() {
+
+        try {
+            List<Hospital> hospitals = hospitalService.allHospitalDetails();
             return new ResponseEntity<>(hospitals, HttpStatus.OK);
-        }catch(Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(new ErrorResponse("Internal Server Error"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
+
     @PostMapping("/update")
-    public ResponseEntity<?> updateUserDetail(String _id, @RequestBody UserDto userBody){////////////////////////////need to get id part through authentication
-        try{
-            Optional<User> existingUser = userservice.getUserById(_id);
-            if(existingUser.isPresent()){
-                //Optional<User> updatedUser = userservice.getUserById(_id);
-                User updatedUser= userservice.updateUser(_id,userBody);
+    public ResponseEntity<?> updateUserDetail(String id, @RequestBody UserDto userBody) {
+        //todo : need to get id part through authentication generate
+        try {
+            Optional<User> existingUser = userservice.getUserById(id);
+            if (existingUser.isPresent()) {
+                User updatedUser = userservice.updateUser(id, userBody);
                 return ResponseEntity.ok(Map.of(
-                        "_id", updatedUser.getId(),
-                   "username", updatedUser.getUsername(),
+                        "id", updatedUser.getId(),
+                        "username", updatedUser.getUsername(),
                         "hospital", updatedUser.getHospital(),
                         "contact_no", updatedUser.getContactNo(),
                         "availability", updatedUser.isAvailability(),
                         "message", "User details updated successfully"
                 ));
-            }else{
+            } else {
                 return ResponseEntity.status(401).body(Map.of("message", "User not found"));
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("message", "Internal Server Error"));
         }
     }

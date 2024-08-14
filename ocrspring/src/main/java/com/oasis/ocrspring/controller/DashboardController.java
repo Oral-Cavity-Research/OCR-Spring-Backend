@@ -14,26 +14,27 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/dashboard")
-public class DashboardController
-{
+public class DashboardController {
 
     @Autowired
-    private UserRepository UserRepo;
+    private UserRepository userRepo;
     @Autowired
     private ImageRepository imageRepo;
     @Autowired
-    private PatientRepository PatientRepo;
+    private PatientRepository patientRepo;
+
     @ApiIgnore
     public void redirect(HttpServletResponse response) throws IOException {
         response.sendRedirect("/swagger-ui.html");
     }
-    @GetMapping("/percentages")
-    public String riskHabitPercentage(){
-        return "/api/dashboard/percentages";
 
+    @GetMapping("/percentages")
+    public String riskHabitPercentage() {
+        return "/api/dashboard/percentages";
     }
+
     @GetMapping("/totals")
-    public String getTotal(){
+    public String getTotal() {
         return "/api/dashboard/totals";
     }
 }

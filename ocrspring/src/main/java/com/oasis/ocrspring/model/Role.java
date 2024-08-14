@@ -1,9 +1,9 @@
 package com.oasis.ocrspring.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -15,8 +15,7 @@ import java.util.List;
 @Setter
 @ToString
 @NoArgsConstructor
-public class Role
-{
+public class Role {
     @Id
     private String id;
 
@@ -24,8 +23,7 @@ public class Role
 
     private List<String> permissions = new ArrayList<>();
 
-    public Role(String role, List<String> permissions)
-    {
+    public Role(String role, List<String> permissions) {
         this.role = role;
         this.permissions = permissions;
     }

@@ -1,10 +1,10 @@
 package com.oasis.ocrspring.dto;
 
+
 import com.oasis.ocrspring.dto.subdto.Risk_factors;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-
 import java.util.Date;
 import java.util.List;
 
@@ -24,4 +24,5 @@ public class ConsentRequestDto {
     private String systemic_disease;
     private String contact_no;
     private String consent_form;
+
 }

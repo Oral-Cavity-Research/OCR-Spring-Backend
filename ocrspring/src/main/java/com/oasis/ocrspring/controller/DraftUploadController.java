@@ -14,25 +14,27 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/user/draftupload")
-public class DraftUploadController
-{
+public class DraftUploadController {
     @Autowired
     private DraftReportRepository draftReportRepo;
     @Autowired
     private DraftimageRepository draftImageRepo;
     @Autowired
     private DraftEntryRepository draftEntryRepo;
+
     @ApiIgnore
     public void redirect(HttpServletResponse response) throws IOException {
         response.sendRedirect("/swagger-ui.html");
     }
+
     @PostMapping("/images/:id")
-    public String uploadDraftImages(String id){
-        return "/api/user/draftupload/images/"+id;
+    public String uploadDraftImages(String id) {
+        return "/api/user/draftupload/images/" + id;
     }
+
     @PostMapping("/reports/:id")
-    public String uploadDraftReport(String id){
-        return "/api/user/draftupload/reports/"+id;
+    public String uploadDraftReport(String id) {
+        return "/api/user/draftupload/reports/" + id;
     }
 
 }

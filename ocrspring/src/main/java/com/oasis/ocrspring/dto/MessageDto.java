@@ -1,25 +1,12 @@
 package com.oasis.ocrspring.dto;
 
-public class MessageDto
-{
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class MessageDto {
     private String message;
-
-    public MessageDto(String message) {
-        this.message = message;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    @Override
-    public String toString() {
-        return "messageDto{" +
-                "message='" + message + '\'' +
-                '}';
-    }
 }

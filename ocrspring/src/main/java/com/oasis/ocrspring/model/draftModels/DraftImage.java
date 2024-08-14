@@ -1,9 +1,9 @@
 package com.oasis.ocrspring.model.draftModels;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -15,8 +15,7 @@ import java.util.List;
 @Setter
 @ToString
 @NoArgsConstructor
-public class DraftImage
-{
+public class DraftImage {
     @Id
     private String id;
 
@@ -41,8 +40,7 @@ public class DraftImage
 
     public DraftImage(String teleconEntryId, String imageName, String location,
                       String clinicalDiagnosis, Boolean lesionsAppear,
-                      List<String> annotation, String predictedCat)
-    {
+                      List<String> annotation, String predictedCat) {
         this.teleconEntryId = teleconEntryId;
         this.imageName = imageName;
         this.location = location;

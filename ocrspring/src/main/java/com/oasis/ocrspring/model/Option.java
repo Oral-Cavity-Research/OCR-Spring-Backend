@@ -1,9 +1,9 @@
 package com.oasis.ocrspring.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,8 +14,7 @@ import java.util.List;
 @Setter
 @ToString
 @NoArgsConstructor
-public class Option
-{
+public class Option {
     @Id
     private String id;
 
@@ -23,8 +22,7 @@ public class Option
 
     private List<String> options;
 
-    public Option(String name, List<String> options)
-    {
+    public Option(String name, List<String> options) {
         this.name = name;
         this.options = options;
     }

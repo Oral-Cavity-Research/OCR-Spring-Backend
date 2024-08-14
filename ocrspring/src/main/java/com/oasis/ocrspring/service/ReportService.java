@@ -31,7 +31,7 @@ public class ReportService {
     @Value("src/main/Storage/Reports")
     private String reportUploadDir;
 
-    public List<Report> AllReportDetails(){
+    public List<Report> allReportDetails(){
         System.out.println("appeared in service layer");
         return reportRepo.findAll();
     }

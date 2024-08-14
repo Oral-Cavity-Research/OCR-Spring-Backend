@@ -20,13 +20,10 @@ import java.util.List;
 public class Controller {
     @Autowired
     private UserService userservice;
-//    @Autowired
-//    private PatientService patientService;
     @Autowired
     private RoleService roleService;
     @Autowired
     private RequestService requestService;
-
     @Autowired
     private TeleconEntriesService teleconEntriesService;
     @Autowired
@@ -52,106 +49,80 @@ public class Controller {
 
 
     @ApiIgnore
-    @RequestMapping(value ="/")
+    @RequestMapping(value = "/")
     public void redirect(HttpServletResponse response) throws IOException {
         response.sendRedirect("/swagger-ui.html");
     }
+
     @GetMapping("/allUserDetails")
-    public List<User> getAllUserDetails(){
-
-
-        return userservice.AllUserDetails();
-
+    public List<User> getAllUserDetails() {
+        return userservice.allUserDetails();
     }
-//    @GetMapping("/allPatientDetails")
-//    public List<Patient> AllPatientDetails(){
-//
-//        System.out.println("Get all user details");
-//        return patientService.AllPatientDetails();
-//    }
-    @GetMapping("/allRoleDetails")
-    public List<Role> AllRoleDetails(){
 
-        System.out.println("Get all user details");
-        return  roleService.AllRoleDetails();
+    @GetMapping("/allRoleDetails")
+    public List<Role> allRoleDetails() {
+        return roleService.allRoleDetails();
     }
 
     @GetMapping("/allRequestDetails")
-    public List<Request> AllRequestDetails() {
-
+    public List<Request> allRequestDetails() {
         return requestService.AllRequestDetails();
     }
 
     @GetMapping("/allTeleconEntryDetails")
-    public List<TeleconEntry> AllTeleconEntryDetails() {
-
-        return teleconEntriesService.AllTeleconEntriesDetails();
+    public List<TeleconEntry> allTeleconEntryDetails() {
+        return teleconEntriesService.allTeleconEntriesDetails();
     }
+
     @GetMapping("/allReviewDetails")
-    public List<Review> AllReviewDetails() {
-
-        return reviewService.AllReviewDetails();
+    public List<Review> allReviewDetails() {
+        return reviewService.allReviewDetails();
     }
-    @GetMapping("/allReportDetails")
-    public List<Report> AllReportDetails() {
 
-        return reportService.AllReportDetails();
+    @GetMapping("/allReportDetails")
+    public List<Report> allReportDetails() {
+        return reportService.allReportDetails();
     }
 
     @GetMapping("/allRefreshTokenDetails")
-    public List<RefreshToken> AllRefreshTokenDetails() {
-
-        return refreshTokenService.AllRefreshtokenDetails();
+    public List<RefreshToken> allRefreshTokenDetails() {
+        return refreshTokenService.allRefreshtokenDetails();
     }
+
     @GetMapping("/allOptionDetails")
-    public List<Option> AllOptionDetails() {
-
-        return optionService.AllOptionDetails();
+    public List<Option> allOptionDetails() {
+        return optionService.allOptionDetails();
     }
 
-//    @GetMapping("/allImageDetails")
-//    public List<Image> AllImageDetails() {
-//
-//        return imageService.AllImageDetails();
-//    }
     @GetMapping("/allHospitalDetails")
-    public List<Hospital> AllHospitalDetails() {
+    public List<Hospital> allHospitalDetails() {
 
-        return hospitalService.AllHospitalDetails();
+        return hospitalService.allHospitalDetails();
     }
-    @GetMapping("/allAssignmentDetails")
-    public List<Assignment> AllAssignmentDetails() {
 
-        return assignmentService.AllAssignmentDetails();
+    @GetMapping("/allAssignmentDetails")
+    public List<Assignment> allAssignmentDetails() {
+
+        return assignmentService.allAssignmentDetails();
     }
 
     @GetMapping("/allDraftEntryDetails")
-    public List<DraftEntry> AllDraftEntryDetails() {
-
-        return draftEntryService.AllDraftEntryDetails();
+    public List<DraftEntry> allDraftEntryDetails() {
+        return draftEntryService.allDraftEntryDetails();
     }
-    @GetMapping("/allDraftImageDetails")
-    public List<DraftImage> AllDraftImageDetails() {
 
-        return draftImageService.AllDraftImageDetails();
+    @GetMapping("/allDraftImageDetails")
+    public List<DraftImage> allDraftImageDetails() {
+        return draftImageService.allDraftImageDetails();
     }
 
     @GetMapping("/allDraftReportDetails")
-    public List<DraftReport> AllDraftReportDetails() {
-
-        return draftReportService.AllDraftReportDetails();
+    public List<DraftReport> allDraftReportDetails() {
+        return draftReportService.allDraftReportDetails();
     }
+
     @PostMapping("/postUserDetails")
-    public User postUserDetails(@RequestBody User user){
+    public User postUserDetails(@RequestBody User user) {
         return userservice.createUser(user);
     }
-//    @PostMapping("/signup")
-//    public ResponseEntity<String> createUser(@RequestBody User user){
-//
-//        if(service.getuserDetailsByEmail(user.getEmail())!=null){
-//            return new ResponseEntity<>("user Already Exists", HttpStatus.CONFLICT);
-//        }else{
-//            service.createUser(user);
-//            return new ResponseEntity<>("User Created",HttpStatus.CREATED);
-//        }
 }

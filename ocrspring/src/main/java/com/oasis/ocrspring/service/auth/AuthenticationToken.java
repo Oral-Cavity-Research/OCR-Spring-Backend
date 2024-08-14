@@ -32,21 +32,19 @@ public class AuthenticationToken {
         String authHeader = request.getHeader("Authorization");
         String token = authHeader != null ? authHeader.split(" ")[1] : null;
         String email = request.getHeader("email");
-
         SendErrorResponse sendErrorResponse = new SendErrorResponse();
 
         if (token == null || email == null) {
 
-            sendErrorResponse.setErrorResponse(response,false ,"Unauthorized Access");
-            return ;
+            sendErrorResponse.setErrorResponse(response, false, "Unauthorized Access");
+            return;
         }
 
         Map<String, Object> tokenBody = tokenService.decodeAccessToken(token);
         Optional<User> user = userservice.getUserByEmail(tokenBody.get("sub").toString());
 
         if (user.isEmpty() || !Objects.equals(user.get().getEmail(), email) || !Objects.equals(user.get().getRole(), tokenBody.get("role").toString())) {
-
-            sendErrorResponse.setErrorResponse(response,false ,"Unauthorized Access");
+            sendErrorResponse.setErrorResponse(response, false, "Unauthorized Access");
             return;
         }
 
@@ -59,12 +57,7 @@ public class AuthenticationToken {
         request.setAttribute("ownsToken", (TokenOwner) tokenToCheck -> refreshTokenRepository.findByUser(user.get().getId()).stream().anyMatch(rt -> rt.getToken().equals(tokenToCheck))
 
         );
-
-
     }
-
-
-
 
     @FunctionalInterface
     public interface TokenOwner {

@@ -1,9 +1,9 @@
 package com.oasis.ocrspring.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -13,8 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Setter
 @ToString
 @NoArgsConstructor
-public class Request
-{
+public class Request {
     @Id
     private String id;
 
@@ -34,8 +33,7 @@ public class Request
     private String contactNo;
 
     public Request(String userName, String email, String regNo, String hospital,
-                   String designation, String contactNo)
-    {
+                   String designation, String contactNo) {
         this.userName = userName;
         this.email = email;
         this.regNo = regNo;

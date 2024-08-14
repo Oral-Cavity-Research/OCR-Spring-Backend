@@ -1,31 +1,19 @@
 package com.oasis.ocrspring.dto;
 
 import com.oasis.ocrspring.model.User;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public class ReviewerDetailsDto
-{
-    private String _id;
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ReviewerDetailsDto {
+    private String id;
     private String username;
 
-    public ReviewerDetailsDto(User Reviewer)
-    {
-        this._id = String.valueOf(Reviewer.getId());
-        this.username = Reviewer.getUsername();
-    }
-
-    public String get_id() {
-        return _id;
-    }
-
-    public void set_id(String _id) {
-        this._id = _id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
+    public ReviewerDetailsDto(User reviewer) {
+        this.id = String.valueOf(reviewer.getId());
+        this.username = reviewer.getUsername();
     }
 }

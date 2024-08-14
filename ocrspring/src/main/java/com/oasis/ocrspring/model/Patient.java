@@ -2,9 +2,9 @@ package com.oasis.ocrspring.model;
 
 import com.oasis.ocrspring.dto.subdto.Risk_factors;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -75,7 +75,7 @@ public class Patient {
         this.clinicianId = clinicianId;
         this.patientName = patientName;
         this.riskFactors = riskFactors;
-        this.dob = dob;
+        this.dateOfBirth = dateOfBirth;
         this.gender = gender;
         this.histoDiagnosis = histoDiagnosis;
         this.medicalHistory = medicalHistory;

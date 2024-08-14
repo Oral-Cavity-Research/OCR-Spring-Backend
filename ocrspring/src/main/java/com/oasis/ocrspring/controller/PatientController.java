@@ -20,8 +20,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/user/patient/")
-public class PatientController
-{
+public class PatientController {
     @Autowired
     private PatientService patientService;
 
@@ -30,6 +29,8 @@ public class PatientController
 
     @Autowired
     private TokenService tokenService;
+
+
 
     @ApiIgnore
     public void redirect(HttpServletResponse response) throws IOException {
@@ -62,29 +63,28 @@ public class PatientController
 
         return ResponseEntity.ok(finalRes);
 
-
     }
 
 
 
     //get all patients
     @GetMapping("/get")
-    public List<com.oasis.ocrspring.model.Patient> getPatient(){
+    public List<com.oasis.ocrspring.model.Patient> getPatient() {
         //todo : should add user id and his authentication checking
-        return patientService.AllPatientDetails();
+        return patientService.allPatientDetails();
     }
 
 
     //check if a patient exists
     @GetMapping("/check/{id}")
-    public boolean checkPatient(String id){
+    public boolean checkPatient(String id) {
         //todo : should add user id and his authentication checking
-        return patientService.isexist(id);
+        return patientService.isExist(id);
     }
 
     //get one id
     @GetMapping("/{id}")
-    public com.oasis.ocrspring.model.Patient getPatientById(String id){
+    public com.oasis.ocrspring.model.Patient getPatientById(String id) {
         //todo : should add user id and his authentication checking
         return patientService.getPatientById(id);
     }
@@ -92,18 +92,15 @@ public class PatientController
     //get one shared id
     //id is patient id
     @GetMapping("/shared/{id}")
-    public com.oasis.ocrspring.model.Patient getSharedPatient(String id, @RequestHeader String review_id){
-
-        //print patient id
-        return patientService.sharedPatient(id, review_id);
+    public com.oasis.ocrspring.model.Patient getSharedPatient(String id, @RequestHeader String reviewId) {
+        return patientService.sharedPatient(id, reviewId);
     }
 
     //get available reviewers
     @GetMapping("/reviewer/all")
-    public String getReviewers(){
+    public String getReviewers() {
         //todo : should add user id and his authentication checking
         //todo : should complete role service
         return "/api/user/patient/reviewer/all";
     }
-
 }

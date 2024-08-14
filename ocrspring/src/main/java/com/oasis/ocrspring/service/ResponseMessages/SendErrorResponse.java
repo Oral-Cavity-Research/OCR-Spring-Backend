@@ -20,8 +20,9 @@ public class SendErrorResponse {
         ObjectMapper objectMapper = new ObjectMapper();
         response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
     }
-    public void setErrorResponse(HttpServletResponse response, boolean success,String message) throws IOException {
-       ErrorResponse errorResponse = new ErrorResponse(success,message);
+
+    public void setErrorResponse(HttpServletResponse response, boolean success, String message) throws IOException {
+        ErrorResponse errorResponse = new ErrorResponse(success, message);
         response.setStatus(HttpStatus.BAD_REQUEST.value());
         ObjectMapper objectMapper = new ObjectMapper();
         response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
