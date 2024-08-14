@@ -62,15 +62,15 @@ public class Patient {
     @Field("consent_form")
     private String consentForm;
 
-    private String createdAt;
+    private LocalDateTime createdAt;
 
-    private String updatedAt;
+    private LocalDateTime updatedAt;
 
     public Patient(String patientId, ObjectId clinicianId, String patientName,
                    List<Risk_factors> riskFactors, LocalDateTime dob, String gender,
                    String histoDiagnosis, List<String> medicalHistory,
                    List<String> familyHistory, String systemicDisease,
-                   String contactNo, String consentForm, String createdAt, String updatedAt) {
+                   String contactNo, String consentForm, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.patientId = patientId;
         this.clinicianId = clinicianId;
         this.patientName = patientName;

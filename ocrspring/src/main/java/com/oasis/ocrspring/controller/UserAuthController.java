@@ -63,7 +63,7 @@ public class UserAuthController
     }
     @PostMapping("/verify")
     public ResponseEntity<?> userVerify(@RequestBody EmailDto emailbody, HttpServletRequest httpServletRequest, HttpServletResponse response){
-        System.out.println("dgdeg");
+
         String email= emailbody.getEmail();
 
         Optional<User> user =userservice.getUserByEmail(email);
