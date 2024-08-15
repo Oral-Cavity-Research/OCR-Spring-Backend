@@ -73,11 +73,11 @@ public class PatientService {
     }
 
     public Optional<Patient> getPaitentByIdAndClinicianId(String id, String clinicianId){
-        return   PatientRepo.findByIdAndClinicianId(new ObjectId(id), new ObjectId(clinicianId));
+        return   patientRepo.findByIdAndClinicianId(new ObjectId(id), new ObjectId(clinicianId));
 
     }
     public Patient findAndUpdate (String id, String clinicianId , UpdatePatientDto updatePatientDto){
-        Optional<Patient> patient =PatientRepo.findByIdAndClinicianId(new ObjectId(id), new ObjectId(clinicianId));
+        Optional<Patient> patient =patientRepo.findByIdAndClinicianId(new ObjectId(id), new ObjectId(clinicianId));
         if(patient.isPresent()){
             Patient currentPatient=patient.get();
             currentPatient.setPatientName(updatePatientDto.getPatient_name());
@@ -94,7 +94,7 @@ public class PatientService {
             currentPatient.setFamilyHistory(updatePatientDto.getFamily_history());
             currentPatient.setMedicalHistory(updatePatientDto.getMedical_history());
             currentPatient.setUpdatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
-            return PatientRepo.save(currentPatient);
+            return patientRepo.save(currentPatient);
 
         }else{
             return null;
@@ -107,13 +107,13 @@ public class PatientService {
 
 
 public Patient findOne(String patient_id, String clinician_id){
-    Patient patient =  PatientRepo.findByPatientIdAndClinicianId(patient_id,new ObjectId(clinician_id)).orElse(null);
+    Patient patient =  patientRepo.findByPatientIdAndClinicianId(patient_id,new ObjectId(clinician_id)).orElse(null);
     return patient;
 }
 public  Patient findPatient(String id,String clinician_Id){
 
         ObjectId id_ = new ObjectId(id);
-        ObjectId clinicianId_ = new ObjectId(clinicianId);
+        ObjectId clinicianId_ = new ObjectId(clinician_Id);
         Patient newPatient = patientRepo.findByIdAndClinicianId(id_, clinicianId_).orElse(null);
         return newPatient;
     }
@@ -125,7 +125,7 @@ public  Patient findPatient(String id,String clinician_Id){
         List<String> uploadedURIs = new ArrayList<>();
 
         try {
-            Patient patient = findOne(data.getPatientId(), id);
+            Patient patient = findOne(data.getPatient_id(), id);
             if (patient != null) {
                 return ResponseEntity.status(401).body("Patient ID already exists");
             }
