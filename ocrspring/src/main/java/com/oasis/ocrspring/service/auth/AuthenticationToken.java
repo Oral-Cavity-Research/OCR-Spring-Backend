@@ -1,29 +1,20 @@
 package com.oasis.ocrspring.service.auth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.oasis.ocrspring.model.RefreshToken;
 import com.oasis.ocrspring.model.Role;
 import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.repository.RefreshtokenRepsitory;
-import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
 import com.oasis.ocrspring.service.ResponseMessages.SendErrorResponse;
 import com.oasis.ocrspring.service.RoleService;
-import com.oasis.ocrspring.service.userService;
-import org.bson.types.ObjectId;
+import com.oasis.ocrspring.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class AuthenticationToken {
@@ -31,7 +22,7 @@ public class AuthenticationToken {
     @Autowired
     private TokenService tokenService;
     @Autowired
-    private userService userservice;
+    private UserService userservice;
     @Autowired
     private RoleService roleService;
     @Autowired

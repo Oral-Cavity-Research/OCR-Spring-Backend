@@ -1,9 +1,10 @@
 package com.oasis.ocrspring.dto;
 
-public class messageDto {
+public class MessageDto
+{
     private String message;
 
-    public messageDto(String message) {
+    public MessageDto(String message) {
         this.message = message;
     }
 

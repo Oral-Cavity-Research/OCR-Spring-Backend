@@ -9,8 +9,6 @@ import com.oasis.ocrspring.service.draftServices.DraftEntryService;
 import com.oasis.ocrspring.service.draftServices.DraftImageService;
 import com.oasis.ocrspring.service.draftServices.DraftReportService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -21,7 +19,7 @@ import java.util.List;
 @RestController
 public class Controller {
     @Autowired
-    private userService userservice;
+    private UserService userservice;
 //    @Autowired
 //    private PatientService patientService;
     @Autowired

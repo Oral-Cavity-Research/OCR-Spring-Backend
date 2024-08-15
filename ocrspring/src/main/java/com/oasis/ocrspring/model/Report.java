@@ -1,76 +1,51 @@
 package com.oasis.ocrspring.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "reports")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Report {
+    @JsonIgnore
     @Field("telecon_entry_id")
-    private ObjectId telecon_entry_id;
-    private String report_name;
+    private ObjectId teleconId;
+    @JsonProperty("telecon_entry_id")
+    public String getTeleconEntryIdString(){ return teleconId != null? teleconId.toHexString():null;}
+
+    @Field("report_name")
+    private String reportName;
+
     @Id
     @Field("_id")
+    @JsonIgnore
     private ObjectId id;
+    @JsonProperty("_id")
+    public String getIDString(){return id != null? id.toHexString():null;}
+
+    @JsonProperty("_id")
     private String createdAt;
 
     private String updatedAt;
-    public Report(){}
-
-    public Report(ObjectId telecon_entry_id, String report_name) {
-        this.telecon_entry_id = telecon_entry_id;
-        this.report_name = report_name;
-    }
-
-    public ObjectId getTelecon_entry_id() {
-        return telecon_entry_id;
-    }
-
-    public void setTelecon_entry_id(ObjectId telecon_entry_id) {
-        this.telecon_entry_id = telecon_entry_id;
-    }
-
-    public String getReport_name() {
-        return report_name;
-    }
-
-    public void setReport_name(String report_name) {
-        this.report_name = report_name;
-    }
-
-    public ObjectId getId() {
-        return id;
-    }
-
-    public void setId(ObjectId id) {
-        this.id = id;
-    }
-
-    public String getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 
     @Override
     public String toString() {
         return "Report{" +
-                "telecon_entry_id=" + telecon_entry_id +
-                ", report_name='" + report_name + '\'' +
-                ", id=" + id +
+                "telecon_entry_id=" + getTeleconEntryIdString() +
+                ", report_name='" + reportName + '\'' +
+                ", id=" + getIDString() +
                 ", createdAt='" + createdAt + '\'' +
                 ", updatedAt='" + updatedAt + '\'' +
                 '}';
+
     }
 }

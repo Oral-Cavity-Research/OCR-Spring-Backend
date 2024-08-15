@@ -67,8 +67,8 @@ public class ReportService {
 
                         // creating a report instance and saving it on the database
                         Report report = new Report();
-                        report.setTelecon_entry_id(data.getTeleconId());
-                        report.setReport_name(data.getReportName());
+                        report.setTeleconId(data.getTeleconId());
+                        report.setReportName(data.getReportName());
                         report.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
                         report.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
                         reportRepo.save(report);
@@ -77,7 +77,8 @@ public class ReportService {
 
                     }
                     catch(Exception ex){
-                        return ResponseEntity.status(500).body(new UploadReportResponse(null,"Internal Server Error"));
+                        return ResponseEntity.status(500).body(new UploadReportResponse(null,
+                                "Internal Server Error"));
                     }
 
             }

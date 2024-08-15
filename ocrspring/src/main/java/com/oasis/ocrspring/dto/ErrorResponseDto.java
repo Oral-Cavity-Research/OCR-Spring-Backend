@@ -1,9 +1,10 @@
 package com.oasis.ocrspring.dto;
 
-public class errorResponseDto {
+public class ErrorResponseDto
+{
     private String message;
     private String error;
-    public errorResponseDto(String message,String error){
+    public ErrorResponseDto(String message, String error){
         this.message = message;
         this.error = error;
     }

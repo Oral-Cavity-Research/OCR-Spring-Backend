@@ -1,7 +1,6 @@
 package com.oasis.ocrspring.service;
 
 import com.oasis.ocrspring.dto.ImageRequestDto;
-import com.oasis.ocrspring.dto.TeleconRequestDto;
 import com.oasis.ocrspring.dto.UploadImageResponse;
 import com.oasis.ocrspring.model.Image;
 import com.oasis.ocrspring.model.TeleconEntry;
@@ -69,13 +68,13 @@ public class ImageService {
 
                             //create new Image object for each file and copy the image data
                             Image image = new Image();
-                            image.setTelecon_entry_id(new ObjectId(data.getTeleconId()));
-                            image.setImage_name(data.getImage_name());
+                            image.setTeleconEntryId(data.getTeleconId());
+                            image.setImageName(data.getImage_name());
                             image.setLocation(data.getLocation());
-                            image.setClinical_diagnosis(data.getClinical_diagnosis());
-                            image.setLesions_appear(data.getLesions_appear());
+                            image.setClinicalDiagnosis(data.getClinical_diagnosis());
+                            image.setLesionsAppear(data.getLesions_appear());
                             image.setAnnotation(data.getAnnotation());
-                            image.setPredicted_cat(data.getPredicted_cat());
+                            image.setPredictedCat(data.getPredicted_cat());
                             image.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
                             image.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
 

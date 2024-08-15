@@ -1,13 +1,13 @@
 package com.oasis.ocrspring.dto;
 
+import com.oasis.ocrspring.dto.subdto.HabitDto;
 import com.oasis.ocrspring.model.TeleconEntry;
-import com.oasis.ocrspring.model.subModels.HabitDto;
 import org.bson.types.ObjectId;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class patientTeleconResponse {
+public class PatientTeleconResponse {
     private String _id; // MongoDB typically uses String for IDs
 
     private String patient;
@@ -25,15 +25,15 @@ public class patientTeleconResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public patientTeleconResponse(TeleconEntry teleconEntry) {
+    public PatientTeleconResponse(TeleconEntry teleconEntry) {
         this._id = teleconEntry.getId().toString();
         this.patient = teleconEntry.getPatient().toString();
         this.clinician_id = teleconEntry.getClinicianId().toString();
         this.complaint = teleconEntry.getComplaint();
-        this.start_time = teleconEntry.getStart_time();
-        this.end_time = teleconEntry.getEnd_time();
+        this.start_time = teleconEntry.getStartTime();
+        this.end_time = teleconEntry.getEndTime();
         this.findings = teleconEntry.getFindings();
-        this.current_habits = teleconEntry.getCurrent_habits();
+        this.current_habits = teleconEntry.getCurrentHabits();
         this.updated = teleconEntry.isUpdated();
         this.reviewers = teleconEntry.getReviewers();
         this.reviews = teleconEntry.getReviews();

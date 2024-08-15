@@ -1,110 +1,58 @@
 package com.oasis.ocrspring.model.draftModels;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Document(collection = "draftentries")
-public class DraftEntry {
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+public class DraftEntry
+{
     @Id
     private String id;
-    private String patient_id;
-    private String clinician_id;
+
+    @Field("patient_id")
+    private String patientId;
+
+    @Field("clinician_id")
+    private String clinicianId;
+
     private String complaint;
-    private LocalDateTime start_time;
-    private LocalDateTime end_time;
+
+    @Field("start_time")
+    private LocalDateTime startTime;
+
+    @Field("end_time")
+    private LocalDateTime endTime;
+
     private String findings;
-    private List<String> current_habits;
+
+    @Field("current_habits")
+    private List<String> currentHabits;
+
     private boolean updated;
 
-    public DraftEntry(String patient_id, String clinician_id, String complaint, LocalDateTime start_time, LocalDateTime end_time, String findings, List<String> current_habits, boolean updated) {
-        this.patient_id = patient_id;
-        this.clinician_id = clinician_id;
+    public DraftEntry(String patientId, String clinicianId, String complaint,
+                      LocalDateTime startTime, LocalDateTime endTime, String findings,
+                      List<String> currentHabits, boolean updated)
+    {
+        this.patientId = patientId;
+        this.clinicianId = clinicianId;
         this.complaint = complaint;
-        this.start_time = start_time;
-        this.end_time = end_time;
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.findings = findings;
-        this.current_habits = current_habits;
+        this.currentHabits = currentHabits;
         this.updated = updated;
-    }
-
-    public String getPatient_id() {
-        return patient_id;
-    }
-
-    public void setPatient_id(String patient_id) {
-        this.patient_id = patient_id;
-    }
-
-    public String getClinician_id() {
-        return clinician_id;
-    }
-
-    public void setClinician_id(String clinician_id) {
-        this.clinician_id = clinician_id;
-    }
-
-    public String getComplaint() {
-        return complaint;
-    }
-
-    public void setComplaint(String complaint) {
-        this.complaint = complaint;
-    }
-
-    public LocalDateTime getStart_time() {
-        return start_time;
-    }
-
-    public void setStart_time(LocalDateTime start_time) {
-        this.start_time = start_time;
-    }
-
-    public LocalDateTime getEnd_time() {
-        return end_time;
-    }
-
-    public void setEnd_time(LocalDateTime end_time) {
-        this.end_time = end_time;
-    }
-
-    public String getFindings() {
-        return findings;
-    }
-
-    public void setFindings(String findings) {
-        this.findings = findings;
-    }
-
-    public List<String> getCurrent_habits() {
-        return current_habits;
-    }
-
-    public void setCurrent_habits(List<String> current_habits) {
-        this.current_habits = current_habits;
-    }
-
-    public boolean isUpdated() {
-        return updated;
-    }
-
-    public void setUpdated(boolean updated) {
-        this.updated = updated;
-    }
-
-    @Override
-    public String toString() {
-        return "DraftEntry{" +
-                "patient_id=" + patient_id +
-                ", clinician_id=" + clinician_id +
-                ", complaint='" + complaint + '\'' +
-                ", start_time=" + start_time +
-                ", end_time=" + end_time +
-                ", findings='" + findings + '\'' +
-                ", current_habits=" + current_habits +
-                ", updated=" + updated +
-                '}';
     }
 }

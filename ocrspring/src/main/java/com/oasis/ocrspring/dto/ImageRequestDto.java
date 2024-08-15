@@ -1,12 +1,13 @@
 package com.oasis.ocrspring.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.bson.types.ObjectId;
 
 import java.util.List;
 
 public class ImageRequestDto {
     @JsonProperty("telecon_entry_id")
-    private String teleconId;
+    private ObjectId teleconId;
     @JsonProperty("image_name")
     private String image_name;
     private String location;
@@ -15,11 +16,11 @@ public class ImageRequestDto {
     private List<String> annotation;
     private String predicted_cat;
 
-    public String getTeleconId() {
+    public ObjectId getTeleconId() {
         return teleconId;
     }
 
-    public void setTeleconId(String teleconId) {
+    public void setTeleconId(ObjectId teleconId) {
         this.teleconId = teleconId;
     }
 

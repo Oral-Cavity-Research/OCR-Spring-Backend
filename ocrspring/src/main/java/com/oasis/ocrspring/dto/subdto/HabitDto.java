@@ -1,4 +1,4 @@
-package com.oasis.ocrspring.model.subModels;
+package com.oasis.ocrspring.dto.subdto;
 
 public class HabitDto {
     private String habit;

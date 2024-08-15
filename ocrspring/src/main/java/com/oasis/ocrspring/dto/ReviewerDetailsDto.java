@@ -2,11 +2,14 @@ package com.oasis.ocrspring.dto;
 
 import com.oasis.ocrspring.model.User;
 
-public class ReviewerDetailsDto {
+public class ReviewerDetailsDto
+{
     private String _id;
     private String username;
-    public  ReviewerDetailsDto(User Reviewer){
-        this._id = Reviewer.getId().toString();
+
+    public ReviewerDetailsDto(User Reviewer)
+    {
+        this._id = String.valueOf(Reviewer.getId());
         this.username = Reviewer.getUsername();
     }
 
