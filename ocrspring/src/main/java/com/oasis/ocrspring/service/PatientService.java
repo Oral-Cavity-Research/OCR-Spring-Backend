@@ -110,6 +110,9 @@ public Patient findOne(String patient_id, String clinician_id){
     Patient patient =  patientRepo.findByPatientIdAndClinicianId(patient_id,new ObjectId(clinician_id)).orElse(null);
     return patient;
 }
+
+
+
 public  Patient findPatient(String id,String clinician_Id){
 
         ObjectId id_ = new ObjectId(id);
@@ -193,4 +196,9 @@ public  Patient findPatient(String id,String clinician_Id){
         }
         return searchRes;
     }
+    public Patient getPatientByPatientIDAndClinicianId(String patient_id, String clinician_id){
+        Patient patient =  patientRepo.findByPatientIdAndClinicianId(patient_id,new ObjectId(clinician_id)).orElse(null);
+        return patient;
+    }
 }
+
