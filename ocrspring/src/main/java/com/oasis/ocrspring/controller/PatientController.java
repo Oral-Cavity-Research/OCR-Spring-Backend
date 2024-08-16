@@ -238,8 +238,12 @@ public class PatientController {
         }
         try {
             List<User> reviewers = reviewerService.getAllReviewers();
+            List<ReviewerResDto> reviewerResDtos = new ArrayList<>();
+            for (User reviewer : reviewers) {
+                reviewerResDtos.add(new ReviewerResDto(reviewer));
+            }
             if (reviewers != null && !reviewers.isEmpty()) {
-                return ResponseEntity.ok(new ReviewerResDto(reviewers));
+                return ResponseEntity.ok(reviewerResDtos);
             } else {
                 return ResponseEntity.status(404).body(new ErrorMessage("Reviewers Not Found"));
             }
