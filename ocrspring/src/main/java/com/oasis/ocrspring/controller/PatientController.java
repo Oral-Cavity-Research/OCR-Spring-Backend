@@ -3,6 +3,7 @@ package com.oasis.ocrspring.controller;
 
 import com.oasis.ocrspring.dto.PatientDetailsResDto;
 import com.oasis.ocrspring.dto.SearchPatientDto;
+import com.oasis.ocrspring.dto.SharedResponseDto;
 import com.oasis.ocrspring.dto.UpdatePatientDto;
 import com.oasis.ocrspring.model.Patient;
 import com.oasis.ocrspring.service.PatientService;
@@ -211,7 +212,9 @@ public class PatientController {
             Patient patient = patientService.getSharedPatient(id, reviewerId);
 
             if (patient != null) {
-                return ResponseEntity.ok(patient);
+                SharedResponseDto details =new  SharedResponseDto(patient);
+                return ResponseEntity.ok(details);
+
             } else {
                 return ResponseEntity.status(404).body(new ErrorMessage("Patient not found"));
             }
