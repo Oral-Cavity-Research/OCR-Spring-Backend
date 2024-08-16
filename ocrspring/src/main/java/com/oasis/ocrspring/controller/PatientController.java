@@ -1,5 +1,6 @@
 package com.oasis.ocrspring.controller;
 
+import com.oasis.ocrspring.dto.SearchPatientDto;
 import com.oasis.ocrspring.dto.UpdatePatientDto;
 import com.oasis.ocrspring.model.Patient;
 import com.oasis.ocrspring.service.PatientService;
@@ -7,6 +8,7 @@ import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
 import com.oasis.ocrspring.service.auth.AuthenticationToken;
 import com.oasis.ocrspring.service.auth.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -69,9 +71,71 @@ public class PatientController {
 
     //get all patients
     @GetMapping("/get")
-    public List<com.oasis.ocrspring.model.Patient> getPatient() {
-        //todo : should add user id and his authentication checking
-        return patientService.allPatientDetails();
+    public ResponseEntity<?> getPatient(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String page,
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false)String filter
+    ) throws IOException {
+        authenticationToken.authenticateRequest(request, response);
+
+        if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized Access"));
+        }
+
+        String clinicianId=request.getAttribute("_id").toString();
+
+        int pageSize = 20;
+        int pageQuery = page == null ? 1 : Integer.parseInt(page);
+        String searchQuery = search == null ? "" : search;
+        Sort.Direction sortDirection = sort == null || sort.equals("false") ? Sort.Direction.DESC : Sort.Direction.ASC;
+
+        Sort Order;
+
+        Sort.Order sortOrder;
+        switch (filter != null ? filter : "") {
+            case "Name":
+                sortOrder = Sort.Order.by("patientName").with(sortDirection);
+                break;
+            case "Age":
+                sortOrder = Sort.Order.by("DOB").with(sortDirection);
+                break;
+            case "Gender":
+                sortOrder = Sort.Order.by("gender").with(sortDirection);
+                break;
+            case "Created Date":
+                sortOrder = Sort.Order.by("createdAt").with(sortDirection);
+                break;
+            case "Updated Date":
+                sortOrder = Sort.Order.by("updatedAt").with(sortDirection);
+                break;
+            default:
+                sortOrder = Sort.Order.by("patientId").with(sortDirection);
+                break;
+        }
+
+
+
+        List<SearchPatientDto> patients;
+
+        try{
+            if(searchQuery.isEmpty()){
+                patients = patientService.getAllPatients(clinicianId,pageQuery,pageSize,Sort.by(sortOrder));
+            }else{
+                patients = patientService.searchPatients(clinicianId,searchQuery,pageQuery,pageSize,Sort.by(sortOrder));
+
+            }
+            Map<String, Object> finalRes = new HashMap<>(); // Assuming you have a method to convert Patient to Map
+            finalRes.put("patients", patients);
+            return ResponseEntity.ok(finalRes);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage("Internal Server Error"));
+        }
+
+
+
     }
 
 

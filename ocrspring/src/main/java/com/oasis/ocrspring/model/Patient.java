@@ -75,7 +75,7 @@ public class Patient {
         this.clinicianId = clinicianId;
         this.patientName = patientName;
         this.riskFactors = riskFactors;
-        this.dateOfBirth = dateOfBirth;
+        this.dob = dob;
         this.gender = gender;
         this.histoDiagnosis = histoDiagnosis;
         this.medicalHistory = medicalHistory;
