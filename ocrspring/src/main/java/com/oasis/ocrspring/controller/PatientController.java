@@ -1,5 +1,7 @@
 package com.oasis.ocrspring.controller;
 
+import com.oasis.ocrspring.dto.PatientDetailsRes;
+import com.oasis.ocrspring.dto.PatientDetailsResDto;
 import com.oasis.ocrspring.dto.SearchPatientDto;
 import com.oasis.ocrspring.dto.UpdatePatientDto;
 import com.oasis.ocrspring.model.Patient;
@@ -147,20 +149,50 @@ public class PatientController {
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
             return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized Access"));
         }
-
-        Patient patient =patientService.getPatientByPatientIDAndClinicianId(id,request.getAttribute("_id").toString());
-        if (patient != null) {
-            return ResponseEntity.status(200).body(Collections.singletonMap("exists", true));
-        } else {
-            return ResponseEntity.status(200).body(Collections.singletonMap("exists", false));
+        try {
+            Patient patient = patientService.getPatientByPatientIDAndClinicianId(id, request.getAttribute("_id").toString());
+            if (patient != null) {
+                return ResponseEntity.status(200).body(Collections.singletonMap("exists", true));
+            } else {
+                return ResponseEntity.status(200).body(Collections.singletonMap("exists", false));
+            }
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage("Internal Server Error"));
         }
     }
 
     //get one id
     @GetMapping("/{id}")
-    public com.oasis.ocrspring.model.Patient getPatientById(String id) {
-        //todo : should add user id and his authentication checking
-        return patientService.getPatientById(id);
+    public ResponseEntity<?> getPatientById(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) throws IOException {
+        authenticationToken.authenticateRequest(request, response);
+
+        if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized Access"));
+        }
+        try{
+            Optional<Patient> patient =patientService.getPaitentByIdAndClinicianId(id,request.getAttribute("_id").toString());
+            if(patient.isEmpty()){
+                return ResponseEntity.status(404).body(new ErrorMessage("Patient not found"));
+            }
+            return ResponseEntity.ok(new PatientDetailsResDto(
+                    patient.get().getSystemicDisease(),
+                    patient.get().getId().toString(),
+                    patient.get().getPatientId(),
+                    patient.get().getClinicianId().toString(),
+                    patient.get().getPatientName(),
+                    patient.get().getRiskFactors(),
+                    patient.get().getGender(),
+                    patient.get().getHistoDiagnosis(),
+                    patient.get().getMedicalHistory(),
+                    patient.get().getFamilyHistory(),
+                    patient.get().getContactNo(),
+                    patient.get().getConsentForm(),
+                    patient.get().getCreatedAt().toString(),
+                    patient.get().getUpdatedAt().toString()
+                    ));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage("Internal Server Error"));
+        }
     }
 
     //get one shared id
