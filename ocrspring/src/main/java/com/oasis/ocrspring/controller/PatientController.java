@@ -233,7 +233,7 @@ public class PatientController {
     public ResponseEntity<?> getAllReviewers(HttpServletRequest request, HttpServletResponse response) throws IOException {
         authenticationToken.authenticateRequest(request, response);
 
-        if (!tokenService.checkPermissions(request, Collections.singletonList("200"))) {
+        if (!tokenService.checkPermissions(request, Arrays.asList("300", "200"))) {
             return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized Access"));
         }
         try {
