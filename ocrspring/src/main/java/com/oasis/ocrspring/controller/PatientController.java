@@ -199,10 +199,26 @@ public class PatientController {
     //get one shared id
     //id is patient id
     @GetMapping("/shared/{id}")
-    public com.oasis.ocrspring.model.Patient getSharedPatient(String id, @RequestHeader String reviewId) {
-        return patientService.sharedPatient(id, reviewId);
-    }
+    public ResponseEntity<?> getSharedPatient(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) throws IOException {
+        authenticationToken.authenticateRequest(request, response);
 
+        if (!tokenService.checkPermissions(request, Collections.singletonList("200"))) {
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized Access"));
+        }
+
+        try {
+            String reviewerId = request.getAttribute("_id").toString();
+            Patient patient = patientService.getSharedPatient(id, reviewerId);
+
+            if (patient != null) {
+                return ResponseEntity.ok(patient);
+            } else {
+                return ResponseEntity.status(404).body(new ErrorMessage("Patient not found"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage("Internal Server Error"));
+        }
+    }
     //get available reviewers
     @GetMapping("/reviewer/all")
     public String getReviewers() {
