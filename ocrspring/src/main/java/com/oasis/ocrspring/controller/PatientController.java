@@ -141,9 +141,19 @@ public class PatientController {
 
     //check if a patient exists
     @GetMapping("/check/{id}")
-    public boolean checkPatient(String id) {
-        //todo : should add user id and his authentication checking
-        return patientService.isExist(id);
+    public ResponseEntity<?> checkPatient(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) throws IOException {
+        authenticationToken.authenticateRequest(request, response);
+
+        if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized Access"));
+        }
+
+        Patient patient =patientService.getPatientByPatientIDAndClinicianId(id,request.getAttribute("_id").toString());
+        if (patient != null) {
+            return ResponseEntity.status(200).body(Collections.singletonMap("exists", true));
+        } else {
+            return ResponseEntity.status(200).body(Collections.singletonMap("exists", false));
+        }
     }
 
     //get one id
