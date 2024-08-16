@@ -1,9 +1,6 @@
 package com.oasis.ocrspring.service;
 
-import com.oasis.ocrspring.dto.ConsentRequestDto;
-import com.oasis.ocrspring.dto.ConsentResponseDto;
-import com.oasis.ocrspring.dto.ErrorResponseDto;
-import com.oasis.ocrspring.dto.UpdatePatientDto;
+import com.oasis.ocrspring.dto.*;
 import com.oasis.ocrspring.model.Patient;
 import com.oasis.ocrspring.model.TeleconEntry;
 import com.oasis.ocrspring.repository.PatientRepository;
@@ -12,6 +9,9 @@ import com.oasis.ocrspring.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -172,5 +172,25 @@ public  Patient findPatient(String id,String clinician_Id){
             return ResponseEntity.status(500).body(new ErrorResponseDto("Internal " +
                     "Server Error", e.toString()));
         }
+    }
+
+    public List<SearchPatientDto> searchPatients(String clinicianId, String searchQuery, int pageQuery, int pageSize, Sort sort) {
+        Pageable pageable = PageRequest.of(pageQuery - 1, pageSize, sort);
+        List<Patient> patientList = patientRepo.findByClinicianIdAndSearch(new ObjectId(clinicianId), searchQuery, pageable);
+        List<SearchPatientDto> searchRes = new ArrayList<>();
+        for (Patient patient : patientList) {
+            searchRes.add(new SearchPatientDto(patient.getId().toString(), patient.getPatientId(), patient.getPatientName(),patient.getDob().toString(), patient.getGender()));
+        }
+        return searchRes;
+    }
+
+    public List<SearchPatientDto> getAllPatients(String clinicianId,int pageQuery,int pageSize,Sort sort){
+        Pageable pageable = PageRequest.of(pageQuery-1,pageSize,sort);
+        List<Patient>  patientList = patientRepo.findByClinicianId(new ObjectId(clinicianId),pageable);
+        List<SearchPatientDto> searchRes = new ArrayList<>();
+        for(Patient patient:patientList){
+            searchRes.add(new SearchPatientDto(patient.getId().toString(),patient.getPatientId(),patient.getPatientName(),patient.getDob().toString(),patient.getGender()));
+        }
+        return searchRes;
     }
 }

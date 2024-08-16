@@ -1,5 +1,6 @@
 package com.oasis.ocrspring.controller;
 
+import com.oasis.ocrspring.dto.SearchPatientDto;
 import com.oasis.ocrspring.dto.UpdatePatientDto;
 import com.oasis.ocrspring.model.Patient;
 import com.oasis.ocrspring.service.PatientService;
@@ -92,21 +93,43 @@ public class PatientController {
         Sort.Direction sortDirection = sort == null || sort.equals("false") ? Sort.Direction.DESC : Sort.Direction.ASC;
 
         Sort Order;
-        if(!(filter==null)){
-             Order = Sort.by(sortDirection, filter);
-        }else{
-             Order = Sort.by(sortDirection, "patientId");
+
+        Sort.Order sortOrder;
+        switch (filter != null ? filter : "") {
+            case "Name":
+                sortOrder = Sort.Order.by("patientName").with(sortDirection);
+                break;
+            case "Age":
+                sortOrder = Sort.Order.by("DOB").with(sortDirection);
+                break;
+            case "Gender":
+                sortOrder = Sort.Order.by("gender").with(sortDirection);
+                break;
+            case "Created Date":
+                sortOrder = Sort.Order.by("createdAt").with(sortDirection);
+                break;
+            case "Updated Date":
+                sortOrder = Sort.Order.by("updatedAt").with(sortDirection);
+                break;
+            default:
+                sortOrder = Sort.Order.by("patientId").with(sortDirection);
+                break;
         }
 
-        List<Patient> patients;
+
+
+        List<SearchPatientDto> patients;
 
         try{
             if(searchQuery.isEmpty()){
-                patients = patientService.getAllPatients(clinicianId,pageQuery,pageSize,Order);
+                patients = patientService.getAllPatients(clinicianId,pageQuery,pageSize,Sort.by(sortOrder));
             }else{
-                patients = patientService.searchPatient(clinicianId,searchQuery,pageQuery,pageSize,Order);
+                patients = patientService.searchPatients(clinicianId,searchQuery,pageQuery,pageSize,Sort.by(sortOrder));
+
             }
-            return ResponseEntity.ok(patients);
+            Map<String, Object> finalRes = new HashMap<>(); // Assuming you have a method to convert Patient to Map
+            finalRes.put("patients", patients);
+            return ResponseEntity.ok(finalRes);
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage("Internal Server Error"));
         }
