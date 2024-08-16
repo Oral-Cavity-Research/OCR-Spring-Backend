@@ -12,22 +12,20 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-@NoArgsConstructor
 @AllArgsConstructor
 public class PatientDetailsResDto {
-    private String systemicDisease;
-    private String id;
-    private String patientId;
-    private String clinicianId;
-    private String patientName;
-    private List<Risk_factors> riskFactors;
+    private String systemic_disease;
+    private String _id;
+    private String patient_id;
+    private String clinician_id;
+    private String patient_name;
+    private List<Risk_factors> risk_factors;
     private String gender;
-    private String histoDiagnosis;
-    private LocalDateTime dob;
-    private List<String> medicalHistory;
-    private List<String> familyHistory;
-    private String contactNo;
-    private String consentForm;
+    private String histo_diagnosis;
+    private List<String> medical_history;
+    private List<String> family_history;
+    private String contact_no;
+    private String consent_form;
     private String  createdAt;
     private String updatedAt;
 

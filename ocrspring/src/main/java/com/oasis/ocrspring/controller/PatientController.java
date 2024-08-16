@@ -1,6 +1,6 @@
 package com.oasis.ocrspring.controller;
 
-import com.oasis.ocrspring.dto.PatientDetailsRes;
+
 import com.oasis.ocrspring.dto.PatientDetailsResDto;
 import com.oasis.ocrspring.dto.SearchPatientDto;
 import com.oasis.ocrspring.dto.UpdatePatientDto;
@@ -170,26 +170,27 @@ public class PatientController {
             return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized Access"));
         }
         try{
-            Optional<Patient> patient =patientService.getPaitentByIdAndClinicianId(id,request.getAttribute("_id").toString());
-            if(patient.isEmpty()){
+            Optional<Patient> patientOptional =patientService.getPaitentByIdAndClinicianId(id,request.getAttribute("_id").toString());
+            if(patientOptional.isEmpty()){
                 return ResponseEntity.status(404).body(new ErrorMessage("Patient not found"));
             }
-            return ResponseEntity.ok(new PatientDetailsResDto(
-                    patient.get().getSystemicDisease(),
-                    patient.get().getId().toString(),
-                    patient.get().getPatientId(),
-                    patient.get().getClinicianId().toString(),
-                    patient.get().getPatientName(),
-                    patient.get().getRiskFactors(),
-                    patient.get().getGender(),
-                    patient.get().getHistoDiagnosis(),
-                    patient.get().getMedicalHistory(),
-                    patient.get().getFamilyHistory(),
-                    patient.get().getContactNo(),
-                    patient.get().getConsentForm(),
-                    patient.get().getCreatedAt().toString(),
-                    patient.get().getUpdatedAt().toString()
-                    ));
+            Patient patient = patientOptional.get();
+            return ResponseEntity.ok( new PatientDetailsResDto(
+                    patient.getSystemicDisease(),
+                    patient.getId().toString(),
+                    patient.getPatientId(),
+                    patient.getClinicianId().toString(),
+                    patient.getPatientName(),
+                    patient.getRiskFactors(),
+                    patient.getGender(),
+                    patient.getHistoDiagnosis(),
+                    patient.getMedicalHistory(),
+                    patient.getFamilyHistory(),
+                    patient.getContactNo(),
+                    patient.getConsentForm(),
+                    patient.getCreatedAt().toString(),
+                    patient.getUpdatedAt().toString()
+            ));
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage("Internal Server Error"));
         }
