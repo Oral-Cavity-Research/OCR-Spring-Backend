@@ -2,13 +2,16 @@ package com.oasis.ocrspring.dto;
 
 import com.oasis.ocrspring.dto.subdto.Risk_factors;
 import com.oasis.ocrspring.model.Patient;
+import lombok.Getter;
+import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.time.LocalDateTime;
-import java.util.List;
 
+import java.util.List;
+@Getter
+@Setter
 public class SharedResponseDto {
 
     private String  _id;
