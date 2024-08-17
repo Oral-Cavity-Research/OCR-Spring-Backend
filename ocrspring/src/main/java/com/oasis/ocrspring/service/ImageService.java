@@ -44,82 +44,76 @@ public class ImageService {
                                                             List<MultipartFile> files) throws IOException {
         List<Image> uploadedImages = new ArrayList<>();
         List<String> imageURIs = new ArrayList<>();
+        final String errorMessage = "Internal Server Error";
+        TeleconEntry teleconEntry;
         try {
-            TeleconEntry teleconEntry = teleconServices.findByID(id);
-            if (teleconEntry != null ) {
-                try {
-                    for (MultipartFile file : files) {
-                        //Save the image
-                        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-                        try {
-                            Path path = Paths.get(uploadDir + File.separator + fileName);
-                            if (!Files.exists(path)) {
-                                Files.createDirectories(path);
-                            }
-                            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-                            //useful for creating uri to check the report
-                            String fileDownUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                                    .path("/files")
-                                    .path(fileName)
-                                    .toUriString();
-                            imageURIs.add(fileDownUri);
-                            //How the Naming convension of the files work
-
-
-                            //create new Image object for each file and copy the image data
-                            Image image = new Image();
-                            image.setTeleconEntryId(data.getTeleconId());
-                            image.setImageName(data.getImageName());
-                            image.setLocation(data.getLocation());
-                            image.setClinicalDiagnosis(data.getClinicalDiagnosis());
-                            image.setLesionsAppear(data.getLesionsAppear());
-                            image.setAnnotation(data.getAnnotation());
-                            image.setPredictedCat(data.getPredictedCat());
-                            image.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-                            image.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-
-                            //save images to database
-                            imageRepo.save(image);
-                            //imageIds_.add(image.getId());//Image ID list
-                            uploadedImages.add(image);//Image Model list
-
-                        } catch (Exception e) {//1st
-                            return ResponseEntity.status(500).body(new UploadImageResponse(null
-                                    , "Internal Server Error")); //Unable to save the file
-                        }
-                    }
-                    // Extract image IDs and add them to the teleconEntry
-                    List<ObjectId> imageIds = uploadedImages.stream().map(Image::getId).toList();
-                    List<ObjectId> existedImageIds = teleconEntry.getImages();
-                    if (existedImageIds.isEmpty()) {
-                        existedImageIds = new ArrayList<>();
-                    }
-
-                    existedImageIds.addAll(imageIds);
-                    teleconEntry.setImages(existedImageIds);
-                    teleconEntry.setUpdatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
-                    teleconServices.save(teleconEntry);
-
-                    return ResponseEntity.status(200).body(new UploadImageResponse(uploadedImages, "Images Uploaded Successfully"));
-
-                } catch (Exception e) {//2nd
-                    return ResponseEntity.status(404).body(new UploadImageResponse(null, "Internal Server Error"));
-                }
-
-            } else if (teleconEntry == null) {
-                return ResponseEntity.status(500).body(new UploadImageResponse(null, "Entry Not Found"));
-
-            } else {
-                return ResponseEntity.status(401).body(new UploadImageResponse(null, "Unauthorized Access"));
-            }
+            teleconEntry = teleconServices.findByID(id);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new UploadImageResponse(null, "Internal Server Error"));
+            return ResponseEntity.status(500).body(new UploadImageResponse(null, errorMessage));
         }
 
+        if (teleconEntry == null) {
+            return ResponseEntity.status(404).body(new UploadImageResponse(null, "Entry Not Found"));
+        }
+
+        for (MultipartFile file : files) {
+            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+            try {
+                extracted(file, fileName, imageURIs);
+                Image image = getImage(data);
+                imageRepo.save(image);
+                uploadedImages.add(image);
+            } catch (Exception e) {
+                return ResponseEntity.status(500).body(new UploadImageResponse(null, errorMessage));
+            }
+        }
+
+        try {
+            List<ObjectId> imageIds = uploadedImages.stream().map(Image::getId).toList();
+            List<ObjectId> existedImageIds = teleconEntry.getImages();
+            if (existedImageIds.isEmpty()) {
+                existedImageIds = new ArrayList<>();
+            }
+
+            existedImageIds.addAll(imageIds);
+            teleconEntry.setImages(existedImageIds);
+            teleconEntry.setUpdatedAt(LocalDateTime.now());
+            teleconServices.save(teleconEntry);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new UploadImageResponse(null, errorMessage));
+        }
+
+        return ResponseEntity.status(200).body(new UploadImageResponse(uploadedImages, "Images Uploaded Successfully"));
     }
 
-    private String getAuthenticatedUser() {
-        return "641060a61530810142e045de";
+    private void extracted(MultipartFile file, String fileName, List<String> imageURIs) throws IOException {
+        Path path = Paths.get(uploadDir + File.separator + fileName);
+        if (!Files.exists(path)) {
+            Files.createDirectories(path);
+        }
+        Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+        //useful for creating uri to check the report
+        String fileDownUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/files")
+                .path(fileName)
+                .toUriString();
+        imageURIs.add(fileDownUri);
+        //How the Naming convension of the files work
+    }
+
+    private static Image getImage(ImageRequestDto data) {
+        //create new Image object for each file and copy the image data
+        Image image = new Image();
+        image.setTeleconEntryId(data.getTeleconId());
+        image.setImageName(data.getImageName());
+        image.setLocation(data.getLocation());
+        image.setClinicalDiagnosis(data.getClinicalDiagnosis());
+        image.setLesionsAppear(data.getLesionsAppear());
+        image.setAnnotation(data.getAnnotation());
+        image.setPredictedCat(data.getPredictedCat());
+        image.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+        image.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+        return image;
     }
 
     public List<String> uploadFiles(List<MultipartFile> files) throws IOException {
