@@ -1,15 +1,34 @@
 package com.oasis.ocrspring.controller;
 
+import com.oasis.ocrspring.dto.RequestResDetailsDto;
+import com.oasis.ocrspring.model.Request;
+import com.oasis.ocrspring.model.User;
+import com.oasis.ocrspring.service.RequestService;
+import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
+import com.oasis.ocrspring.service.ReviewerResDto;
+import com.oasis.ocrspring.service.auth.AuthenticationToken;
+import com.oasis.ocrspring.service.auth.TokenService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
     // connect admin to the service layer
+    @Autowired
+    TokenService tokenService;
+    @Autowired
+    RequestService requestService;
+    @Autowired
+    AuthenticationToken authenticationToken;
 
     @ApiIgnore
     @RequestMapping(value = "/")
@@ -19,8 +38,22 @@ public class AdminController {
 
     //get all requests
     @GetMapping("/requests")
-    public String getAllRequests() {
-        return "/api/admin/requests";
+    public ResponseEntity<?> getAllRequests(HttpServletRequest request,HttpServletResponse response) throws IOException {
+        authenticationToken.authenticateRequest(request,response);
+        if (!tokenService.checkPermissions(request, List.of("100"))) {
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+        }
+
+        try {
+            List<Request> requests = requestService.AllRequestDetails();
+            List<RequestResDetailsDto> requestResDetailsDtos = new ArrayList<>();
+            for (Request reviewer : requests) {
+                requestResDetailsDtos.add(new RequestResDetailsDto(reviewer));
+            }
+            return ResponseEntity.ok(requestResDetailsDtos);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+        }
     }
 
     //get one request
