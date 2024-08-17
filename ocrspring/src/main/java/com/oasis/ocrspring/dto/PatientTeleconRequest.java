@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -13,8 +14,8 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 public class PatientTeleconRequest {
-    private String startTime;
-    private String endTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private String complaint;
     private String findings;
     private List<HabitDto> currentHabits;

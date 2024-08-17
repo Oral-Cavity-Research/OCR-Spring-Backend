@@ -5,6 +5,7 @@ import com.oasis.ocrspring.model.TeleconEntry;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -17,7 +18,6 @@ import java.util.List;
 @AllArgsConstructor
 public class TeleconEntryDto {
     private String id; // MongoDB typically uses String for IDs
-
     private PatientDetailsDto patient;
     private String clinicianId;
     private String complaint;
@@ -28,8 +28,8 @@ public class TeleconEntryDto {
     private boolean updated;
     private List<ReviewerDetailsDto> reviewers;
     private List<String> reviews;
-    private List<String> images;
-    private List<String> reports;
+    private List<ObjectId> images;
+    private List<ObjectId> reports;
     @CreatedDate
     private LocalDateTime createdAt;
     @LastModifiedDate

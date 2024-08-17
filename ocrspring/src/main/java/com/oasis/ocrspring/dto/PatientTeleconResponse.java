@@ -5,6 +5,7 @@ import com.oasis.ocrspring.model.TeleconEntry;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,10 +23,10 @@ public class PatientTeleconResponse {
     private String findings;
     private List<HabitDto> currentHabits;
     private boolean updated;
-    private List<String> reviewers;
+    private List<ObjectId> reviewers;
     private List<String> reviews;
-    private List<String> images;
-    private List<String> reports;
+    private List<ObjectId> images;
+    private List<ObjectId> reports;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

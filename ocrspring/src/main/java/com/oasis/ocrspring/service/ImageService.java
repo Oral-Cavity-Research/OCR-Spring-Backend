@@ -5,6 +5,7 @@ import com.oasis.ocrspring.dto.UploadImageResponse;
 import com.oasis.ocrspring.model.Image;
 import com.oasis.ocrspring.model.TeleconEntry;
 import com.oasis.ocrspring.repository.ImageRepository;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +46,7 @@ public class ImageService {
         List<String> imageURIs = new ArrayList<>();
         try {
             TeleconEntry teleconEntry = teleconServices.findByID(id);
-            if (teleconEntry != null && teleconEntry.getClinicianId().equals(getAuthenticatedUser())) {
+            if (teleconEntry != null ) {
                 try {
                     for (MultipartFile file : files) {
                         //Save the image
@@ -88,8 +89,8 @@ public class ImageService {
                         }
                     }
                     // Extract image IDs and add them to the teleconEntry
-                    List<String> imageIds = uploadedImages.stream().map(Image::getId).toList();
-                    List<String> existedImageIds = teleconEntry.getImages();
+                    List<ObjectId> imageIds = uploadedImages.stream().map(Image::getId).toList();
+                    List<ObjectId> existedImageIds = teleconEntry.getImages();
                     if (existedImageIds.isEmpty()) {
                         existedImageIds = new ArrayList<>();
                     }

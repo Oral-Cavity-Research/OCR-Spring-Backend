@@ -14,18 +14,15 @@ public interface TeleconEntriesRepository extends MongoRepository<TeleconEntry, 
 
     Optional<TeleconEntry> findByPatientIn(String patient);
 
-    Optional<TeleconEntry> findByPatientAndClinicianId(ObjectId patient, ObjectId clinicianId);
-
+    TeleconEntry findById(ObjectId id);
+    Optional<TeleconEntry> findByPatientAndClinicianId(ObjectId patient,ObjectId clinicianId);
     Page<TeleconEntry> findByClinicianId(ObjectId clinicianId, Pageable pageable);
+    Page<TeleconEntry> findByClinicianIdAndReviewersIsNotNull(ObjectId clinicianId,Pageable pageable);
+    Page<TeleconEntry> findByClinicianIdAndReviewersIsEmpty(ObjectId clinicianId,Pageable pageable);
+    Page<TeleconEntry> findByClinicianIdAndReviewsIsNotNull(ObjectId clinicianId,Pageable pageable);
+    Page<TeleconEntry> findByClinicianIdAndReviewsIsEmpty(ObjectId clinicianId,Pageable pageable);
+    Page<TeleconEntry> findByClinicianIdAndUpdatedTrue(ObjectId clinicianId,Pageable pageable);
+    Page<TeleconEntry> findByPatientAndClinicianId(ObjectId patient,ObjectId clinicianId, Pageable pageable);
 
-    Page<TeleconEntry> findByClinicianIdAndReviewersIsNotNull(ObjectId clinicianId, Pageable pageable);
-
-    Page<TeleconEntry> findByClinicianIdAndReviewersIsEmpty(ObjectId clinicianId, Pageable pageable);
-
-    Page<TeleconEntry> findByClinicianIdAndReviewsIsNotNull(ObjectId clinicianId, Pageable pageable);
-
-    Page<TeleconEntry> findByClinicianIdAndReviewsIsEmpty(ObjectId clinicianId, Pageable pageable);
-
-    Page<TeleconEntry> findByClinicianIdAndUpdatedTrue(ObjectId clinicianId, Pageable pageable);
 
 }

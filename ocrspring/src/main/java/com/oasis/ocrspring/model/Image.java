@@ -1,9 +1,9 @@
 package com.oasis.ocrspring.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -13,14 +13,28 @@ import java.util.List;
 @Document(collection = "images")
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
-public class Image {
+@AllArgsConstructor
+public class Image
+{
     @Id
-    private String id;
+    @Field("_id")
+    @JsonIgnore
+    private ObjectId id;
 
+    @JsonProperty("_id")
+    public String getIdString() {
+        return id != null ? id.toHexString() : null;
+    }
+
+    @JsonIgnore
     @Field("telecon_entry_id")
-    private String teleconEntryId;
+    private ObjectId teleconEntryId;
+
+    @JsonProperty("telecon_entry_id")
+    public String getTeleconEntryIdString() {
+        return teleconEntryId != null ? teleconEntryId.toHexString() : null;
+    }
 
     @Field("image_name")
     private String imageName;
@@ -42,15 +56,19 @@ public class Image {
 
     private String updatedAt;
 
-    public Image(String teleconEntryId, String imageName, String location,
-                 String clinicalDiagnosis, Boolean lesionsAppear, List<String> annotation,
-                 String predictedCat) {
-        this.teleconEntryId = teleconEntryId;
-        this.imageName = imageName;
-        this.location = location;
-        this.clinicalDiagnosis = clinicalDiagnosis;
-        this.lesionsAppear = lesionsAppear;
-        this.annotation = annotation;
-        this.predictedCat = predictedCat;
+    @Override
+    public String toString() {
+        return "Image{" +
+                "_id='" + getIdString() + '\'' +
+                ", telecon_entry_id='" + getTeleconEntryIdString() + '\'' +
+                ", image_name='" + imageName + '\'' +
+                ", location='" + location + '\'' +
+                ", clinical_diagnosis='" + clinicalDiagnosis + '\'' +
+                ", lesions_appear=" + lesionsAppear +
+                ", annotation=" + annotation +
+                ", predicted_cat='" + predictedCat + '\'' +
+                ", createdAt='" + createdAt + '\'' +
+                ", updatedAt='" + updatedAt + '\'' +
+                '}';
     }
 }

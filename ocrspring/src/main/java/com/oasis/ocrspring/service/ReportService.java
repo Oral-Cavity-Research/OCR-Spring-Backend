@@ -5,6 +5,7 @@ import com.oasis.ocrspring.dto.UploadReportResponse;
 import com.oasis.ocrspring.model.Report;
 import com.oasis.ocrspring.model.TeleconEntry;
 import com.oasis.ocrspring.repository.ReportRepository;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +41,7 @@ public class ReportService {
                                                               List<MultipartFile> files){
         List<Report> uploadedReports = new ArrayList<>();//Report model list
         List<String> uploadFiles = new ArrayList<>();//List of file uri's
-        List<String> ReportIds = new ArrayList<>();
+        List<ObjectId> ReportIds = new ArrayList<>();
 
         TeleconEntry teleconEntry = teleconServ.findByID(id);
         if (teleconEntry != null ){ //auth part should be added
@@ -78,8 +79,8 @@ public class ReportService {
 
             }
                 //to make sure not to overwritten on the existing IDs
-                List<String> reportIds = uploadedReports.stream().map(Report :: getId).toList();
-                List<String> existedReportIds = teleconEntry.getReports();
+                List<ObjectId> reportIds = uploadedReports.stream().map(Report :: getId).toList();
+                List<ObjectId> existedReportIds = teleconEntry.getReports();
                 if(existedReportIds.isEmpty()){
                     existedReportIds = new ArrayList<>();
                 }
@@ -101,10 +102,4 @@ public class ReportService {
                         ,"Entry Not Found"));
             }
     }
-    public String getAuthUser(String id){
-        return "642849d55a89306e01036070";
-    }
-//    public ResponseEntity<?> reportFileUpload(List<MultipartFile> files){
-//
-//    }
 }
