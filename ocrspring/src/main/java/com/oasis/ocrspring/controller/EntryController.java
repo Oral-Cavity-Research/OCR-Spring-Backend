@@ -1,20 +1,29 @@
 package com.oasis.ocrspring.controller;
 
 import com.oasis.ocrspring.dto.PatientTeleconRequest;
+import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
 import com.oasis.ocrspring.service.TeleconEntriesService;
+import com.oasis.ocrspring.service.auth.AuthenticationToken;
+import com.oasis.ocrspring.service.auth.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collections;
 
 @RestController
 @RequestMapping("/api/user/entry")
 public class EntryController {
     @Autowired
     private TeleconEntriesService teleconService;
+    @Autowired
+    private AuthenticationToken authenticationToken;
+    @Autowired
+    private TokenService tokenService;
 
     // connect entry to the service layer
     @ApiIgnore
@@ -25,29 +34,50 @@ public class EntryController {
 
     //add a teleconsultation entry
     @PostMapping("/add/{id}")
-    public ResponseEntity<?> addTeleconsultationEntry(@PathVariable String id,
+    public ResponseEntity<?> addTeleconsultationEntry(HttpServletRequest request, HttpServletResponse response,
+                                                      @PathVariable String id,
                                                       @RequestHeader("_id") String clinicianId,
-                                                      @RequestBody PatientTeleconRequest newPatient) {
+                                                      @RequestBody PatientTeleconRequest newPatient)
+    throws IOException{
+        authenticationToken.authenticateRequest(request, response);
+        if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized Access"));
+        }
         // add a teleconsultation entry
         return teleconService.patientTeleconEntry(id, clinicianId, newPatient);
     }
 
     //get all entries
     @GetMapping("/get")
-    public ResponseEntity<?> getAllEntries(@RequestHeader("id") String id,
+    public ResponseEntity<?> getAllEntries(HttpServletRequest request, HttpServletResponse response,
+                                           @RequestHeader("id") String id,
                                            @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
-                                           @RequestParam(name = "filter", required = false, defaultValue = "Created Date") String filter) { //id is clinician Id
+                                           @RequestParam(name = "filter", required = false, defaultValue = "Created Date") String filter)
+    throws IOException{ //id is clinician Id
         // get all teleconsultation entries
         int pageSize = 20;
-
+        authenticationToken.authenticateRequest(request, response);
+        if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized Access"));
+        }
         return teleconService.getAllUserEntries(id, page, filter, pageSize);
     }
 
     //get patient entries
     @GetMapping("/get/patient/{id}")
-    public String getPatientEntries(long id) {
+    public ResponseEntity<?> getPatientEntries(HttpServletRequest request, HttpServletResponse response,
+                                               @RequestHeader("_id") String clinicianId,
+                                               @PathVariable String id,
+                                               @RequestParam(name = "page",required = false,defaultValue ="1") Integer page,
+                                               @RequestParam(name = "filter",required = false,defaultValue = "1") String filter)
+    throws IOException{
+        int pageSize = 20;
+        authenticationToken.authenticateRequest(request, response);
+        if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized Access"));
+        }
         // get patient entries
-        return "/api/user/entry/get/patient/" + id;
+        return teleconService.getUserEntryById(clinicianId,id,page,filter,pageSize);
     }
 
     //get shared patient entries (view only data)

@@ -1,5 +1,6 @@
 package com.oasis.ocrspring.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.oasis.ocrspring.dto.subdto.HabitDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,9 +15,12 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 public class PatientTeleconRequest {
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    @JsonProperty("start_time")
+    private String startTime;
+    @JsonProperty("end_time")
+    private String endTime;
     private String complaint;
     private String findings;
+    @JsonProperty("current_habits")
     private List<HabitDto> currentHabits;
 }

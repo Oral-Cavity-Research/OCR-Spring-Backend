@@ -11,7 +11,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -28,8 +30,8 @@ public class TeleconEntryDto {
     private boolean updated;
     private List<ReviewerDetailsDto> reviewers;
     private List<String> reviews;
-    private List<ObjectId> images;
-    private List<ObjectId> reports;
+    private List<String> images;
+    private List<String> reports;
     @CreatedDate
     private LocalDateTime createdAt;
     @LastModifiedDate
@@ -47,8 +49,10 @@ public class TeleconEntryDto {
         this.updated = teleconEntry.isUpdated();
         this.reviewers = reviewer;
         this.reviews = teleconEntry.getReviews();
-        this.images = teleconEntry.getImages();
-        this.reports = teleconEntry.getReports();
+        this.images = teleconEntry.getImages().stream()
+                    .map(ObjectId::toHexString) // Convert ObjectId to String
+                    .collect(Collectors.toList());
+        this.reports = teleconEntry.getReports().stream().map(ObjectId::toHexString).collect(Collectors.toList());
         this.createdAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         this.updatedAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
     }

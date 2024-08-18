@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,8 +60,8 @@ public class TeleconEntriesService {
                 TeleconEntry newEntry = new TeleconEntry();
                 newEntry.setPatient(patient.getId());
                 newEntry.setClinicianId(patient.getClinicianId());
-                newEntry.setStartTime(newPatient.getStartTime());
-                newEntry.setEndTime(newPatient.getEndTime());
+                newEntry.setStartTime(OffsetDateTime.parse(newPatient.getStartTime()).toLocalDateTime());
+                newEntry.setEndTime(OffsetDateTime.parse(newPatient.getEndTime()).toLocalDateTime());
                 newEntry.setComplaint(newPatient.getComplaint());
                 newEntry.setFindings(newPatient.getFindings());
                 newEntry.setCurrentHabits(newPatient.getCurrentHabits());
