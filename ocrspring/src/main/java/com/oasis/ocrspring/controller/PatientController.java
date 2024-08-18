@@ -3,10 +3,14 @@ package com.oasis.ocrspring.controller;
 
 import com.oasis.ocrspring.dto.PatientDetailsResDto;
 import com.oasis.ocrspring.dto.SearchPatientDto;
+import com.oasis.ocrspring.dto.SharedResponseDto;
 import com.oasis.ocrspring.dto.UpdatePatientDto;
 import com.oasis.ocrspring.model.Patient;
+import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.service.PatientService;
 import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
+import com.oasis.ocrspring.service.ReviewService;
+import com.oasis.ocrspring.service.ReviewerResDto;
 import com.oasis.ocrspring.service.auth.AuthenticationToken;
 import com.oasis.ocrspring.service.auth.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +37,9 @@ public class PatientController {
 
     @Autowired
     private TokenService tokenService;
+
+    @Autowired
+    private ReviewService reviewerService;
 
 
 
@@ -199,15 +206,49 @@ public class PatientController {
     //get one shared id
     //id is patient id
     @GetMapping("/shared/{id}")
-    public com.oasis.ocrspring.model.Patient getSharedPatient(String id, @RequestHeader String reviewId) {
-        return patientService.sharedPatient(id, reviewId);
+    public ResponseEntity<?> getSharedPatient(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) throws IOException {
+        authenticationToken.authenticateRequest(request, response);
+
+        if (!tokenService.checkPermissions(request, Collections.singletonList("200"))) {
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized Access"));
+        }
+
+        try {
+            String reviewerId = request.getAttribute("_id").toString();
+            Patient patient = patientService.getSharedPatient(id, reviewerId);
+
+            if (patient != null) {
+                SharedResponseDto details =new  SharedResponseDto(patient);
+                return ResponseEntity.ok(details);
+
+            } else {
+                return ResponseEntity.status(404).body(new ErrorMessage("Patient not found"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage("Internal Server Error"));
+        }
     }
 
-    //get available reviewers
-    @GetMapping("/reviewer/all")
-    public String getReviewers() {
-        //todo : should add user id and his authentication checking
-        //todo : should complete role service
-        return "/api/user/patient/reviewer/all";
+    @GetMapping("reviewer/all")
+    public ResponseEntity<?> getAllReviewers(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        authenticationToken.authenticateRequest(request, response);
+
+        if (!tokenService.checkPermissions(request, Arrays.asList("300", "200"))) {
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized Access"));
+        }
+        try {
+            List<User> reviewers = reviewerService.getAllReviewers();
+            List<ReviewerResDto> reviewerResDtos = new ArrayList<>();
+            for (User reviewer : reviewers) {
+                reviewerResDtos.add(new ReviewerResDto(reviewer));
+            }
+            if (reviewers != null && !reviewers.isEmpty()) {
+                return ResponseEntity.ok(reviewerResDtos);
+            } else {
+                return ResponseEntity.status(404).body(new ErrorMessage("Reviewers Not Found"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+        }
     }
 }

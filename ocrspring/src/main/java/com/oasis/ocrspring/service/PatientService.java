@@ -63,16 +63,7 @@ public class PatientService {
         return patientRepo.existsById(id);
     }
 
-    public Patient sharedPatient(String id, String reviewId) {
-        Optional<TeleconEntry> entry = teleconEntriesRepo.findByPatientAndReviewersIn(id, reviewId);
-        Optional<Patient> patient = patientRepo.findById(id);
 
-        if (entry.isPresent() && patient.isPresent()) {
-            return patient.get();
-        } else {
-            return null;
-        }
-    }
 
     public Optional<Patient> getPaitentByIdAndClinicianId(String id, String clinicianId){
         return   patientRepo.findByIdAndClinicianId(new ObjectId(id), new ObjectId(clinicianId));
@@ -204,6 +195,17 @@ public  Patient findPatient(String id,String clinician_Id){
     public Patient getPatientByPatientIDAndClinicianId(String patient_id, String clinician_id){
         Patient patient =  patientRepo.findByPatientIdAndClinicianId(patient_id,new ObjectId(clinician_id)).orElse(null);
         return patient;
+    }
+
+    public Patient getSharedPatient(String patientId, String reviewerId) {
+        Optional<TeleconEntry> entry = teleconEntriesRepo.findByPatientAndReviewersIn(new ObjectId(patientId), new ObjectId(reviewerId));
+        Optional<Patient> patient = patientRepo.findById(patientId);
+
+        if (entry.isPresent() && patient.isPresent()) {
+            return patient.get();
+        } else {
+            return null;
+        }
     }
 }
 

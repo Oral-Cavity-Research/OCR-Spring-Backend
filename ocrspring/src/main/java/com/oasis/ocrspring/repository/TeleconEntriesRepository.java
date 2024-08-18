@@ -6,11 +6,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 public interface TeleconEntriesRepository extends MongoRepository<TeleconEntry, String> {
 
-    Optional<TeleconEntry> findByPatientAndReviewersIn(String patient, String reviewerId);
+    //Optional<TeleconEntry> findByPatientAndReviewersIn(String patient, String reviewerId);
 
     Optional<TeleconEntry> findByPatientIn(String patient);
 
@@ -23,6 +25,5 @@ public interface TeleconEntriesRepository extends MongoRepository<TeleconEntry, 
     Page<TeleconEntry> findByClinicianIdAndReviewsIsEmpty(ObjectId clinicianId,Pageable pageable);
     Page<TeleconEntry> findByClinicianIdAndUpdatedTrue(ObjectId clinicianId,Pageable pageable);
     Page<TeleconEntry> findByPatientAndClinicianId(ObjectId patient,ObjectId clinicianId, Pageable pageable);
-
 
 }

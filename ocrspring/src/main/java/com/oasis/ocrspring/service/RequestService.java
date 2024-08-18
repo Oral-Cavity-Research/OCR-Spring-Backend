@@ -11,7 +11,6 @@ public class RequestService {
     @Autowired
     private RequestRepository RequestRepo;
     public List<Request> AllRequestDetails(){
-        System.out.println("appeared in service layer");
         return RequestRepo.findAll();
     }
     public Request createRequest(Request Request){
