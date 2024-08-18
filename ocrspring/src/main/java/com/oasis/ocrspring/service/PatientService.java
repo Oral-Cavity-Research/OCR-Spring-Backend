@@ -25,10 +25,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -75,8 +77,8 @@ public class PatientService {
             currentPatient.setGender(updatePatientDto.getGender());
 
             OffsetDateTime offsetDateTime = OffsetDateTime.parse(updatePatientDto.getDob());
-            LocalDateTime localDateTime = offsetDateTime.toLocalDateTime();
-            currentPatient.setDob(localDateTime);
+            LocalDate date = offsetDateTime.toLocalDate();
+            currentPatient.setDob(date);
 
             currentPatient.setRiskFactors(updatePatientDto.getRisk_factors());
             currentPatient.setHistoDiagnosis(updatePatientDto.getHisto_diagnosis());
@@ -84,7 +86,7 @@ public class PatientService {
             currentPatient.setSystemicDisease(updatePatientDto.getSystemic_disease());
             currentPatient.setFamilyHistory(updatePatientDto.getFamily_history());
             currentPatient.setMedicalHistory(updatePatientDto.getMedical_history());
-            currentPatient.setUpdatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
+            currentPatient.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
             return patientRepo.save(currentPatient);
 
         }else{
@@ -142,13 +144,16 @@ public  Patient findPatient(String id,String clinician_Id){
                 newPatient.setClinicianId(new ObjectId(data.getClinician_id()));
                 newPatient.setPatientName(data.getPatient_name());
                 newPatient.setRiskFactors(data.getRisk_factors());
+                newPatient.setDob(LocalDate.parse(data.getDOB(), DateTimeFormatter.ISO_LOCAL_DATE));
+                newPatient.setGender(data.getGender());
                 newPatient.setHistoDiagnosis(data.getHisto_diagnosis());
                 newPatient.setMedicalHistory(data.getMedical_history());
                 newPatient.setFamilyHistory(data.getFamily_history());
                 newPatient.setSystemicDisease(data.getSystemic_disease());
                 newPatient.setContactNo(data.getContact_no());
-                newPatient.setCreatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
-                newPatient.setUpdatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
+                newPatient.setConsentForm(data.getConsent_form());
+                newPatient.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+                newPatient.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
 
 
                 patientRepo.save(newPatient);

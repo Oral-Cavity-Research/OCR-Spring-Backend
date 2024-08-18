@@ -5,19 +5,21 @@ import com.oasis.ocrspring.model.TeleconEntry;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class TeleconEntryDto {
     private String id; // MongoDB typically uses String for IDs
-
     private PatientDetailsDto patient;
     private String clinicianId;
     private String complaint;
@@ -47,8 +49,10 @@ public class TeleconEntryDto {
         this.updated = teleconEntry.isUpdated();
         this.reviewers = reviewer;
         this.reviews = teleconEntry.getReviews();
-        this.images = teleconEntry.getImages();
-        this.reports = teleconEntry.getReports();
+        this.images = teleconEntry.getImages().stream()
+                    .map(ObjectId::toHexString) // Convert ObjectId to String
+                    .collect(Collectors.toList());
+        this.reports = teleconEntry.getReports().stream().map(ObjectId::toHexString).collect(Collectors.toList());
         this.createdAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         this.updatedAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
     }

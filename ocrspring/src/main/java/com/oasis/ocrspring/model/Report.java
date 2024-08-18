@@ -1,9 +1,12 @@
 package com.oasis.ocrspring.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -11,24 +14,38 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "reports")
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 public class Report {
-    @Id
-    private String id;
-
-    @Field("telecon_id")
-    private String teleconId;
+    @JsonIgnore
+    @Field("telecon_entry_id")
+    private ObjectId teleconId;
+    @JsonProperty("telecon_entry_id")
+    public String getTeleconEntryIdString(){ return teleconId != null? teleconId.toHexString():null;}
 
     @Field("report_name")
     private String reportName;
 
+    @Id
+    @Field("_id")
+    @JsonIgnore
+    private ObjectId id;
+    @JsonProperty("_id")
+    public String getIDString(){return id != null? id.toHexString():null;}
+
+    @JsonProperty("_id")
     private String createdAt;
 
     private String updatedAt;
 
-    public Report(String teleconId, String reportName) {
-        this.teleconId = teleconId;
-        this.reportName = reportName;
+    @Override
+    public String toString() {
+        return "Report{" +
+                "telecon_entry_id=" + getTeleconEntryIdString() +
+                ", report_name='" + reportName + '\'' +
+                ", id=" + getIDString() +
+                ", createdAt='" + createdAt + '\'' +
+                ", updatedAt='" + updatedAt + '\'' +
+                '}';
+
     }
 }
