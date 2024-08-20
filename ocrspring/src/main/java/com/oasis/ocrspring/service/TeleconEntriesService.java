@@ -1,27 +1,28 @@
 package com.oasis.ocrspring.service;
 
 import com.oasis.ocrspring.dto.*;
-import com.oasis.ocrspring.model.Patient;
-import com.oasis.ocrspring.model.TeleconEntry;
-import com.oasis.ocrspring.model.User;
-import com.oasis.ocrspring.repository.PatientRepository;
-import com.oasis.ocrspring.repository.TeleconEntriesRepository;
-import com.oasis.ocrspring.repository.UserRepository;
+import com.oasis.ocrspring.model.*;
+import com.oasis.ocrspring.repository.*;
+import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class TeleconEntriesService {
@@ -33,6 +34,14 @@ public class TeleconEntriesService {
     private PatientRepository patientRepo;
     @Autowired
     private UserRepository userRepo;
+    @Autowired
+    private AssignmentRepository assignmentRepo;
+    @Autowired
+    private ImageRepository imageRepo;
+    @Autowired
+    private ReportRepository reportRepo;
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     public List<TeleconEntry> AllTeleconEntriesDetails(){
 
@@ -151,7 +160,6 @@ public class TeleconEntriesService {
         try{
             EntryPage = TeleconEntriesRepo.findByPatientAndClinicianId(patientId,clinician_Id,pageable);
             EntryPageList = EntryPage.getContent();
-
             for(TeleconEntry entry:EntryPageList){
 //                List<ObjectId> reviewerIdList = new ArrayList<>();
                 Patient patientProfile = patientRepo.findById(entry.getPatient());
@@ -164,10 +172,198 @@ public class TeleconEntriesService {
                 }
                 response.add(new TeleconEntryDto(entry,patientDetails,reviewerList));
             }
-
             return  ResponseEntity.status(200).body(response);
+        } catch(Exception e){
+            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+        }
+    }
+
+    public ResponseEntity<?> getSharedPatient(String clinicianId, String patient,String filter,Integer pageSize,Integer page){
+
+        Pageable pageable = PageRequest.of(page-1, pageSize, Sort.by( Sort.Direction.DESC, getSortField(filter)));
+        ObjectId patientId = new ObjectId(patient);
+        ObjectId clinician_id = new ObjectId(clinicianId);
+        List<TeleconEntry> entryList = new ArrayList<>();
+        List<TeleconEntryDto> results = new ArrayList<>();
+
+        try {
+            Optional<TeleconEntry> entry = TeleconEntriesRepo.findByPatientAndReviewersIn(patientId, clinician_id); //List Can be used as well
+            if (entry.isEmpty()) {
+                return ResponseEntity.status(404).body(new ErrorMessage("Entries Not Found"));
+            }
+            Page<TeleconEntry> entries = TeleconEntriesRepo.findByPatient(patientId, pageable);
+            entryList = entries.getContent();
+            for(TeleconEntry element: entryList){
+                Patient newPatient = patientRepo.findById(element.getPatient());
+                PatientDetailsDto patientDetails = new PatientDetailsDto(newPatient);
+                List<ObjectId> reviewerList = element.getReviewers();
+                List<ReviewerDetailsDto> reviewerDetails = new ArrayList<>();
+                setReviewerDetails(reviewerList, reviewerDetails);
+                results.add(new TeleconEntryDto(element,patientDetails,reviewerDetails));
+            }
+            return ResponseEntity.status(200).body(results);
+        }catch(NullPointerException er){
+            return ResponseEntity.status(404).body(new ErrorMessage("Entries Not Found"));
+        } catch (Exception e ){
+            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+        }
+
+
+    }
+    public ResponseEntity<?> getEntryDetails(String clinicianId,String id){
+        ObjectId clinicinId_ = new ObjectId(clinicianId);
+        ObjectId teleconId = new ObjectId(id);
+        try{
+            Optional<TeleconEntry> entry = TeleconEntriesRepo.findByIdAndClinicianId(teleconId,clinicinId_);
+            if (entry.isPresent()) {
+                TeleconEntry entryDetails = entry.get();
+                populatedResultDto teleconDetails = new populatedResultDto();
+
+                Patient patient = patientRepo.findById(entryDetails.getPatient());
+                PatientDetailsDto patientDetails = new PatientDetailsDto(patient);
+
+                List<ObjectId> reviewers = entryDetails.getReviewers();
+                List<ReviewerDetailsDto> reviewerDetailList = new ArrayList<>();
+                List<Image> imageList = new ArrayList<>();
+                List<Report> reportList = new ArrayList<>();
+
+                setReviewerDetails(reviewers, reviewerDetailList);
+                setImageDetails(entryDetails.getImages(),imageList);
+                setReportDetails(entryDetails.getReports(),reportList);
+
+                teleconDetails = new populatedResultDto(entryDetails, patientDetails, reviewerDetailList,imageList,reportList);
+                return ResponseEntity.status(200).body(teleconDetails);
+            }else {
+                return ResponseEntity.status(404).body(new ErrorMessage("Entry not found"));
+            }
         }catch(Exception e){
             return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+        }
+    }
+    public ResponseEntity<?> countNewReviews(String clinicianId){
+        ObjectId clinicianId_ = new ObjectId(clinicianId);
+        try{
+            long count = TeleconEntriesRepo.countByClinicianIdAndUpdatedTrue(clinicianId_);
+            Map<String,Long> response = new HashMap<>();
+            response.put("count",count);
+            return ResponseEntity.status(200).body(response);
+        }catch (Exception e){
+            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+        }
+
+    }
+
+    public ResponseEntity<?> addReviewer(String clinicianId, String id, String reviewerId){
+
+        ObjectId clinicianId_ = new ObjectId(clinicianId);
+        ObjectId teleconId = new ObjectId(id);
+        ObjectId reviewerId_ = new ObjectId(reviewerId);
+
+        Optional<TeleconEntry> entry;
+        TeleconEntry entryElement;
+        List<ObjectId> reviewers;
+        try {
+            entry = TeleconEntriesRepo.findByIdAndClinicianId(teleconId, clinicianId_);
+            entryElement = entry.get();
+            reviewers = entryElement.getReviewers();
+            if(entry.isEmpty()){
+                return ResponseEntity.status(404).body(new ErrorMessage("Entry not found"));
+            }
+            if (entryElement.getReviewers().contains(reviewerId_)){
+
+                TeleconEntry teleconEntry = TeleconEntriesRepo.findByIdAndClinicianId(teleconId,clinicianId_).get();
+                List<ObjectId> reviewersIdList = teleconEntry.getReviewers();
+                List<ObjectId> imageIdList = teleconEntry.getImages();
+                List<ObjectId> reportIdList = teleconEntry.getReports();
+
+                Patient patient = patientRepo.findById(teleconEntry.getPatient());
+                PatientDetailsDto patientDetails = new PatientDetailsDto(patient);
+
+                List<ReviewerDetailsDto> reviewerDetails = new ArrayList<>();
+                List<Image> imageList = new ArrayList<>();
+                List<Report> reportList = new ArrayList<>();
+
+                setReviewerDetails(reviewersIdList, reviewerDetails);
+                setImageDetails(imageIdList, imageList);
+                setReportDetails(reportIdList, reportList);
+
+                populatedResultDto updatedEntry = new populatedResultDto(teleconEntry,patientDetails,reviewerDetails,imageList,reportList);
+                return ResponseEntity.status(200).body(updatedEntry);
+            }
+            createAssignment(teleconId, clinicianId_);
+
+            reviewers.add(reviewerId_);
+            entryElement.setReviewers(reviewers);
+            TeleconEntriesRepo.save(entryElement);
+            return ResponseEntity.status(200).body(new MessageDto("Reviewer is added" ));
+
+        }catch(Exception e){
+            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+        }
+    }
+
+    public ResponseEntity<?> removeReviewer(String clinicianId,String id, String reviewerId){
+
+        ObjectId clinicianId_ = new ObjectId(clinicianId);
+        ObjectId teleconId = new ObjectId(id);
+        ObjectId reviewerId_ = new ObjectId(reviewerId);
+
+        Optional<TeleconEntry> entry;
+        TeleconEntry entryElement;
+        List<ObjectId> reviewers;
+        try{
+            entry = TeleconEntriesRepo.findByIdAndClinicianId(teleconId,clinicianId_);
+            entryElement = entry.get();
+            if (entry.isEmpty()){
+                return ResponseEntity.status(404).body(new MessageDto("Entry is not found"));
+            }
+            assignmentRepo.deleteByTeleconEntryAndReviewerId(teleconId,reviewerId_);
+            pullReviewFromEntry(teleconId,entryElement.getReviewers());
+            return ResponseEntity.status(200).body(new MessageDto("Reviewer is removed"));
+        }catch(Exception err){
+            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!" ,err.toString()));
+        }
+    }
+
+    public void pullReviewFromEntry(ObjectId teleconId, List<ObjectId> reviewers){
+        Query query = new Query().addCriteria(Criteria.where("_id").is(teleconId)) ;
+        Update update = new Update().pullAll("reviewers", reviewers.toArray());
+        mongoTemplate.updateFirst(query,update,TeleconEntry.class);
+    }
+
+    private void createAssignment(ObjectId teleconId, ObjectId clinicianId_) {
+        Assignment newAssignement = new Assignment();
+        newAssignement.setTeleconEntry(teleconId);
+        newAssignement.setReviewerId(clinicianId_);
+        newAssignement.setChecked(Boolean.FALSE);
+        newAssignement.setReviewed(Boolean.FALSE);
+        assignmentRepo.save(newAssignement);
+    }
+
+    private void setReportDetails(List<ObjectId> reportIdList, List<Report> reportList) {
+        if(!reportIdList.isEmpty()){
+            for (ObjectId report: reportIdList){
+                Report reportObject = reportRepo.findById(report);
+                reportList.add(reportObject);
+            }
+        }
+    }
+
+    private void setImageDetails(List<ObjectId> imageIdList, List<Image> imageList) {
+        if(!imageIdList.isEmpty()){
+            for (ObjectId imageId: imageIdList){
+                Image imageObject = imageRepo.findById(imageId);
+                imageList.add(imageObject);
+            }
+        }
+    }
+
+    private void setReviewerDetails(List<ObjectId> reviewersIdList, List<ReviewerDetailsDto> reviewerDetails) {
+        if(!reviewersIdList.isEmpty()){
+            for (ObjectId reviewer: reviewersIdList){
+                User reviewerObject = userRepo.findById(reviewer);
+                reviewerDetails.add(new ReviewerDetailsDto(reviewerObject));
+            }
         }
     }
 

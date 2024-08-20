@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -15,19 +16,20 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @NoArgsConstructor
 public class Assignment {
     @Id
-    private String id;
+    @Field("_id")
+    private ObjectId id;
 
     @Field("reviewer_id")
-    private String reviewerId;
+    private ObjectId reviewerId;
 
     @Field("telecon_entry")
-    private String teleconEntry;
+    private ObjectId teleconEntry;
 
     private Boolean checked;
 
     private Boolean reviewed;
 
-    public Assignment(String reviewerId, String teleconEntry, Boolean checked,
+    public Assignment(ObjectId reviewerId, ObjectId teleconEntry, Boolean checked,
                       Boolean reviewed) {
         this.reviewerId = reviewerId;
         this.teleconEntry = teleconEntry;

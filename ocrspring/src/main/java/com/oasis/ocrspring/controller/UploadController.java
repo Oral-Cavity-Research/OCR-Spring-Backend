@@ -67,7 +67,8 @@ public class UploadController {
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
             return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
         }
-        return imageService.uploadImages(data, id, files);
+        String clinicianId = request.getAttribute("_id").toString();
+        return imageService.uploadImages(data, id,clinicianId, files);
     }
 
     @PostMapping("/files")
@@ -85,13 +86,13 @@ public class UploadController {
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
             return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
         }
-        return reportServ.uploadReports(data, id, files);
+        String clinicianId=request.getAttribute("_id").toString();
+        return reportServ.uploadReports(data, id,clinicianId, files);
     }
 
     @PostMapping("/patient")
     public ResponseEntity<?> addConsentForm(
             HttpServletRequest request, HttpServletResponse response,
-            @RequestHeader("_id") String id,
             @RequestPart("data") ConsentRequestDto data,
             @RequestPart("files") MultipartFile files
     ) throws IOException {
@@ -99,6 +100,7 @@ public class UploadController {
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
             return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
         }
-        return patientService.addPatient(id, data, files);
+        String clinicianId = request.getAttribute("_id").toString();
+        return patientService.addPatient(clinicianId, data, files);
     }
 }

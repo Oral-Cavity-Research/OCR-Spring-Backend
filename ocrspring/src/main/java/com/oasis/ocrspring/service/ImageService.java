@@ -41,6 +41,7 @@ public class ImageService {
 
     public ResponseEntity<UploadImageResponse> uploadImages(ImageRequestDto data,
                                                             String id,
+                                                            String clinicianId,
                                                             List<MultipartFile> files) throws IOException {
         List<Image> uploadedImages = new ArrayList<>();
         List<String> imageURIs = new ArrayList<>();
@@ -52,7 +53,7 @@ public class ImageService {
             return ResponseEntity.status(500).body(new UploadImageResponse(null, errorMessage));
         }
 
-        if (teleconEntry == null) {
+        if (teleconEntry == null || teleconEntry.getClinicianId().toString() == clinicianId) {
             return ResponseEntity.status(404).body(new UploadImageResponse(null, "Entry Not Found"));
         }
 

@@ -2,6 +2,7 @@ package com.oasis.ocrspring.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.oasis.ocrspring.dto.subdto.AnnotationDto;
 import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -47,7 +48,7 @@ public class Image
     @Field("lesions_appear")
     private Boolean lesionsAppear;
 
-    private List<String> annotation;
+    private List<AnnotationDto> annotation;
 
     @Field("predicted_cat")
     private String predictedCat;
