@@ -1,6 +1,7 @@
 package com.oasis.ocrspring.controller;
 
 import com.oasis.ocrspring.dto.EmailDto;
+import com.oasis.ocrspring.dto.RequestDto;
 import com.oasis.ocrspring.dto.TokenRequest;
 import com.oasis.ocrspring.model.RefreshToken;
 import com.oasis.ocrspring.model.Request;
@@ -56,7 +57,7 @@ public class UserAuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<String> userSignup(@RequestBody Request request) {
+    public ResponseEntity<String> userSignup(@RequestBody RequestDto request) {
         String message = userService.signup(request);
         if (message.equals("Request is sent successfully. You will receive an Email on acceptance")) {
             return ResponseEntity.ok(message);

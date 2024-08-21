@@ -1,5 +1,6 @@
 package com.oasis.ocrspring.service;
 
+import com.oasis.ocrspring.dto.RequestDto;
 import com.oasis.ocrspring.dto.UserDto;
 import com.oasis.ocrspring.model.Request;
 import com.oasis.ocrspring.model.User;
@@ -19,6 +20,7 @@ public class UserService
     @Autowired
     private RequestRepository requestRepo;
 
+
     public List<User> allUserDetails(){
 
         return userRepo.findAll();
@@ -27,10 +29,10 @@ public class UserService
     public User createUser(User user){
         return userRepo.save(user);
     }
-    public String signup(Request request){
-        Optional<User> userRepoByRegNo = userRepo.findByRegNo(request.getRegNo());
+    public String signup(RequestDto request){
+        Optional<User> userRepoByRegNo = userRepo.findByRegNo(request.getReg_no());
         Optional<User> userByEmail = userRepo.findByEmail(request.getEmail());
-        Optional<Request> requestByRegNo = requestRepo.findByRegNo(request.getRegNo());
+        Optional<Request> requestByRegNo = requestRepo.findByRegNo(request.getReg_no());
         Optional<Request> requestByEmail = requestRepo.findByEmail(request.getEmail());
 
         if(userRepoByRegNo.isPresent()){
@@ -42,7 +44,8 @@ public class UserService
         if (requestByRegNo.isPresent()||requestByEmail.isPresent() ){
             return "A request for registration is already exists";
         }
-        requestRepo.save(request);
+
+        requestRepo.save(new Request(request.getUsername(),request.getEmail(),request.getReg_no(),request.getHospital(),request.getDesignation(),request.getContact_no()));
         return "Request is sent successfully. You will receive an Email on acceptance";
 
     }

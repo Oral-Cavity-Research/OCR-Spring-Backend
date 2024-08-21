@@ -1,5 +1,6 @@
 package com.oasis.ocrspring.controller;
 
+import com.oasis.ocrspring.dto.ReqestDeleteReasonDto;
 import com.oasis.ocrspring.dto.RequestDetailsDto;
 import com.oasis.ocrspring.dto.RequestResDetailsDto;
 import com.oasis.ocrspring.model.Request;
@@ -81,21 +82,21 @@ public class AdminController {
 
     //reject a request
     @PostMapping("/requests/{id}")
-    public ResponseEntity<?> rejectRequest(HttpServletRequest request, HttpServletResponse response, @PathVariable String id, @RequestBody String reason) throws IOException {
+    public ResponseEntity<?> rejectRequest(HttpServletRequest request, HttpServletResponse response, @PathVariable String id, @RequestBody ReqestDeleteReasonDto reason) throws IOException {
         authenticationToken.authenticateRequest(request, response);
         if (!tokenService.checkPermissions(request, List.of("100"))) {
             return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
         }
 
         try {
-            boolean isDeleted = requestService.rejectRequest(id, reason);
+            boolean isDeleted = requestService.rejectRequest(id, reason.getReason());
             if (isDeleted) {
                 return ResponseEntity.ok().body("Request has been deleted!");
             } else {
                 return ResponseEntity.status(404).body(new ErrorMessage("Request not found"));
             }
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+            return ResponseEntity.status(500).body(new ErrorMessage(e.toString()));
         }
     }
 
