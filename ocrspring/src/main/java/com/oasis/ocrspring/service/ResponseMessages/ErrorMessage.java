@@ -1,6 +1,6 @@
 package com.oasis.ocrspring.service.ResponseMessages;
 
-public class ErrorMessage {
+public class ErrorMessage extends Throwable {
 
     private String message;
 

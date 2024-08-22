@@ -1,5 +1,7 @@
 package com.oasis.ocrspring.controller;
 
+import com.oasis.ocrspring.dto.ReqestDeleteReasonDto;
+import com.oasis.ocrspring.dto.RequestDetailsDto;
 import com.oasis.ocrspring.dto.RequestResDetailsDto;
 import com.oasis.ocrspring.model.Request;
 import com.oasis.ocrspring.model.User;
@@ -18,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -58,15 +61,47 @@ public class AdminController {
 
     //get one request
     @GetMapping("/requests/{id}")
-    public String getRequest(long id) {
-        return "/api/admin/requests/" + id;
+    public ResponseEntity<?> getRequest(HttpServletRequest request, HttpServletResponse response,@PathVariable String id) throws IOException {
+        authenticationToken.authenticateRequest(request,response);
+        if (!tokenService.checkPermissions(request, List.of("100"))) {
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+        }
+
+        try {
+            Optional<Request> requestOptional = requestService.getRequestById(id);
+            if (requestOptional.isPresent()) {
+                return ResponseEntity.ok(new RequestDetailsDto(requestOptional.get()));
+            } else {
+                return ResponseEntity.status(404).body(new ErrorMessage("Request not found"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+        }
     }
+
 
     //reject a request
     @PostMapping("/requests/{id}")
-    public String rejectRequest(long id) {
-        return "/api/admin/requests/" + id;
+    public ResponseEntity<?> rejectRequest(HttpServletRequest request, HttpServletResponse response, @PathVariable String id, @RequestBody ReqestDeleteReasonDto reason) throws IOException {
+        authenticationToken.authenticateRequest(request, response);
+        if (!tokenService.checkPermissions(request, List.of("100"))) {
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+        }
+
+        try {
+            boolean isDeleted = requestService.rejectRequest(id, reason.getReason());
+            if (isDeleted) {
+                return ResponseEntity.ok().body(new ErrorMessage("Request has been deleted!"));
+            } else {
+                return ResponseEntity.status(404).body(new ErrorMessage("Request not found"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorMessage(e.toString()));
+        } catch (ErrorMessage e) {
+            throw new RuntimeException(e);
+        }
     }
+
 
     //approve a request
     @PostMapping("/accept/{id}")
