@@ -1,7 +1,9 @@
 package com.oasis.ocrspring.service;
 
 import com.oasis.ocrspring.model.Request;
+import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.repository.RequestRepository;
+import com.oasis.ocrspring.repository.UserRepository;
 import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
 import com.oasis.ocrspring.service.email.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,8 @@ public class RequestService {
     private RequestRepository requestRepo;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private UserRepository userRepo;
     public List<Request> AllRequestDetails(){
         return requestRepo.findAll();
     }
@@ -35,5 +39,14 @@ public class RequestService {
         } else {
             return false;
         }
+    }
+    public void acceptRequest(String id, User newUser, String reason) throws ErrorMessage {
+        Optional<Request> requestOptional = requestRepo.findById(id);
+            Request request = requestOptional.get();
+            userRepo.save(newUser);
+            requestRepo.deleteById(id);
+            emailService.sendEmail(request.getEmail(), "ACCEPT", reason, request.getUserName());
+
+
     }
 }
