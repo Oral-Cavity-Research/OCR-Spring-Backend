@@ -91,12 +91,14 @@ public class AdminController {
         try {
             boolean isDeleted = requestService.rejectRequest(id, reason.getReason());
             if (isDeleted) {
-                return ResponseEntity.ok().body("Request has been deleted!");
+                return ResponseEntity.ok().body(new ErrorMessage("Request has been deleted!"));
             } else {
                 return ResponseEntity.status(404).body(new ErrorMessage("Request not found"));
             }
         } catch (Exception e) {
             return ResponseEntity.status(500).body(new ErrorMessage(e.toString()));
+        } catch (ErrorMessage e) {
+            throw new RuntimeException(e);
         }
     }
 

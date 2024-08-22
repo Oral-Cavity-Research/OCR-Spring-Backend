@@ -2,6 +2,7 @@ package com.oasis.ocrspring.service;
 
 import com.oasis.ocrspring.model.Request;
 import com.oasis.ocrspring.repository.RequestRepository;
+import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
 import com.oasis.ocrspring.service.email.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ public class RequestService {
     public Request createRequest(Request Request){
         return requestRepo.save(Request);
     }
-    public boolean rejectRequest(String id, String reason) {
+    public boolean rejectRequest(String id, String reason) throws ErrorMessage {
         Optional<Request> requestOptional = requestRepo.findById(id);
         if (requestOptional.isPresent()) {
             Request request = requestOptional.get();

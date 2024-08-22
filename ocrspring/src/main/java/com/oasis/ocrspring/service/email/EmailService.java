@@ -1,5 +1,6 @@
 package com.oasis.ocrspring.service.email;
 
+import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ public class EmailService {
     @Autowired
     private TemplateEngine templateEngine;
 
-    public void sendEmail(String receiversEmail, String type, String message, String name) {
+    public void sendEmail(String receiversEmail, String type, String message, String name) throws ErrorMessage {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
@@ -36,7 +37,7 @@ public class EmailService {
 
         try {
             Message msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress(sendersEmail, false));
+            msg.setFrom(new InternetAddress("OCR Tech Team <" + sendersEmail + ">", false));
             msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiversEmail));
             msg.setSubject("OCRP Account Registrations");
             msg.setContent(body(type, message, name), "text/html");
@@ -44,13 +45,14 @@ public class EmailService {
 
             Transport.send(msg);
         } catch (MessagingException e) {
-            throw new RuntimeException(e);
+            throw new ErrorMessage("Email not sent");
         }
     }
 
     private String body(String type, String message, String name) {
         Context context = new Context();
         context.setVariable("name", name);
+        context.setVariable("message", message);
         switch(type) {
             case "ACCEPT":
                 return templateEngine.process("emails/accept", context);
