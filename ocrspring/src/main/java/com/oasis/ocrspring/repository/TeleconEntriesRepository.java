@@ -25,5 +25,6 @@ public interface TeleconEntriesRepository extends MongoRepository<TeleconEntry, 
     Page<TeleconEntry> findByClinicianIdAndReviewsIsEmpty(ObjectId clinicianId,Pageable pageable);
     Page<TeleconEntry> findByClinicianIdAndUpdatedTrue(ObjectId clinicianId,Pageable pageable);
     Page<TeleconEntry> findByPatientAndClinicianId(ObjectId patient,ObjectId clinicianId, Pageable pageable);
+    Optional <TeleconEntry> findByPatientAndReviewersIn(ObjectId patient, ObjectId reviewerId);
 
 }

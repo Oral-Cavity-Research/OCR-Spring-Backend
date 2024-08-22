@@ -6,6 +6,8 @@ import com.oasis.ocrspring.model.Request;
 import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.repository.RequestRepository;
 import com.oasis.ocrspring.repository.UserRepository;
+import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
+import com.oasis.ocrspring.service.email.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,8 @@ public class UserService
     private UserRepository userRepo;
     @Autowired
     private RequestRepository requestRepo;
+    @Autowired
+    private EmailService emailService;
 
 
     public List<User> allUserDetails(){
@@ -65,6 +69,20 @@ public class UserService
         user.setContactNo(userReqBody.getContactNo());
         user.setAvailability(userReqBody.isAvailability());
         return userRepo.save(user);
+
+    }
+
+    public boolean isRegNoInUse(String regNo){
+        return userRepo.findByRegNo(regNo).isPresent();
+    }
+    public boolean isEmailInUse(String email) {
+        return userRepo.findByEmail(email).isPresent();
+    }
+    public User addUser(User user) {
+        return userRepo.save(user);
+    }
+    public void sendAcceptanceEmail(String email, String reason, String username) throws ErrorMessage {
+        emailService.sendEmail(email, "ACCEPT", reason, username);
 
     }
 }
