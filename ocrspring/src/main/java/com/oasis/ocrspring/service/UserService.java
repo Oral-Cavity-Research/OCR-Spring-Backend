@@ -25,9 +25,8 @@ public class UserService
     private EmailService emailService;
 
 
-    public List<User> allUserDetails(){
-
-        return userRepo.findAll();
+    public Optional<List<User>> allUserDetails(){
+        return Optional.of(userRepo.findAll());
     }
 
     public User createUser(User user){
@@ -85,4 +84,9 @@ public class UserService
         emailService.sendEmail(email, "ACCEPT", reason, username);
 
     }
+    public Optional<List<User>> getUsersByRole(String role) {
+        List<User> users = userRepo.findByRole(role);
+        return users.isEmpty() ? Optional.empty() : Optional.of(users);
+    }
+
 }

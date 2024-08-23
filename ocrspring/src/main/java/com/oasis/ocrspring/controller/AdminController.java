@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -156,9 +157,47 @@ public class AdminController {
 
     //get users by thier roles
     //only for read or write access permission
-    @GetMapping("/users/roles/{role}")
-    public String getUsersByRole(String role) {
-        return "/api/admin/users/roles/" + role;
+    @GetMapping("/users/role/{role}")
+    public ResponseEntity<?> getUsersByRole(HttpServletRequest request, HttpServletResponse response, @PathVariable String role) throws IOException {
+        authenticationToken.authenticateRequest(request, response);
+        if (!tokenService.checkPermissions(request, List.of("106", "107"))) {
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+        }
+
+        try {
+            Optional<List<User>> users;
+            if ("All".equals(role)) {
+                users = userService.allUserDetails();
+                if(users.isEmpty()){
+                    return ResponseEntity.status(404).body(new ErrorMessage("No users found"));
+                }
+            } else {
+                users = userService.getUsersByRole(role);
+                if(users.isEmpty()){
+                    return ResponseEntity.status(404).body(new ErrorMessage("No users found"));
+                }
+            }
+
+            List<UserResDto> userResDtos = users.get().stream()
+                    .map(user -> new UserResDto(
+                            user.getUsername(),
+                            user.getEmail(),
+                            user.getRegNo(),
+                            user.getHospital(),
+                            user.getDesignation(),
+                            user.getContactNo(),
+                            user.isAvailable(),
+                            user.getRole(),
+                            user.getId().toString(),
+                            user.getCreatedAt().toString(),
+                            user.getUpdatedAt() != null ? user.getUpdatedAt().toString() : null,
+                            null))
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(userResDtos);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+        }
     }
 
     //get all user roles
