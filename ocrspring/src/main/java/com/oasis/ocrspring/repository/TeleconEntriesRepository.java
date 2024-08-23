@@ -31,4 +31,5 @@ public interface TeleconEntriesRepository extends MongoRepository<TeleconEntry, 
 //    void pullReviewersFromTeleconEntry(ObjectId entryId,List<ObjectId> reviewerIds);
     void deleteById(ObjectId id);
     Optional<TeleconEntry> findByIdAndReviewersContaining (ObjectId teleconId, ObjectId reviewerId);
+
 }
