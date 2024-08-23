@@ -182,24 +182,31 @@ public class EntryController {
     //delete an entry by user
     //id is entry _id
     @PostMapping("/delete/{id}")
-    public String deleteEntry(long id) {
+    public ResponseEntity<?> deleteEntry(HttpServletRequest request, HttpServletResponse response,
+                              @RequestHeader("_id") String clinicianId,
+                              @PathVariable String id) throws IOException{
         // delete an entry
-        return "/api/user/entry/delete/" + id;
+        return teleconService.deleteEntry(clinicianId,id);
     }
 
     //get all shared entries
     @GetMapping("/shared/all")
-    public String getAllSharedEntries() {
+    public ResponseEntity<?> getAllSharedEntries(HttpServletRequest request, HttpServletResponse response,
+                                      @RequestParam(name = "page",required = false, defaultValue = "1") Integer page,
+                                      @RequestHeader("_id") String clinicianId,
+                                      @RequestParam(name = "filter",required = false) String filter) throws IOException{
         // get all shared entries
-        return "/api/user/entry/shared/all";
+        final int pageSize = 20;
+        return teleconService.getAllSharedEntries(page,pageSize,clinicianId,filter);
     }
 
     //get one shared entry(view only)
     //id is entry _id
     @GetMapping("/shared/{id}")
-    public String getSharedEntry(long id) {
+    public ResponseEntity<?> getSharedEntry(@PathVariable String id,
+                                 @RequestHeader("_id") String clinicianId ) {
         // get one shared entry
-        return "/api/user/entry/shared/" + id;
+        return teleconService.getSharedEntry(id,clinicianId);
     }
 
     //get assigned entry details

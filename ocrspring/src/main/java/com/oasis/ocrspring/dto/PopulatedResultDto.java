@@ -1,24 +1,22 @@
 package com.oasis.ocrspring.dto;
-
 import com.oasis.ocrspring.dto.subdto.HabitDto;
+import com.oasis.ocrspring.model.Image;
+import com.oasis.ocrspring.model.Report;
 import com.oasis.ocrspring.model.TeleconEntry;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TeleconEntryDto {
+public class PopulatedResultDto {
     private String id; // MongoDB typically uses String for IDs
     private PatientDetailsDto patient;
     private String clinicianId;
@@ -30,12 +28,13 @@ public class TeleconEntryDto {
     private boolean updated;
     private List<ReviewerDetailsDto> reviewers;
     private List<String> reviews;
-    private List<String> images;
-    private List<String> reports;
+    private List<Image> imageDetails;
+    private List<Report> reportDetails;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public TeleconEntryDto(TeleconEntry teleconEntry, PatientDetailsDto patient, List<ReviewerDetailsDto> reviewer) {
+    public PopulatedResultDto(TeleconEntry teleconEntry, PatientDetailsDto patient, List<ReviewerDetailsDto> reviewer,
+                              List<Image> imageDetails, List<Report> reportDetails) {
         this.id = teleconEntry.getId().toString();
         this.patient = patient;
         this.clinicianId = teleconEntry.getClinicianId().toString();
@@ -47,10 +46,8 @@ public class TeleconEntryDto {
         this.updated = teleconEntry.isUpdated();
         this.reviewers = reviewer;
         this.reviews = teleconEntry.getReviews();
-        this.images = teleconEntry.getImages().stream()
-                    .map(ObjectId::toHexString) // Convert ObjectId to String
-                    .collect(Collectors.toList());
-        this.reports = teleconEntry.getReports().stream().map(ObjectId::toHexString).collect(Collectors.toList());
+        this.imageDetails = imageDetails;
+        this.reportDetails = reportDetails;
         this.createdAt = teleconEntry.getCreatedAt();
         this.updatedAt = teleconEntry.getUpdatedAt();
     }

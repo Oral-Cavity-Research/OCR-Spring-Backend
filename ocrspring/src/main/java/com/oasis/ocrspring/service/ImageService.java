@@ -112,8 +112,8 @@ public class ImageService {
         image.setLesionsAppear(data.getLesionsAppear());
         image.setAnnotation(data.getAnnotation());
         image.setPredictedCat(data.getPredictedCat());
-        image.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-        image.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+        image.setCreatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
+        image.setUpdatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
         return image;
     }
 

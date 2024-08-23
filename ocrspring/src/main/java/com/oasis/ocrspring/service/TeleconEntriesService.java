@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -132,12 +133,12 @@ public class TeleconEntriesService {
 
             //loop through the list to access getters and setters
             for(TeleconEntry entry: entryPageList){
-                Patient patient = patientRepo.findById(entry.getPatient());
+                Patient patient = (patientRepo.findById(entry.getPatient()).orElse(null));
                 PatientDetailsDto patientDetails =new PatientDetailsDto(patient);
                 List<ObjectId> ReviewerList = entry.getReviewers() ;
                 List<ReviewerDetailsDto> reviewerObjectList = new ArrayList<>();
                 for(ObjectId Reviewer : ReviewerList){
-                    User user = userRepo.findById(Reviewer);
+                    User user = userRepo.findById(Reviewer).orElse(null);
                     ReviewerDetailsDto reviewerDetails = new ReviewerDetailsDto(user);
                     reviewerObjectList.add(reviewerDetails);
                 }
@@ -162,12 +163,12 @@ public class TeleconEntriesService {
             EntryPageList = EntryPage.getContent();
             for(TeleconEntry entry:EntryPageList){
 //                List<ObjectId> reviewerIdList = new ArrayList<>();
-                Patient patientProfile = patientRepo.findById(entry.getPatient());
+                Patient patientProfile = patientRepo.findById(entry.getPatient()).orElse(null);
                 PatientDetailsDto patientDetails = new PatientDetailsDto(patientProfile);
                 List<ObjectId> reviewerIdList = entry.getReviewers();
                 List<ReviewerDetailsDto> reviewerList = new ArrayList<>();
                 for (ObjectId reviewer: reviewerIdList){
-                    User Reviewer = userRepo.findById(reviewer);
+                    User Reviewer = userRepo.findById(reviewer).orElse(null);
                     reviewerList.add(new ReviewerDetailsDto(Reviewer));
                 }
                 response.add(new TeleconEntryDto(entry,patientDetails,reviewerList));
@@ -194,7 +195,7 @@ public class TeleconEntriesService {
             Page<TeleconEntry> entries = TeleconEntriesRepo.findByPatient(patientId, pageable);
             entryList = entries.getContent();
             for(TeleconEntry element: entryList){
-                Patient newPatient = patientRepo.findById(element.getPatient());
+                Patient newPatient = patientRepo.findById(element.getPatient()).orElse(null);
                 PatientDetailsDto patientDetails = new PatientDetailsDto(newPatient);
                 List<ObjectId> reviewerList = element.getReviewers();
                 List<ReviewerDetailsDto> reviewerDetails = new ArrayList<>();
@@ -217,9 +218,9 @@ public class TeleconEntriesService {
             Optional<TeleconEntry> entry = TeleconEntriesRepo.findByIdAndClinicianId(teleconId,clinicinId_);
             if (entry.isPresent()) {
                 TeleconEntry entryDetails = entry.get();
-                populatedResultDto teleconDetails = new populatedResultDto();
+                PopulatedResultDto teleconDetails = new PopulatedResultDto();
 
-                Patient patient = patientRepo.findById(entryDetails.getPatient());
+                Patient patient = patientRepo.findById(entryDetails.getPatient()).orElse(null);
                 PatientDetailsDto patientDetails = new PatientDetailsDto(patient);
 
                 List<ObjectId> reviewers = entryDetails.getReviewers();
@@ -231,7 +232,7 @@ public class TeleconEntriesService {
                 setImageDetails(entryDetails.getImages(),imageList);
                 setReportDetails(entryDetails.getReports(),reportList);
 
-                teleconDetails = new populatedResultDto(entryDetails, patientDetails, reviewerDetailList,imageList,reportList);
+                teleconDetails = new PopulatedResultDto(entryDetails, patientDetails, reviewerDetailList,imageList,reportList);
                 return ResponseEntity.status(200).body(teleconDetails);
             }else {
                 return ResponseEntity.status(404).body(new ErrorMessage("Entry not found"));
@@ -276,7 +277,7 @@ public class TeleconEntriesService {
                 List<ObjectId> imageIdList = teleconEntry.getImages();
                 List<ObjectId> reportIdList = teleconEntry.getReports();
 
-                Patient patient = patientRepo.findById(teleconEntry.getPatient());
+                Patient patient = patientRepo.findById(teleconEntry.getPatient()).orElse(null);
                 PatientDetailsDto patientDetails = new PatientDetailsDto(patient);
 
                 List<ReviewerDetailsDto> reviewerDetails = new ArrayList<>();
@@ -287,7 +288,7 @@ public class TeleconEntriesService {
                 setImageDetails(imageIdList, imageList);
                 setReportDetails(reportIdList, reportList);
 
-                populatedResultDto updatedEntry = new populatedResultDto(teleconEntry,patientDetails,reviewerDetails,imageList,reportList);
+                PopulatedResultDto updatedEntry = new PopulatedResultDto(teleconEntry,patientDetails,reviewerDetails,imageList,reportList);
                 return ResponseEntity.status(200).body(updatedEntry);
             }
             createAssignment(teleconId, clinicianId_);
@@ -323,6 +324,105 @@ public class TeleconEntriesService {
         }catch(Exception err){
             return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!" ,err.toString()));
         }
+    }
+    public ResponseEntity<?> deleteEntry(String clinicianId,String id){
+        ObjectId clinicianId_ = new ObjectId(clinicianId);
+        ObjectId teleconId_ = new ObjectId(id);
+        try{
+            Optional<TeleconEntry> entry = TeleconEntriesRepo.findByIdAndClinicianId(teleconId_,clinicianId_);
+            TeleconEntry entry_ = entry.get();
+            final LocalDateTime now = LocalDateTime.now();
+            final LocalDateTime createdAt = entry_.getCreatedAt();
+            final Duration duration = Duration.between(now,createdAt) ;
+            final float hours = Duration.ZERO.toMinutes()/60f;
+            if(hours >= 24){
+                return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+            }
+            if (entry.isPresent()){
+                assignmentRepo.deleteByTeleconEntry(teleconId_);
+                imageRepo.deleteByTeleconEntryId(teleconId_);
+                reportRepo.deleteByTeleconId(teleconId_);
+                TeleconEntriesRepo.deleteById(teleconId_);
+                return ResponseEntity.status(200).body(new MessageDto("Entry is deleted successfully"));
+            }
+            else {
+                return ResponseEntity.status(404).body(new MessageDto("Entry Not Found!"));
+            }
+        }catch (Exception err){
+            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",err.toString()));
+        }
+    }
+
+    public ResponseEntity<?> getAllSharedEntries(int page, int pageSize, String clinicianId,String filter) {
+        Map<String, Object> filterMap = new HashMap<>();
+        filterMap.put("reviewer_id", clinicianId);
+        if (filter != null && !filter.equals("All")) {
+            filterMap.put("reviewed", filter.equals("Reviewed"));
+        }
+        try {
+            Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+            Page<Assignment> assignments;
+            if (filterMap.containsKey("reviewed")) {
+                assignments = assignmentRepo.findByReviewerIdAndReviewed((ObjectId) filterMap.get("reviewer_id"), (Boolean) filterMap.get("reviewed"), pageable);
+            } else {
+                assignments = assignmentRepo.findByReviewerId(new ObjectId(clinicianId), pageable);
+            }
+
+            List<SharedEntriesDto> results = new ArrayList<>();
+
+            if (!assignments.isEmpty()) {
+                for (Assignment assignment : assignments) {
+                    ObjectId teleconId = assignment.getTeleconEntry();
+                    TeleconEntry teleconEntry = TeleconEntriesRepo.findById(teleconId).orElse(null);
+                    if (teleconEntry == null) {
+                        results.add(new SharedEntriesDto(null, null, null, assignment));
+                    }
+                    else {
+                        ObjectId patientId = teleconEntry.getPatient();
+                        ObjectId clicianId = teleconEntry.getClinicianId();
+                        Patient patient = patientRepo.findById(patientId).orElse(null);
+                        User clinician = userRepo.findById(clicianId).orElse(null);
+                        SharedEntriesDto result = new SharedEntriesDto(teleconEntry, patient, clinician, assignment);
+                        results.add(result);
+
+                    }
+                }
+
+            }
+            return ResponseEntity.status(200).body(results);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+        }
+    }
+
+    public ResponseEntity<?> getSharedEntry(String id, String clinicianId){
+        ObjectId teleconId = new ObjectId(id);
+        ObjectId clinicianId_ = new ObjectId(clinicianId);
+        try{
+            TeleconEntry entry = TeleconEntriesRepo.findByIdAndReviewersContaining(teleconId,clinicianId_).orElse(null);
+            if (entry == null){
+                return ResponseEntity.status(404).body(new MessageDto("Entry Not Found!"));
+            }
+            Patient patient = patientRepo.findById(entry.getPatient()).orElse(null);
+            List<ObjectId> reviewerList = entry.getReviewers();
+            List<ObjectId> imageIdList = entry.getImages();
+            List<ObjectId> reportIdList = entry.getReports();
+
+            List<ReviewerDetailsDto_> reviewerDetails = new ArrayList<>();
+            List<Image> imageDetailsList = new ArrayList<>();
+            List<Report> reportDetailsList = new ArrayList<>();
+
+            setReviewers(reviewerList, reviewerDetails);
+            setImageDetails( imageIdList, imageDetailsList);
+            setReportDetails(reportIdList, reportDetailsList);
+            PatientDetailsDto patientDetails = new PatientDetailsDto(patient);
+
+            PopulatedEntryDto result = new PopulatedEntryDto(entry,patientDetails,reviewerDetails,imageDetailsList,reportDetailsList);
+            return ResponseEntity.status(200).body(result);
+        }catch(Exception e){
+            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+        }
+
     }
 
     public void pullReviewFromEntry(ObjectId teleconId, List<ObjectId> reviewers){
@@ -361,8 +461,16 @@ public class TeleconEntriesService {
     private void setReviewerDetails(List<ObjectId> reviewersIdList, List<ReviewerDetailsDto> reviewerDetails) {
         if(!reviewersIdList.isEmpty()){
             for (ObjectId reviewer: reviewersIdList){
-                User reviewerObject = userRepo.findById(reviewer);
+                User reviewerObject = userRepo.findById(reviewer).orElse(null);
                 reviewerDetails.add(new ReviewerDetailsDto(reviewerObject));
+            }
+        }
+    }
+    private void setReviewers(List<ObjectId> reviwerIdList,List<ReviewerDetailsDto_> reviewerDetails){
+        if (!reviwerIdList.isEmpty()){
+            for(ObjectId reviewer: reviwerIdList){
+                User reviewerObject = userRepo.findById(reviewer).orElse(null);
+                reviewerDetails.add(new ReviewerDetailsDto_(reviewerObject));
             }
         }
     }

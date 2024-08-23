@@ -1,22 +1,27 @@
 package com.oasis.ocrspring.dto;
+
 import com.oasis.ocrspring.dto.subdto.HabitDto;
 import com.oasis.ocrspring.model.Image;
 import com.oasis.ocrspring.model.Report;
 import com.oasis.ocrspring.model.TeleconEntry;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
-@AllArgsConstructor
-public class populatedResultDto {
+public class PopulatedEntryDto {
     private String id; // MongoDB typically uses String for IDs
     private PatientDetailsDto patient;
     private String clinicianId;
@@ -26,17 +31,18 @@ public class populatedResultDto {
     private String findings;
     private List<HabitDto> currentHabits;
     private boolean updated;
-    private List<ReviewerDetailsDto> reviewers;
+    private List<ReviewerDetailsDto_> reviewers;
     private List<String> reviews;
     private List<Image> imageDetails;
     private List<Report> reportDetails;
     @CreatedDate
-    private LocalDateTime createdAt;
+    @Field("createdAt")
+    private ZonedDateTime  createdAt;
     @LastModifiedDate
-    private LocalDateTime updatedAt;
-
-    public populatedResultDto(TeleconEntry teleconEntry, PatientDetailsDto patient, List<ReviewerDetailsDto> reviewer,
-                              List<Image> imageDetails, List<Report> reportDetails) {
+    @Field("updatedAt")
+    private ZonedDateTime updatedAt;
+    public PopulatedEntryDto(TeleconEntry teleconEntry, PatientDetailsDto patient, List<ReviewerDetailsDto_> reviewer,
+                             List<Image> imageDetails, List<Report> reportDetails) {
         this.id = teleconEntry.getId().toString();
         this.patient = patient;
         this.clinicianId = teleconEntry.getClinicianId().toString();
@@ -50,7 +56,7 @@ public class populatedResultDto {
         this.reviews = teleconEntry.getReviews();
         this.imageDetails = imageDetails;
         this.reportDetails = reportDetails;
-        this.createdAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        this.updatedAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        this.createdAt = teleconEntry.getCreatedAt().atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC"));
+        this.updatedAt = teleconEntry.getUpdatedAt().atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC"));
     }
 }

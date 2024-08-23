@@ -14,7 +14,7 @@ import java.util.Optional;
 
 public interface TeleconEntriesRepository extends MongoRepository<TeleconEntry, String> {
 
-    TeleconEntry findById(ObjectId id);
+    Optional<TeleconEntry> findById(ObjectId id);
     Optional<TeleconEntry> findByPatientAndClinicianId(ObjectId patient,ObjectId clinicianId);
     Page<TeleconEntry> findByClinicianId(ObjectId clinicianId, Pageable pageable);
     Page<TeleconEntry> findByClinicianIdAndReviewersIsNotNull(ObjectId clinicianId,Pageable pageable);
@@ -29,4 +29,6 @@ public interface TeleconEntriesRepository extends MongoRepository<TeleconEntry, 
     long countByClinicianIdAndUpdatedTrue(ObjectId clinicianId);
 //    @Query(value = "{ '_id': ?0 }", update = "{ '$pull': { 'reviewers': ?1 } }")
 //    void pullReviewersFromTeleconEntry(ObjectId entryId,List<ObjectId> reviewerIds);
+    void deleteById(ObjectId id);
+    Optional<TeleconEntry> findByIdAndReviewersContaining (ObjectId teleconId, ObjectId reviewerId);
 }

@@ -67,8 +67,8 @@ public class ReportService {
                         Report report = new Report();
                         report.setTeleconId(data.getTeleconId());
                         report.setReportName(data.getReportName());
-                        report.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-                        report.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                        report.setCreatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+                        report.setUpdatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
                         reportRepo.save(report);
                         uploadedReports.add(report); //Report model list
                         ReportIds.add(report.getId());
