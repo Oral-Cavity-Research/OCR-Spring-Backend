@@ -212,17 +212,17 @@ public class EntryController {
     //get assigned entry details
     //id is assignment _id
     @GetMapping("/shared/data/{id}")
-    public String getAssignedEntryDetails(long id) {
+    public ResponseEntity<?> getAssignedEntryDetails(@PathVariable String id) {
         // get assigned entry details
-        return "/api/user/entry/shared/data/" + id;
+        return teleconService.getAssignedEntryDetails(id);
     }
 
     //get entry reviews
     //id is entry _id
     @GetMapping("/reviews/{id}")
-    public String getEntryReviews(long id) {
+    public ResponseEntity<?> getEntryReviews(@PathVariable String id) throws IOException {
         // get entry reviews
-        return "/api/user/entry/reviews/" + id;
+        return teleconService.getEntryReviews(id);
     }
 
     //change a reviewer(reviewer assignes another)

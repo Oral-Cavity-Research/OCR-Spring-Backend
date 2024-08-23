@@ -52,6 +52,7 @@ public class TeleconEntry
     private LocalDateTime endTime;
 
     private String findings;
+    private String status;
 
     @Field("current_habits")
     private List<HabitDto> currentHabits;
@@ -82,6 +83,7 @@ public class TeleconEntry
                 ", start_time=" + startTime +
                 ", end_time=" + endTime +
                 ", findings='" + findings + '\'' +
+                ", status='" + status + '\'' +
                 ", current_habits=" + currentHabits +
                 ", updated=" + updated +
                 ", reviewers=" + reviewers +
@@ -92,4 +94,6 @@ public class TeleconEntry
                 ", updatedAt=" + updatedAt +
                 '}';
     }
+
+
 }

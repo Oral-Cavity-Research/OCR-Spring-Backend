@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -43,6 +44,8 @@ public class TeleconEntriesService {
     private ReportRepository reportRepo;
     @Autowired
     private MongoTemplate mongoTemplate;
+    @Autowired
+    private ReviewRepository reviewRepo;
 
     public List<TeleconEntry> AllTeleconEntriesDetails(){
 
@@ -425,6 +428,62 @@ public class TeleconEntriesService {
 
     }
 
+    public ResponseEntity<?> getAssignedEntryDetails(String id){
+        ObjectId assignmentId = new ObjectId(id);
+        try{
+            Assignment assignment = assignmentRepo.findById(assignmentId).orElse(null);
+            AssignedEntryDetailsDto result = new AssignedEntryDetailsDto();
+            if (assignment != null){
+                TeleconEntry entry = TeleconEntriesRepo.findById(assignment.getTeleconEntry()).orElse(null);
+                if(entry != null){
+                    List<ObjectId> imageIdList = entry.getImages();
+                    List<ObjectId> reportIdList = entry.getReports();
+
+                    List<Image> imageDetailsList = new ArrayList<>();
+                    List<Report> reportDetailsList = new ArrayList<>();
+
+                    setImageDetails( imageIdList, imageDetailsList);
+                    setReportDetails(reportIdList, reportDetailsList);
+                    Patient patient = patientRepo.findById(entry.getPatient()).orElse(null);
+                    User clinician = userRepo.findById(entry.getClinicianId()).orElse(null);
+                    PatientDetailsDto patientDetails = new PatientDetailsDto(patient);
+                    ClinicianDetailsDto clinicianDetails = new ClinicianDetailsDto(clinician);
+
+                    result = new AssignedEntryDetailsDto(entry, patientDetails, clinicianDetails,
+                            imageDetailsList, reportDetailsList);
+
+                    result.setAssignedAt(assignment.getCreatedAt());
+                    result.setReviewed(assignment.getReviewed());
+                    result.setChecked(assignment.getChecked());
+                }
+                return ResponseEntity.status(200).body(result);
+            }else {
+                return ResponseEntity.status(404).body(new MessageDto("Entry Not Found!"));
+            }
+
+        }catch(Exception e){
+            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+        }
+    }
+
+    public ResponseEntity<?> getEntryReviews(String id){
+        ObjectId teleconId = new ObjectId(id);
+        try{
+            List<Review> reviews = reviewRepo.findByTeleconEntryId(teleconId);
+            List<ReviewDetailsDto> reviewDetails = new ArrayList<>();
+            if (!reviews.isEmpty()){
+                for(Review review: reviews){
+                    User reviewer = userRepo.findById(review.getReviewerId()).orElse(null);
+                    reviewDetails.add(new ReviewDetailsDto(review,reviewer));
+                }
+                return ResponseEntity.status(200).body(reviewDetails);
+            }else {
+                return ResponseEntity.status(404).body(new MessageDto("Entry Not Found!"));
+            }
+        }catch(Exception e){
+            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+        }
+    }
     public void pullReviewFromEntry(ObjectId teleconId, List<ObjectId> reviewers){
         Query query = new Query().addCriteria(Criteria.where("_id").is(teleconId)) ;
         Update update = new Update().pullAll("reviewers", reviewers.toArray());

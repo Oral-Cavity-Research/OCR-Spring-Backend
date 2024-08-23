@@ -1,27 +1,32 @@
 package com.oasis.ocrspring.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Document(collection = "reviews")
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
 public class Review {
     @Id
-    private String id;
+    @Field("_id")
+    private ObjectId id;
 
     @Field("telecon_entry_id")
-    private String teleconEntryId;
+    private ObjectId teleconEntryId;
 
     @Field("reviewer_id")
-    private String reviewerId;
+    private ObjectId reviewerId;
 
     @Field("provisional_diagnosis")
     private String provisionalDiagnosis;
@@ -35,12 +40,23 @@ public class Review {
     @Field("other_comments")
     private String otherComments;
 
-    public Review(String teleconEntryId, String reviewerId, String provisionalDiagnosis, String managementSuggestions, String referralSuggestions, String otherComments) {
-        this.teleconEntryId = teleconEntryId;
-        this.reviewerId = reviewerId;
-        this.provisionalDiagnosis = provisionalDiagnosis;
-        this.managementSuggestions = managementSuggestions;
-        this.referralSuggestions = referralSuggestions;
-        this.otherComments = otherComments;
-    }
+    @CreatedDate
+    @Field("createdAt")
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Field("updatedAt")
+    private LocalDateTime updatedAt;
+
+//    public Review(ObjectId teleconEntryId, ObjectId reviewerId, String provisionalDiagnosis, String managementSuggestions, String referralSuggestions, String otherComments) {
+//        this.teleconEntryId = teleconEntryId;
+//        this.reviewerId = reviewerId;
+//        this.provisionalDiagnosis = provisionalDiagnosis;
+//        this.managementSuggestions = managementSuggestions;
+//        this.referralSuggestions = referralSuggestions;
+//        this.otherComments = otherComments;
+//        this.createdAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+//        this.updatedAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+//
+//    }
 }

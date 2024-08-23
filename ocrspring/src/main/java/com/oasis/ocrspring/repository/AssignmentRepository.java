@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface AssignmentRepository extends MongoRepository<Assignment, String> {
     long countByReviewerIdAndReviewedFalse(ObjectId clinicianId);
@@ -14,4 +15,5 @@ public interface AssignmentRepository extends MongoRepository<Assignment, String
     void deleteByTeleconEntry(ObjectId teleconId);
     Page<Assignment> findByReviewerIdAndReviewed(ObjectId reviewerId, boolean reviewed, Pageable pageable);
     Page<Assignment> findByReviewerId(ObjectId reviewerId,Pageable pageable);
+    Optional<Assignment> findById(ObjectId id);
 }
