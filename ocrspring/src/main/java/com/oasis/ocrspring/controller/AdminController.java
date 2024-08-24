@@ -2,10 +2,12 @@ package com.oasis.ocrspring.controller;
 
 import com.oasis.ocrspring.dto.*;
 import com.oasis.ocrspring.model.Request;
+import com.oasis.ocrspring.model.Role;
 import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.service.RequestService;
 import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
 import com.oasis.ocrspring.service.ReviewerResDto;
+import com.oasis.ocrspring.service.RoleService;
 import com.oasis.ocrspring.service.UserService;
 import com.oasis.ocrspring.service.auth.AuthenticationToken;
 import com.oasis.ocrspring.service.auth.TokenService;
@@ -34,6 +36,8 @@ public class AdminController {
     AuthenticationToken authenticationToken;
     @Autowired
     UserService userService;
+    @Autowired
+    RoleService roleService;
 
     @ApiIgnore
     @RequestMapping(value = "/")
@@ -201,21 +205,70 @@ public class AdminController {
     }
 
     //get all user roles
+
     @GetMapping("/roles")
-    public String getAllRoles() {
-        return "/api/admin/roles";
+    public ResponseEntity<?> getAllRoles(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // Authenticate request
+        authenticationToken.authenticateRequest(request, response);
+
+        // Check permissions
+        if (!tokenService.checkPermissions(request, List.of("106", "107", "100", "109"))) {
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+        }
+
+        try {
+            List<Role> roles = roleService.allRoleDetails();
+            return ResponseEntity.ok(roles);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+        }
     }
 
     //get one user role
     @GetMapping("/roles/{id}")
-    public String getRole(long id) {
-        return "/api/admin/roles/" + id;
+    public ResponseEntity<?> getRoleById(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) throws IOException {
+        // Authenticate request
+        authenticationToken.authenticateRequest(request, response);
+
+        // Check permissions
+        if (!tokenService.checkPermissions(request, List.of("109"))) {
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+        }
+
+        try {
+            Optional<Role> role = roleService.getRoleById(id);
+            if (role.isPresent()) {
+                return ResponseEntity.ok(role.get());
+            } else {
+                return ResponseEntity.status(404).body(new ErrorMessage("Role not found"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+        }
     }
 
     //add a new role
     @PostMapping("/roles")
-    public String addRole() {
-        return "/api/admin/roles";
+    public ResponseEntity<?> addRole(HttpServletRequest request, HttpServletResponse response, @RequestBody RoleReqDto role) throws IOException{
+        // Authenticate request
+        authenticationToken.authenticateRequest(request, response);
+
+        // Check permissions
+        if (!tokenService.checkPermissions(request, List.of("109"))) {
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+        }
+
+        try {
+            boolean isRoleAdded = roleService.addRole(role);
+            if (isRoleAdded) {
+                return ResponseEntity.ok(new ErrorMessage("New role added successfully"));
+            } else {
+
+                return ResponseEntity.status(401).body(new ErrorMessage("Role already exists"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+        }
     }
 
     //update user permission

@@ -4,9 +4,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.tomcat.jni.Local;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,9 +23,11 @@ public class Role {
 
     private String role;
 
-    private List<String> permissions = new ArrayList<>();
+    private List<Integer> permissions = new ArrayList<>();
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-    public Role(String role, List<String> permissions) {
+    public Role(String role, List<Integer> permissions) {
         this.role = role;
         this.permissions = permissions;
     }

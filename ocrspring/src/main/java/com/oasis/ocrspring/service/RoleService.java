@@ -1,5 +1,6 @@
 package com.oasis.ocrspring.service;
 
+import com.oasis.ocrspring.dto.RoleReqDto;
 import com.oasis.ocrspring.model.Role;
 import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.repository.RoleRepository;
@@ -28,6 +29,18 @@ public class RoleService {
 
     public Optional<Role> getRoleByrole(String role) {
         return roleRepo.findByRole(role);
+    }
+    public Optional<Role> getRoleById(String id) {
+        return roleRepo.findById(id);
+    }
+    public boolean addRole(RoleReqDto role)  {
+        Optional<Role> existingRole = roleRepo.findByRoleIgnoreCase(role.getRole());
+        if (existingRole.isPresent()) {
+            return false;
+        }
+
+        roleRepo.save(new Role(role.getRole(), role.getPermissions()));
+        return true;
     }
 
 }
