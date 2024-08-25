@@ -1,5 +1,6 @@
 package com.oasis.ocrspring.model;
 
+import com.oasis.ocrspring.dto.subdto.OptionsSubDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -7,7 +8,9 @@ import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 
 @Document(collection = "options")
 @Getter
@@ -20,10 +23,14 @@ public class Option {
 
     private String name;
 
-    private List<String> options;
+    private List<OptionsSubDto> options;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-    public Option(String name, List<String> options) {
+    public Option(String name, List<OptionsSubDto> options) {
         this.name = name;
         this.options = options;
+        this.createdAt = LocalDateTime.now();
     }
+
 }

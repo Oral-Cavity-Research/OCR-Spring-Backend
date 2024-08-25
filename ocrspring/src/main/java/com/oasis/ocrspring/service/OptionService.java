@@ -15,4 +15,11 @@ public class OptionService {
     public List<Option> allOptionDetails() {
         return optionRepo.findAll();
     }
+    public Option findByName(String name) {
+        String regexName = name.replace(" ", "\\s*");
+        return optionRepo.findByNameRegex(regexName);
+    }
+    public void saveOption(Option option) {
+        optionRepo.save(option);
+    }
 }

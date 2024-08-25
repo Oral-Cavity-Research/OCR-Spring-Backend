@@ -5,6 +5,7 @@ import com.oasis.ocrspring.model.Role;
 import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.repository.RoleRepository;
 import com.oasis.ocrspring.repository.UserRepository;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +32,7 @@ public class RoleService {
         return roleRepo.findByRole(role);
     }
     public Optional<Role> getRoleById(String id) {
-        return roleRepo.findById(id);
+        return roleRepo.findById( new ObjectId(id));
     }
     public boolean addRole(RoleReqDto role)  {
         Optional<Role> existingRole = roleRepo.findByRoleIgnoreCase(role.getRole());
@@ -41,6 +42,12 @@ public class RoleService {
 
         roleRepo.save(new Role(role.getRole(), role.getPermissions()));
         return true;
+    }
+    public void updateRole(String id, Role roleDetails) {
+        Role role = roleRepo.findById(new ObjectId(id)).orElseThrow(() -> new RuntimeException("Role not found"));
+        role.setRole(roleDetails.getRole());
+        role.setPermissions(roleDetails.getPermissions());
+        roleRepo.save(role);
     }
 
 }
