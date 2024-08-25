@@ -1,14 +1,12 @@
 package com.oasis.ocrspring.controller;
 
 import com.oasis.ocrspring.dto.*;
+import com.oasis.ocrspring.model.Hospital;
 import com.oasis.ocrspring.model.Request;
 import com.oasis.ocrspring.model.Role;
 import com.oasis.ocrspring.model.User;
-import com.oasis.ocrspring.service.RequestService;
+import com.oasis.ocrspring.service.*;
 import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
-import com.oasis.ocrspring.service.ReviewerResDto;
-import com.oasis.ocrspring.service.RoleService;
-import com.oasis.ocrspring.service.UserService;
 import com.oasis.ocrspring.service.auth.AuthenticationToken;
 import com.oasis.ocrspring.service.auth.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +36,8 @@ public class AdminController {
     UserService userService;
     @Autowired
     RoleService roleService;
+    @Autowired
+    HospitalService hospitalService;
 
     @ApiIgnore
     @RequestMapping(value = "/")
@@ -247,7 +247,7 @@ public class AdminController {
         }
     }
 
-    //add a new role
+    //add a new role//////////////////////////////
     @PostMapping("/roles")
     public ResponseEntity<?> addRole(HttpServletRequest request, HttpServletResponse response, @RequestBody RoleReqDto role) throws IOException{
         // Authenticate request
@@ -271,46 +271,175 @@ public class AdminController {
         }
     }
 
-    //update user permission
+    //update user permission///////////////////////////
     @PostMapping("/roles/{id}")
-    public String updateRole(long id) {
-        return "/api/admin/roles/" + id;
+    public ResponseEntity<?> updateRole(HttpServletRequest request, HttpServletResponse response, @PathVariable String id, @RequestBody Role roleDetails) throws IOException {
+        // Authenticate request
+        authenticationToken.authenticateRequest(request, response);
+
+        // Check permissions
+        if (!tokenService.checkPermissions(request, List.of("109"))) {
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+        }
+
+        try {
+            Optional<Role> role = roleService.getRoleById(id);
+            if (role.isPresent()) {
+                roleService.updateRole(id, roleDetails);
+                return ResponseEntity.ok(new ErrorMessage("Role updated successfully"));
+            } else {
+                return ResponseEntity.status(404).body(new ErrorMessage("Role not found"));
+            }
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(new ErrorMessage("Role not found"));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+        }
     }
 
     //get a specific user
     @GetMapping("/users/{id}")
-    public String getUser(long id) {
-        return "/api/admin/users/" + id;
+    public ResponseEntity<?> getUserById(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) throws IOException {
+        // Authenticate request
+        authenticationToken.authenticateRequest(request, response);
+
+        // Check permissions
+        if (!tokenService.checkPermissions(request, List.of("106", "107"))) {
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+        }
+
+        try {
+            Optional<User> user = userService.getUserById(id);
+            if (user.isPresent()) {
+                return ResponseEntity.ok(new UserResDto(user.get()));
+            } else {
+                return ResponseEntity.status(404).body(new ErrorMessage("User not found"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+        }
     }
 
     //update a user
-    @PostMapping("update/users/{id}")
-    public String updateUser(@PathVariable long id) {
-        return "/api/admin/update/users/" + id;
+    @PostMapping("/update/user/{id}")
+    public ResponseEntity<?> updateUser(HttpServletRequest request, HttpServletResponse response, @PathVariable String id, @RequestBody User userDetails) throws IOException {
+        // Authenticate request
+        authenticationToken.authenticateRequest(request, response);
+
+        // Check permissions
+        if (!tokenService.checkPermissions(request, List.of("107"))) {
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+        }
+
+        try {
+            Optional<User> user = userService.getUserById(id);
+            if (user.isPresent()) {
+                userService.updateUser(id, userDetails);
+                User updatedUser = userService.getUserById(id).orElseThrow(() -> new RuntimeException("User not found"));
+                UserResDto userResDto = new UserResDto(updatedUser);
+                userResDto.setMessage("User details updated successfully");
+                return ResponseEntity.ok(userResDto);
+            } else {
+                return ResponseEntity.status(404).body(new ErrorMessage("User not found"));
+            }
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(new ErrorMessage("User not found"));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+        }
     }
 
     //delete a user
-    @PostMapping("delete/users/{id}")
-    public String deleteUser(long id) {
-        return "/api/admin/delete/users/" + id;
-    }
+    @PostMapping("/delete/user/{id}")
+    public ResponseEntity<?> deleteUser(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) throws IOException {
+        // Authenticate request
+        authenticationToken.authenticateRequest(request, response);
 
-    //add hospital
+        // Check permissions
+        if (!tokenService.checkPermissions(request, List.of("107"))) {
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+        }
+
+        try {
+            boolean isDeleted = userService.deleteUser(id);
+            if (isDeleted) {
+                return ResponseEntity.ok(new ErrorMessage("User deleted successfully"));
+            } else {
+                return ResponseEntity.status(404).body(new ErrorMessage("User not found"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+        }
+    }
+    //add hospital//////////////////////////////////////////
     @PostMapping("/hospital")
-    public String addHospital() {
-        return "/api/admin/hospital";
-    }
+    public ResponseEntity<?> addHospital(HttpServletRequest request, HttpServletResponse response, @RequestBody HospitalDto hospitalDetails) throws IOException {
+        // Authenticate request
+        authenticationToken.authenticateRequest(request, response);
 
+        // Check permissions
+        if (!tokenService.checkPermissions(request, List.of("101"))) {
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+        }
+
+        try {
+            boolean isAdded = hospitalService.addHospital(hospitalDetails);
+            if (isAdded) {
+                return ResponseEntity.ok(new ErrorMessage("Hospital is added successfully!"));
+            } else {
+                return ResponseEntity.status(401).body(new ErrorMessage("Hospital is already added"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+        }
+    }
     //update hospital details
     @PostMapping("/hospitals/update/{id}")
-    public String updateHospital(long id) {
-        return "/api/admin/hospitals/update/" + id;
+    public ResponseEntity<?> updateHospital(HttpServletRequest request, HttpServletResponse response, @PathVariable String id, @RequestBody HospitalDto hospitalDetails) throws IOException {
+        // Authenticate request
+        authenticationToken.authenticateRequest(request, response);
+
+        // Check permissions
+        if (!tokenService.checkPermissions(request, List.of("101"))) {
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+        }
+
+        try {
+            Optional<Hospital> hospital = hospitalService.getHospitalById(id);
+            if (hospital.isPresent()) {
+                hospitalService.updateHospital(id, hospitalDetails);
+                return ResponseEntity.ok(new MessageDto("Hospital details updated successfully!"));
+            } else {
+                return ResponseEntity.status(404).body(new MessageDto("Hospital Not Found"));
+            }
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(new MessageDto("Hospital Not Found"));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new MessageDto("Internal Server Error!"));
+        }
     }
 
     //delete hospital
     @PostMapping("/hospitals/delete/{id}")
-    public String deleteHospital(long id) {
-        return "/api/admin/hospitals/delete/" + id;
+    public ResponseEntity<?> deleteHospital(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) throws IOException {
+        // Authenticate request
+        authenticationToken.authenticateRequest(request, response);
+
+        // Check permissions
+        if (!tokenService.checkPermissions(request, List.of("101"))) {
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+        }
+
+        try {
+            boolean isDeleted = hospitalService.deleteHospital(id);
+            if (isDeleted) {
+                return ResponseEntity.ok(new MessageDto("Hospital deleted successfully"));
+            } else {
+                return ResponseEntity.status(404).body(new MessageDto("Hospital not found"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new MessageDto("Internal Server Error!"));
+        }
     }
 
     //get all hospitals
