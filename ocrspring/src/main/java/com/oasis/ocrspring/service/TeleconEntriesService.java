@@ -48,6 +48,8 @@ public class TeleconEntriesService {
     @Autowired
     private ReviewRepository reviewRepo;
 
+    final String errorMessage = "Internal Server Error!";
+
     public List<TeleconEntry> AllTeleconEntriesDetails(){
 
         return TeleconEntriesRepo.findAll();
@@ -98,7 +100,7 @@ public class TeleconEntriesService {
                 return ResponseEntity.status(404).body(new MessageDto("Patient is not registered" ));
             }
         }catch(Exception e){
-            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+            return ResponseEntity.status(500).body(new ErrorResponseDto(errorMessage,e.toString()));
         }
 
     }
@@ -150,7 +152,7 @@ public class TeleconEntriesService {
             }
             return ResponseEntity.status(200).body(response);
         }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponseDto(errorMessage,e.toString()));
         }
 
     }
@@ -179,7 +181,7 @@ public class TeleconEntriesService {
             }
             return  ResponseEntity.status(200).body(response);
         } catch(Exception e){
-            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+            return ResponseEntity.status(500).body(new ErrorResponseDto(errorMessage,e.toString()));
         }
     }
 
@@ -210,7 +212,7 @@ public class TeleconEntriesService {
         }catch(NullPointerException er){
             return ResponseEntity.status(404).body(new ErrorMessage("Entries Not Found"));
         } catch (Exception e ){
-            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+            return ResponseEntity.status(500).body(new ErrorResponseDto(errorMessage,e.toString()));
         }
 
 
@@ -242,7 +244,7 @@ public class TeleconEntriesService {
                 return ResponseEntity.status(404).body(new ErrorMessage("Entry not found"));
             }
         }catch(Exception e){
-            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+            return ResponseEntity.status(500).body(new ErrorResponseDto(errorMessage,e.toString()));
         }
     }
     public ResponseEntity<?> countNewReviews(String clinicianId){
@@ -303,7 +305,7 @@ public class TeleconEntriesService {
             return ResponseEntity.status(200).body(new MessageDto("Reviewer is added" ));
 
         }catch(Exception e){
-            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+            return ResponseEntity.status(500).body(new ErrorResponseDto(errorMessage,e.toString()));
         }
     }
 
@@ -326,7 +328,7 @@ public class TeleconEntriesService {
             pullReviewFromEntry(teleconId,entryElement.getReviewers());
             return ResponseEntity.status(200).body(new MessageDto("Reviewer is removed"));
         }catch(Exception err){
-            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!" ,err.toString()));
+            return ResponseEntity.status(500).body(new ErrorResponseDto(errorMessage ,err.toString()));
         }
     }
     public ResponseEntity<?> deleteEntry(String clinicianId,String id){
@@ -353,7 +355,7 @@ public class TeleconEntriesService {
                 return ResponseEntity.status(404).body(new MessageDto("Entry Not Found!"));
             }
         }catch (Exception err){
-            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",err.toString()));
+            return ResponseEntity.status(500).body(new ErrorResponseDto(errorMessage,err.toString()));
         }
     }
 
@@ -367,7 +369,8 @@ public class TeleconEntriesService {
             Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
             Page<Assignment> assignments;
             if (filterMap.containsKey("reviewed")) {
-                assignments = assignmentRepo.findByReviewerIdAndReviewed((ObjectId) filterMap.get("reviewer_id"), (Boolean) filterMap.get("reviewed"), pageable);
+                assignments = assignmentRepo.findByReviewerIdAndReviewed((ObjectId) filterMap.get("reviewer_id"),
+                        (Boolean) filterMap.get("reviewed"), pageable);
             } else {
                 assignments = assignmentRepo.findByReviewerId(new ObjectId(clinicianId), pageable);
             }
@@ -395,7 +398,7 @@ public class TeleconEntriesService {
             }
             return ResponseEntity.status(200).body(results);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+            return ResponseEntity.status(500).body(new ErrorResponseDto(errorMessage,e.toString()));
         }
     }
 
@@ -424,7 +427,7 @@ public class TeleconEntriesService {
             PopulatedEntryDto result = new PopulatedEntryDto(entry,patientDetails,reviewerDetails,imageDetailsList,reportDetailsList);
             return ResponseEntity.status(200).body(result);
         }catch(Exception e){
-            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+            return ResponseEntity.status(500).body(new ErrorResponseDto(errorMessage,e.toString()));
         }
 
     }
@@ -463,7 +466,7 @@ public class TeleconEntriesService {
             }
 
         }catch(Exception e){
-            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+            return ResponseEntity.status(500).body(new ErrorResponseDto(errorMessage,e.toString()));
         }
     }
 
@@ -482,7 +485,7 @@ public class TeleconEntriesService {
                 return ResponseEntity.status(404).body(new MessageDto("Entry Not Found!"));
             }
         }catch(Exception e){
-            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+            return ResponseEntity.status(500).body(new ErrorResponseDto(errorMessage,e.toString()));
         }
     }
 
@@ -511,7 +514,7 @@ public class TeleconEntriesService {
 
                 return ResponseEntity.status(200).body(new MessageDto("Reviewer assigned successfully"));
             }catch(Exception e){
-                return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+                return ResponseEntity.status(500).body(new ErrorResponseDto(errorMessage,e.toString()));
             }
         }else{
             return ResponseEntity.status(404).body(new MessageDto("Entry Not Found!"));
@@ -549,7 +552,7 @@ public class TeleconEntriesService {
                 return ResponseEntity.status(404).body(new MessageDto("Entry Not Found!"));
             }
         }catch(Exception e){
-            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+            return ResponseEntity.status(500).body(new ErrorResponseDto(errorMessage,e.toString()));
         }
     }
 
@@ -573,7 +576,7 @@ public class TeleconEntriesService {
             TeleconEntriesRepo.save(teleconEntry);
             return ResponseEntity.status(200).body(new MessageDto("marked as read"));
         } catch(Exception e){
-            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+            return ResponseEntity.status(500).body(new ErrorResponseDto(errorMessage,e.toString()));
         }
     }
 
