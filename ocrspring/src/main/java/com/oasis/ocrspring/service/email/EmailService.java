@@ -22,7 +22,7 @@ public class EmailService {
     @Autowired
     private TemplateEngine templateEngine;
 
-    public void sendEmail(String receiversEmail, String type, String message, String name) throws ErrorMessage {
+    public void sendEmail(String receiversEmail, String type, String message, String name) throws MessagingException {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
@@ -35,7 +35,7 @@ public class EmailService {
             }
         });
 
-        try {
+
             Message msg = new MimeMessage(session);
             msg.setFrom(new InternetAddress("OCR Tech Team <" + sendersEmail + ">", false));
             msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiversEmail));
@@ -44,9 +44,7 @@ public class EmailService {
             msg.setSentDate(new java.util.Date());
 
             Transport.send(msg);
-        } catch (MessagingException e) {
-            throw new ErrorMessage("Email not sent");
-        }
+
     }
 
     private String body(String type, String message, String name) {
