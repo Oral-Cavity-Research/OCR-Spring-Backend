@@ -1,10 +1,12 @@
 package com.oasis.ocrspring.controller;
 
 import com.oasis.ocrspring.dto.PatientTeleconRequest;
+import com.oasis.ocrspring.service.AssignmentService;
 import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
 import com.oasis.ocrspring.service.TeleconEntriesService;
 import com.oasis.ocrspring.service.auth.AuthenticationToken;
 import com.oasis.ocrspring.service.auth.TokenService;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user/entry")
@@ -24,6 +27,9 @@ public class EntryController {
     private AuthenticationToken authenticationToken;
     @Autowired
     private TokenService tokenService;
+    @Autowired
+    private AssignmentService assignmentService;
+    final  String errorMessage = "Unauthorized Access";
 
     // connect entry to the service layer
     @ApiIgnore
@@ -36,21 +42,20 @@ public class EntryController {
     @PostMapping("/add/{id}")
     public ResponseEntity<?> addTeleconsultationEntry(HttpServletRequest request, HttpServletResponse response,
                                                       @PathVariable String id,
-                                                      @RequestHeader("_id") String clinicianId,
                                                       @RequestBody PatientTeleconRequest newPatient)
     throws IOException{
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized Access"));
+            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
         }
         // add a teleconsultation entry
+        String clinicianId=request.getAttribute("_id").toString();
         return teleconService.patientTeleconEntry(id, clinicianId, newPatient);
     }
 
     //get all entries
     @GetMapping("/get")
     public ResponseEntity<?> getAllEntries(HttpServletRequest request, HttpServletResponse response,
-                                           @RequestHeader("id") String id,
                                            @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
                                            @RequestParam(name = "filter", required = false, defaultValue = "Created Date") String filter)
     throws IOException{ //id is clinician Id
@@ -58,95 +63,150 @@ public class EntryController {
         int pageSize = 20;
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized Access"));
+            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
         }
-        return teleconService.getAllUserEntries(id, page, filter, pageSize);
+        String clinicianId = request.getAttribute("_id").toString();
+        return teleconService.getAllUserEntries(clinicianId, page, filter, pageSize);
     }
 
     //get patient entries
     @GetMapping("/get/patient/{id}")
     public ResponseEntity<?> getPatientEntries(HttpServletRequest request, HttpServletResponse response,
-                                               @RequestHeader("_id") String clinicianId,
                                                @PathVariable String id,
                                                @RequestParam(name = "page",required = false,defaultValue ="1") Integer page,
-                                               @RequestParam(name = "filter",required = false,defaultValue = "1") String filter)
+                                               @RequestParam(name = "filter",required = false,defaultValue = "Created Date") String filter)
     throws IOException{
         int pageSize = 20;
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized Access"));
+            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
         }
         // get patient entries
+        String clinicianId = request.getAttribute("_id").toString();
         return teleconService.getUserEntryById(clinicianId,id,page,filter,pageSize);
     }
 
     //get shared patient entries (view only data)
     //id is the patient id
     @GetMapping("/shared/patient/{id}")
-    public String getSharedPatientEntries(long id) {
+    public ResponseEntity<?> getSharedPatientEntries(HttpServletRequest request, HttpServletResponse response,
+                                                     @PathVariable String id,
+                                                     @RequestParam(name = "page",required = false, defaultValue = "1") Integer page,
+                                                     @RequestParam(name = "filter",required = false,defaultValue = "Created Date") String filter)
+    throws IOException{
         // get shared patient entries
-        return "/api/user/entry/shared/patient/" + id;
+        int pageSize = 20;
+        authenticationToken.authenticateRequest(request, response);
+        if(tokenService.checkPermissions(request, Collections.singletonList("200"))){
+            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+        }
+        String clinicianId = request.getAttribute("_id").toString();
+        return teleconService.getSharedPatient(clinicianId,id,filter,pageSize,page);
     }
 
     // get one entry details added by users
     // id is entry _id
     @GetMapping("/get/{id}")
-    public String getEntry(long id) {
+    public ResponseEntity<?> getEntry(HttpServletRequest request, HttpServletResponse response,
+                           @PathVariable String id) throws IOException{
+
+        authenticationToken.authenticateRequest(request, response);
+        if(tokenService.checkPermissions(request, Collections.singletonList("200"))){
+            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+        }
+        String clinicianId = request.getAttribute("_id").toString();
         // get one entry
-        return "/api/user/entry/get/" + id;
+        return teleconService.getEntryDetails(clinicianId,id);
     }
 
     //get new review count
-    @GetMapping("/vount/newreviews")
-    public String getNewReviewCount() {
+    @GetMapping("/count/newreviews")
+    public ResponseEntity<?> countNewReviews(HttpServletRequest request, HttpServletResponse response)
+    throws IOException{
+        authenticationToken.authenticateRequest(request, response);
+        if(tokenService.checkPermissions(request, Collections.singletonList("200"))){
+            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+        }
+        String clinicianId = request.getAttribute("_id").toString();
         // get new review count
-        return "/api/user/entry/vount/newreviews";
+        return teleconService.countNewReviews(clinicianId);
     }
 
     //get unreviewed entry count
     @GetMapping("/count/newentries")
-    public String getUnreviewedEntryCount() {
+    public ResponseEntity<?> getUnreviewedEntryCount(HttpServletRequest request, HttpServletResponse response)
+    throws IOException{
+        authenticationToken.authenticateRequest(request, response);
+        if(tokenService.checkPermissions(request, Collections.singletonList("200"))){
+            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+        }
+        String clinicianId = request.getAttribute("_id").toString();
         // get unreviewed entry count
-        return "/api/user/entry/count/newentries";
+        return assignmentService.getUnreviewedEntryCount(clinicianId);
     }
 
     //add a reviewer by user
     //id is entry _id
     @PostMapping("/reviewer/add/{id}")
-    public String addReviewer(long id) {
+    public ResponseEntity<?> addReviewer(HttpServletRequest request, HttpServletResponse response,
+                                         @PathVariable String id,
+                                         @RequestBody Map<String,String> payload
+                              ) throws IOException{
+        String reviewerId = (String) payload.get("reviewer_id");
+        authenticationToken.authenticateRequest(request, response);
+        if(tokenService.checkPermissions(request, Collections.singletonList("300"))){
+            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+        }
+        String clinicianId = request.getAttribute("_id").toString();
         // add a reviewer
-        return "/api/user/entry/reviewer/add/" + id;
+        return teleconService.addReviewer(clinicianId,id,reviewerId);
     }
 
     //remove a reviewer by user
     //id is entry _id
     @PostMapping("/reviewer/remove/{id}")
-    public String removeReviewer(long id) {
+    public ResponseEntity<?> removeReviewer(HttpServletRequest request, HttpServletResponse response,
+                                 @PathVariable String id,
+                                 @RequestBody Map<String,String> payload) throws IOException{
         // remove a reviewer
-        return "/api/user/entry/reviewer/remove/" + id;
+        String reviewerId = (String) payload.get("reviewer_id");
+        authenticationToken.authenticateRequest(request, response);
+        if(tokenService.checkPermissions(request, Collections.singletonList("200"))){
+            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+        }
+        String clinicianId = request.getAttribute("_id").toString();
+        // add a reviewer
+        return teleconService.removeReviewer(clinicianId,id,reviewerId);
     }
 
     //delete an entry by user
     //id is entry _id
     @PostMapping("/delete/{id}")
-    public String deleteEntry(long id) {
+    public ResponseEntity<?> deleteEntry(HttpServletRequest request, HttpServletResponse response,
+                              @RequestHeader("_id") String clinicianId,
+                              @PathVariable String id) throws IOException{
         // delete an entry
-        return "/api/user/entry/delete/" + id;
+        return teleconService.deleteEntry(clinicianId,id);
     }
 
     //get all shared entries
     @GetMapping("/shared/all")
-    public String getAllSharedEntries() {
+    public ResponseEntity<?> getAllSharedEntries(HttpServletRequest request, HttpServletResponse response,
+                                      @RequestParam(name = "page",required = false, defaultValue = "1") Integer page,
+                                      @RequestHeader("_id") String clinicianId,
+                                      @RequestParam(name = "filter",required = false) String filter) throws IOException{
         // get all shared entries
-        return "/api/user/entry/shared/all";
+        final int pageSize = 20;
+        return teleconService.getAllSharedEntries(page,pageSize,clinicianId,filter);
     }
 
     //get one shared entry(view only)
     //id is entry _id
     @GetMapping("/shared/{id}")
-    public String getSharedEntry(long id) {
+    public ResponseEntity<?> getSharedEntry(@PathVariable String id,
+                                 @RequestHeader("_id") String clinicianId ) {
         // get one shared entry
-        return "/api/user/entry/shared/" + id;
+        return teleconService.getSharedEntry(id,clinicianId);
     }
 
     //get assigned entry details

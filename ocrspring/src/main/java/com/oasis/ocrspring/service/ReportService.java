@@ -38,13 +38,14 @@ public class ReportService {
     }
     public ResponseEntity<UploadReportResponse> uploadReports(ReportsRequestDto data,
                                                               String id,
+                                                              String clinicianId,
                                                               List<MultipartFile> files){
         List<Report> uploadedReports = new ArrayList<>();//Report model list
         List<String> uploadFiles = new ArrayList<>();//List of file uri's
         List<ObjectId> ReportIds = new ArrayList<>();
 
         TeleconEntry teleconEntry = teleconServ.findByID(id);
-        if (teleconEntry != null ){ //auth part should be added
+        if (teleconEntry != null && !teleconEntry.getClinicianId().toString().equals(clinicianId)){
             try{
                 for(MultipartFile file: files) {
                     String fileName = StringUtils.cleanPath(file.getOriginalFilename());
@@ -66,8 +67,8 @@ public class ReportService {
                         Report report = new Report();
                         report.setTeleconId(data.getTeleconId());
                         report.setReportName(data.getReportName());
-                        report.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-                        report.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                        report.setCreatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+                        report.setUpdatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
                         reportRepo.save(report);
                         uploadedReports.add(report); //Report model list
                         ReportIds.add(report.getId());

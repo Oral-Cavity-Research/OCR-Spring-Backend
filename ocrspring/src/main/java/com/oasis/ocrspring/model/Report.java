@@ -7,9 +7,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.time.LocalDateTime;
 
 @Document(collection = "reports")
 @Getter
@@ -31,11 +35,10 @@ public class Report {
     private ObjectId id;
     @JsonProperty("_id")
     public String getIDString(){return id != null? id.toHexString():null;}
-
-    @JsonProperty("_id")
-    private String createdAt;
-
-    private String updatedAt;
+    @CreatedDate
+    private LocalDateTime createdAt;
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
     @Override
     public String toString() {

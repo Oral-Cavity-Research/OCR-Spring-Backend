@@ -2,12 +2,16 @@ package com.oasis.ocrspring.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.oasis.ocrspring.dto.subdto.AnnotationDto;
 import lombok.*;
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Document(collection = "images")
@@ -47,14 +51,14 @@ public class Image
     @Field("lesions_appear")
     private Boolean lesionsAppear;
 
-    private List<String> annotation;
+    private List<AnnotationDto> annotation;
 
     @Field("predicted_cat")
     private String predictedCat;
-
-    private String createdAt;
-
-    private String updatedAt;
+    @CreatedDate
+    private LocalDateTime createdAt;
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
     @Override
     public String toString() {
