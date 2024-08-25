@@ -1,10 +1,13 @@
 package com.oasis.ocrspring.service;
 
+import com.oasis.ocrspring.dto.RequestDto;
 import com.oasis.ocrspring.dto.UserDto;
 import com.oasis.ocrspring.model.Request;
 import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.repository.RequestRepository;
 import com.oasis.ocrspring.repository.UserRepository;
+import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
+import com.oasis.ocrspring.service.email.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,19 +21,21 @@ public class UserService
     private UserRepository userRepo;
     @Autowired
     private RequestRepository requestRepo;
+    @Autowired
+    private EmailService emailService;
 
-    public List<User> allUserDetails(){
 
-        return userRepo.findAll();
+    public Optional<List<User>> allUserDetails(){
+        return Optional.of(userRepo.findAll());
     }
 
     public User createUser(User user){
         return userRepo.save(user);
     }
-    public String signup(Request request){
-        Optional<User> userRepoByRegNo = userRepo.findByRegNo(request.getRegNo());
+    public String signup(RequestDto request){
+        Optional<User> userRepoByRegNo = userRepo.findByRegNo(request.getReg_no());
         Optional<User> userByEmail = userRepo.findByEmail(request.getEmail());
-        Optional<Request> requestByRegNo = requestRepo.findByRegNo(request.getRegNo());
+        Optional<Request> requestByRegNo = requestRepo.findByRegNo(request.getReg_no());
         Optional<Request> requestByEmail = requestRepo.findByEmail(request.getEmail());
 
         if(userRepoByRegNo.isPresent()){
@@ -42,7 +47,8 @@ public class UserService
         if (requestByRegNo.isPresent()||requestByEmail.isPresent() ){
             return "A request for registration is already exists";
         }
-        requestRepo.save(request);
+
+        requestRepo.save(new Request(request.getUsername(),request.getEmail(),request.getReg_no(),request.getHospital(),request.getDesignation(),request.getContact_no()));
         return "Request is sent successfully. You will receive an Email on acceptance";
 
     }
@@ -64,4 +70,23 @@ public class UserService
         return userRepo.save(user);
 
     }
+
+    public boolean isRegNoInUse(String regNo){
+        return userRepo.findByRegNo(regNo).isPresent();
+    }
+    public boolean isEmailInUse(String email) {
+        return userRepo.findByEmail(email).isPresent();
+    }
+    public User addUser(User user) {
+        return userRepo.save(user);
+    }
+    public void sendAcceptanceEmail(String email, String reason, String username) throws ErrorMessage {
+        emailService.sendEmail(email, "ACCEPT", reason, username);
+
+    }
+    public Optional<List<User>> getUsersByRole(String role) {
+        List<User> users = userRepo.findByRole(role);
+        return users.isEmpty() ? Optional.empty() : Optional.of(users);
+    }
+
 }

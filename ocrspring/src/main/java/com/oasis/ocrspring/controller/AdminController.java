@@ -1,11 +1,12 @@
 package com.oasis.ocrspring.controller;
 
-import com.oasis.ocrspring.dto.RequestResDetailsDto;
+import com.oasis.ocrspring.dto.*;
 import com.oasis.ocrspring.model.Request;
 import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.service.RequestService;
 import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
 import com.oasis.ocrspring.service.ReviewerResDto;
+import com.oasis.ocrspring.service.UserService;
 import com.oasis.ocrspring.service.auth.AuthenticationToken;
 import com.oasis.ocrspring.service.auth.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -29,6 +32,8 @@ public class AdminController {
     RequestService requestService;
     @Autowired
     AuthenticationToken authenticationToken;
+    @Autowired
+    UserService userService;
 
     @ApiIgnore
     @RequestMapping(value = "/")
@@ -38,8 +43,8 @@ public class AdminController {
 
     //get all requests
     @GetMapping("/requests")
-    public ResponseEntity<?> getAllRequests(HttpServletRequest request,HttpServletResponse response) throws IOException {
-        authenticationToken.authenticateRequest(request,response);
+    public ResponseEntity<?> getAllRequests(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        authenticationToken.authenticateRequest(request, response);
         if (!tokenService.checkPermissions(request, List.of("100"))) {
             return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
         }
@@ -58,27 +63,141 @@ public class AdminController {
 
     //get one request
     @GetMapping("/requests/{id}")
-    public String getRequest(long id) {
-        return "/api/admin/requests/" + id;
+    public ResponseEntity<?> getRequest(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) throws IOException {
+        authenticationToken.authenticateRequest(request, response);
+        if (!tokenService.checkPermissions(request, List.of("100"))) {
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+        }
+
+        try {
+            Optional<Request> requestOptional = requestService.getRequestById(id);
+            if (requestOptional.isPresent()) {
+                return ResponseEntity.ok(new RequestDetailsDto(requestOptional.get()));
+            } else {
+                return ResponseEntity.status(404).body(new ErrorMessage("Request not found"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+        }
     }
+
 
     //reject a request
     @PostMapping("/requests/{id}")
-    public String rejectRequest(long id) {
-        return "/api/admin/requests/" + id;
+    public ResponseEntity<?> rejectRequest(HttpServletRequest request, HttpServletResponse response, @PathVariable String id, @RequestBody ReqestDeleteReasonDto reason) throws IOException {
+        authenticationToken.authenticateRequest(request, response);
+        if (!tokenService.checkPermissions(request, List.of("100"))) {
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+        }
+
+        try {
+            boolean isDeleted = requestService.rejectRequest(id, reason.getReason());
+            if (isDeleted) {
+                return ResponseEntity.ok().body(new ErrorMessage("Request has been deleted!"));
+            } else {
+                return ResponseEntity.status(404).body(new ErrorMessage("Request not found"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorMessage(e.toString()));
+        } catch (ErrorMessage e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    //approve a request
     @PostMapping("/accept/{id}")
-    public String acceptRequest(long id) {
-        return "/api/admin/accept/" + id;
+    public ResponseEntity<?> acceptRequest(HttpServletRequest request, HttpServletResponse response, @PathVariable String id, @RequestBody ReqToUserDto userDto) throws IOException {
+        authenticationToken.authenticateRequest(request, response);
+        if (!tokenService.checkPermissions(request, List.of("100"))) {
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+        }
+
+        try {
+            Optional<Request> requestOptional = requestService.getRequestById(id);
+            if (requestOptional.isPresent()) {
+                Request req = requestOptional.get();
+                if (userService.isRegNoInUse(req.getRegNo())) {
+                    return ResponseEntity.status(401).body(new ErrorMessage("Reg No already in use"));
+                }
+
+                if (userService.isEmailInUse(req.getEmail())) {
+                    return ResponseEntity.status(401).body(new ErrorMessage("Email address already in use"));
+                }
+
+                User newUser = new User(
+                        userDto.getUsername() != null ? userDto.getUsername() : req.getUserName(),
+                        req.getEmail(),
+                        req.getRegNo(),
+                        userDto.getRole(),
+                        req.getHospital(),
+                        userDto.getDesignation() != null ? userDto.getDesignation() : "",
+                        userDto.getContact_no() != null ? userDto.getContact_no() : "",
+                        true
+                );
+                requestService.acceptRequest(id, newUser, userDto.getReason());
+                userService.sendAcceptanceEmail(req.getEmail(), userDto.getReason(), req.getUserName());
+                if(newUser.getUpdatedAt()==null){
+                    return ResponseEntity.ok(new UserResDto(newUser.getUsername(), newUser.getEmail(), newUser.getRegNo(), newUser.getHospital(), newUser.getDesignation(), newUser.getContactNo(),newUser.isAvailable(), newUser.getRole() ,newUser.getId().toString(), newUser.getCreatedAt().toString(),  "User created successfully"));
+                }
+                return ResponseEntity.ok(new UserResDto(newUser.getUsername(), newUser.getEmail(), newUser.getRegNo(), newUser.getHospital(), newUser.getDesignation(), newUser.getContactNo(),newUser.isAvailable(), newUser.getRole() ,newUser.getId().toString(), newUser.getCreatedAt().toString(), newUser.getUpdatedAt().toString(), "User created successfully"));
+            } else {
+                return ResponseEntity.status(404).body(new ErrorMessage("Request not found"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+        } catch (ErrorMessage e) {
+            return ResponseEntity.status(500).body(e);
+        }
+
     }
+
+
+
+    //approve a request
+
 
     //get users by thier roles
     //only for read or write access permission
-    @GetMapping("/users/roles/{role}")
-    public String getUsersByRole(String role) {
-        return "/api/admin/users/roles/" + role;
+    @GetMapping("/users/role/{role}")
+    public ResponseEntity<?> getUsersByRole(HttpServletRequest request, HttpServletResponse response, @PathVariable String role) throws IOException {
+        authenticationToken.authenticateRequest(request, response);
+        if (!tokenService.checkPermissions(request, List.of("106", "107"))) {
+            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+        }
+
+        try {
+            Optional<List<User>> users;
+            if ("All".equals(role)) {
+                users = userService.allUserDetails();
+                if(users.isEmpty()){
+                    return ResponseEntity.status(404).body(new ErrorMessage("No users found"));
+                }
+            } else {
+                users = userService.getUsersByRole(role);
+                if(users.isEmpty()){
+                    return ResponseEntity.status(404).body(new ErrorMessage("No users found"));
+                }
+            }
+
+            List<UserResDto> userResDtos = users.get().stream()
+                    .map(user -> new UserResDto(
+                            user.getUsername(),
+                            user.getEmail(),
+                            user.getRegNo(),
+                            user.getHospital(),
+                            user.getDesignation(),
+                            user.getContactNo(),
+                            user.isAvailable(),
+                            user.getRole(),
+                            user.getId().toString(),
+                            user.getCreatedAt().toString(),
+                            user.getUpdatedAt() != null ? user.getUpdatedAt().toString() : null,
+                            null))
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(userResDtos);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+        }
     }
 
     //get all user roles
