@@ -1,6 +1,7 @@
 package com.oasis.ocrspring.controller;
 
 import com.oasis.ocrspring.dto.PatientTeleconRequest;
+import com.oasis.ocrspring.dto.ReviewRequestDto;
 import com.oasis.ocrspring.service.AssignmentService;
 import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
 import com.oasis.ocrspring.service.TeleconEntriesService;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -97,7 +99,7 @@ public class EntryController {
         // get shared patient entries
         int pageSize = 20;
         authenticationToken.authenticateRequest(request, response);
-        if(tokenService.checkPermissions(request, Collections.singletonList("200"))){
+        if(!tokenService.checkPermissions(request, Collections.singletonList("200"))){
             return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
         }
         String clinicianId = request.getAttribute("_id").toString();
@@ -111,7 +113,7 @@ public class EntryController {
                            @PathVariable String id) throws IOException{
 
         authenticationToken.authenticateRequest(request, response);
-        if(tokenService.checkPermissions(request, Collections.singletonList("200"))){
+        if(!tokenService.checkPermissions(request, Collections.singletonList("200"))){
             return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
         }
         String clinicianId = request.getAttribute("_id").toString();
@@ -124,7 +126,7 @@ public class EntryController {
     public ResponseEntity<?> countNewReviews(HttpServletRequest request, HttpServletResponse response)
     throws IOException{
         authenticationToken.authenticateRequest(request, response);
-        if(tokenService.checkPermissions(request, Collections.singletonList("200"))){
+        if(!tokenService.checkPermissions(request, Collections.singletonList("200"))){
             return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
         }
         String clinicianId = request.getAttribute("_id").toString();
@@ -137,7 +139,7 @@ public class EntryController {
     public ResponseEntity<?> getUnreviewedEntryCount(HttpServletRequest request, HttpServletResponse response)
     throws IOException{
         authenticationToken.authenticateRequest(request, response);
-        if(tokenService.checkPermissions(request, Collections.singletonList("200"))){
+        if(!tokenService.checkPermissions(request, Collections.singletonList("200"))){
             return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
         }
         String clinicianId = request.getAttribute("_id").toString();
@@ -154,7 +156,7 @@ public class EntryController {
                               ) throws IOException{
         String reviewerId = (String) payload.get("reviewer_id");
         authenticationToken.authenticateRequest(request, response);
-        if(tokenService.checkPermissions(request, Collections.singletonList("300"))){
+        if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
             return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
         }
         String clinicianId = request.getAttribute("_id").toString();
@@ -171,7 +173,7 @@ public class EntryController {
         // remove a reviewer
         String reviewerId = (String) payload.get("reviewer_id");
         authenticationToken.authenticateRequest(request, response);
-        if(tokenService.checkPermissions(request, Collections.singletonList("200"))){
+        if(!tokenService.checkPermissions(request, Collections.singletonList("200"))){
             return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
         }
         String clinicianId = request.getAttribute("_id").toString();
@@ -183,8 +185,13 @@ public class EntryController {
     //id is entry _id
     @PostMapping("/delete/{id}")
     public ResponseEntity<?> deleteEntry(HttpServletRequest request, HttpServletResponse response,
-                              @RequestHeader("_id") String clinicianId,
                               @PathVariable String id) throws IOException{
+
+        authenticationToken.authenticateRequest(request, response);
+        if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
+            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+        }
+        String clinicianId = request.getAttribute("_id").toString();
         // delete an entry
         return teleconService.deleteEntry(clinicianId,id);
     }
@@ -193,8 +200,12 @@ public class EntryController {
     @GetMapping("/shared/all")
     public ResponseEntity<?> getAllSharedEntries(HttpServletRequest request, HttpServletResponse response,
                                       @RequestParam(name = "page",required = false, defaultValue = "1") Integer page,
-                                      @RequestHeader("_id") String clinicianId,
                                       @RequestParam(name = "filter",required = false) String filter) throws IOException{
+        authenticationToken.authenticateRequest(request, response);
+        if(!tokenService.checkPermissions(request, Collections.singletonList("200"))){
+            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+        }
+        String clinicianId = request.getAttribute("_id").toString();
         // get all shared entries
         final int pageSize = 20;
         return teleconService.getAllSharedEntries(page,pageSize,clinicianId,filter);
@@ -203,8 +214,14 @@ public class EntryController {
     //get one shared entry(view only)
     //id is entry _id
     @GetMapping("/shared/{id}")
-    public ResponseEntity<?> getSharedEntry(@PathVariable String id,
-                                 @RequestHeader("_id") String clinicianId ) {
+    public ResponseEntity<?> getSharedEntry(HttpServletRequest request, HttpServletResponse response,
+                                            @PathVariable String id
+                                            ) throws IOException{
+        authenticationToken.authenticateRequest(request, response);
+        if(!tokenService.checkPermissions(request, Collections.singletonList("200"))){
+            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+        }
+        String clinicianId = request.getAttribute("_id").toString();
         // get one shared entry
         return teleconService.getSharedEntry(id,clinicianId);
     }
@@ -212,48 +229,86 @@ public class EntryController {
     //get assigned entry details
     //id is assignment _id
     @GetMapping("/shared/data/{id}")
-    public String getAssignedEntryDetails(long id) {
+    public ResponseEntity<?> getAssignedEntryDetails(HttpServletRequest request, HttpServletResponse response,
+                                                     @PathVariable String id) throws IOException{
+        authenticationToken.authenticateRequest(request, response);
+        if(!tokenService.checkPermissions(request, Collections.singletonList("200"))){
+            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+        }
+        String clinicianId = request.getAttribute("_id").toString();
         // get assigned entry details
-        return "/api/user/entry/shared/data/" + id;
+        return teleconService.getAssignedEntryDetails(id);
     }
 
     //get entry reviews
     //id is entry _id
     @GetMapping("/reviews/{id}")
-    public String getEntryReviews(long id) {
+    public ResponseEntity<?> getEntryReviews(HttpServletRequest request, HttpServletResponse response,
+                                             @PathVariable String id) throws IOException {
+        authenticationToken.authenticateRequest(request, response);
+        if(!tokenService.checkPermissions(request, List.of("200","300"))){
+            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+        }
         // get entry reviews
-        return "/api/user/entry/reviews/" + id;
+        return teleconService.getEntryReviews(id);
     }
 
     //change a reviewer(reviewer assignes another)
     @PostMapping("/reviewer/change/{id}")
-    public String changeReviewer(long id) {
+    public ResponseEntity<?> changeReviewer(HttpServletRequest request, HttpServletResponse response,
+                                            @PathVariable String id,
+                                            @RequestBody Map<String,String> payload) throws IOException{
+
+
+        authenticationToken.authenticateRequest(request, response);
+        if(!tokenService.checkPermissions(request, Collections.singletonList("200"))){
+            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+        }
+        String clinicianId = request.getAttribute("_id").toString();
+        String ReviewerId = payload.get("reviewer_id");
         // change a reviewer
-        return "/api/user/entry/reviewer/change/" + id;
+        return teleconService.changeReviewer(id,clinicianId,ReviewerId);
     }
 
     //add new review
     //id is telecon_id
     @PostMapping("/review/{id}")
-    public String addNewReview(long id) {
+    public ResponseEntity<?> addNewReview(HttpServletRequest request, HttpServletResponse response,
+                                            @PathVariable String id,
+                                          @RequestBody ReviewRequestDto reviewDetails) throws IOException{
+        authenticationToken.authenticateRequest(request, response);
+        if(!tokenService.checkPermissions(request, Collections.singletonList("200"))){
+            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+        }
+        String clinicianId = request.getAttribute("_id").toString();
         // add new review
-        return "/api/user/entry/review/" + id;
+        return teleconService.addReview(clinicianId, id, reviewDetails);
     }
 
     //mark as read
     //id is assignment _id
     @PostMapping("/mark/{id}")
-    public String markAsRead(long id) {
+    public ResponseEntity<?> markAsRead(HttpServletRequest request, HttpServletResponse response,
+                                        @PathVariable String id) throws IOException{
+        authenticationToken.authenticateRequest(request, response);
+        if(!tokenService.checkPermissions(request, Collections.singletonList("200"))){
+            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+        }
         // mark as read
-        return "/api/user/entry/mark/" + id;
+        return teleconService.markAsRead(id );
     }
 
     //mark as read
     //id is entry _id
     @PostMapping("/open/{id}")
-    public String markAsOpen(long id) {
+    public ResponseEntity<?> markAsOpen(HttpServletRequest request, HttpServletResponse response,
+                                        @PathVariable String id) throws IOException{
+        authenticationToken.authenticateRequest(request, response);
+        if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
+            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+        }
         // mark as open
-        return "/api/user/entry/open/" + id;
+        return teleconService.markAsOpen(id );
     }
 }
 

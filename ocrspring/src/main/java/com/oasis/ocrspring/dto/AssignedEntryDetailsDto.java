@@ -1,59 +1,68 @@
 package com.oasis.ocrspring.dto;
+
 import com.oasis.ocrspring.dto.subdto.HabitDto;
 import com.oasis.ocrspring.model.Image;
 import com.oasis.ocrspring.model.Report;
 import com.oasis.ocrspring.model.TeleconEntry;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
-@AllArgsConstructor
-public class PopulatedResultDto {
+public class AssignedEntryDetailsDto {
     private String id; // MongoDB typically uses String for IDs
     private PatientDetailsDto patient;
-    private String clinicianId;
+    private ClinicianDetailsDto clinician_id;
     private String complaint;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String findings;
+    private String status;
     private List<HabitDto> currentHabits;
     private boolean updated;
-    private List<ReviewerDetailsDto> reviewers;
+    private List<String> reviewers;
     private List<String> reviews;
     private List<Image> imageDetails;
     private List<Report> reportDetails;
     @CreatedDate
     @Field("createdAt")
-    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
     @LastModifiedDate
     @Field("updatedAt")
-    private LocalDateTime updatedAt;
+    private ZonedDateTime updatedAt;
+    private LocalDateTime assignedAt;
+    private Boolean reviewed; // Additional field from Assignment
+    private Boolean checked;
 
-    public PopulatedResultDto(TeleconEntry teleconEntry, PatientDetailsDto patient, List<ReviewerDetailsDto> reviewer,
-                              List<Image> imageDetails, List<Report> reportDetails) {
+    public AssignedEntryDetailsDto(TeleconEntry teleconEntry, PatientDetailsDto patient, ClinicianDetailsDto clinician,
+                             List<Image> imageDetails, List<Report> reportDetails) {
         this.id = teleconEntry.getId().toString();
         this.patient = patient;
-        this.clinicianId = teleconEntry.getClinicianId().toString();
+        this.clinician_id = clinician;
         this.complaint = teleconEntry.getComplaint();
         this.startTime = teleconEntry.getStartTime();
         this.endTime = teleconEntry.getEndTime();
         this.findings = teleconEntry.getFindings();
+        this.status = teleconEntry.getStatus();
         this.currentHabits = teleconEntry.getCurrentHabits();
         this.updated = teleconEntry.isUpdated();
-        this.reviewers = reviewer;
+        this.reviewers = teleconEntry.getReviewers().stream().map(ObjectId::toHexString).collect(Collectors.toList());
         this.reviews = teleconEntry.getReviews();
         this.imageDetails = imageDetails;
         this.reportDetails = reportDetails;
-        this.createdAt = teleconEntry.getCreatedAt();
-        this.updatedAt = teleconEntry.getUpdatedAt();
+        this.createdAt = teleconEntry.getCreatedAt().atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC"));
+        this.updatedAt = teleconEntry.getUpdatedAt().atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC"));
     }
 }
