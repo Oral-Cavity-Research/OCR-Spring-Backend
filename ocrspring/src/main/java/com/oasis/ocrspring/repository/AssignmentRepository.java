@@ -16,4 +16,7 @@ public interface AssignmentRepository extends MongoRepository<Assignment, String
     Page<Assignment> findByReviewerIdAndReviewed(ObjectId reviewerId, boolean reviewed, Pageable pageable);
     Page<Assignment> findByReviewerId(ObjectId reviewerId,Pageable pageable);
     Optional<Assignment> findById(ObjectId id);
+    Optional<Assignment> findByIdAndReviewerId(ObjectId id, ObjectId reviwerId);
+    Optional<Assignment> findByReviewerIdAndTeleconEntry(ObjectId reviewerId, ObjectId teleconId);
+    void deleteByIdAndReviewerId(ObjectId id, ObjectId reviewerId);
 }
