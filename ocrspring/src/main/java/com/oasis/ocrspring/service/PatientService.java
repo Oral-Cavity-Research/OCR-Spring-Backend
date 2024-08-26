@@ -20,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -103,17 +102,17 @@ public class PatientService {
 
 
 
-public Patient findOne(String patient_id, String clinician_id){
-    return patientRepo.findByPatientIdAndClinicianId(patient_id,new ObjectId(clinician_id)).orElse(null);
+public Patient findOne(String patientId, String clinicianId){
+    return patientRepo.findByPatientIdAndClinicianId(patientId,new ObjectId(clinicianId)).orElse(null);
 }
 
 
 
 public  Patient findPatient(String id,String clinicianId){
 
-        ObjectId id_ = new ObjectId(id);
+        ObjectId idObject = new ObjectId(id);
         ObjectId clinicianIdObject = new ObjectId(clinicianId);
-        return patientRepo.findByIdAndClinicianId(id_, clinicianIdObject).orElse(null);
+        return patientRepo.findByIdAndClinicianId(idObject, clinicianIdObject).orElse(null);
     }
 
     public ResponseEntity<?> addPatient(
@@ -127,7 +126,13 @@ public  Patient findPatient(String id,String clinicianId){
             if (patient != null) {
                 return ResponseEntity.status(401).body("Patient ID already exists");
             }
-            String fileName = StringUtils.cleanPath(files.getOriginalFilename());
+
+            String originalFilename = files.getOriginalFilename();
+            if (originalFilename == null) {
+                throw new IllegalArgumentException("File name cannot be null");
+            }
+            String fileName = StringUtils.cleanPath(originalFilename);
+
             return getResponse(data, files, fileName, uploadedURIs);
 
         } catch (Exception e) {
