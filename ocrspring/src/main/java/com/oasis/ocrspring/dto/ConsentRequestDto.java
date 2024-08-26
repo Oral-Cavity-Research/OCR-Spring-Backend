@@ -3,31 +3,38 @@ package com.oasis.ocrspring.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.oasis.ocrspring.dto.subdto.Risk_factors;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ConsentRequestDto {
-    private String patient_id;
-    private String clinician_id;
-    private String patient_name;
-    private List<Risk_factors> risk_factors;
+    @JsonProperty("patient_id")
+    private String patientId;
+    @JsonProperty("clinician_id")
+    private String clinicianId;
+    @JsonProperty("patient_name")
+    private String patientName;
+    @JsonProperty("risk_factors")
+    private List<Risk_factors> riskFactors;
     @JsonProperty("DOB")
-    private String DOB;
+    private String dob;
     private String gender;
-    private String histo_diagnosis;
-    private List<String> medical_history;
-    private List<String> family_history;
-    private String systemic_disease;
-    private String contact_no;
-    private String consent_form;
+    @JsonProperty("histo_diagnosis")
+    private String histoDiagnosis;
+    @JsonProperty("medical_history")
+    private List<String> medicalHistory;
+    @JsonProperty("family_history")
+    private List<String> familyHistory;
+    @JsonProperty("systemic_disease")
+    private String systemicDisease;
+    @JsonProperty("contact_no")
+    private String contactNo;
+    @JsonProperty("consent_form")
+    private String consentForm;
 
 }

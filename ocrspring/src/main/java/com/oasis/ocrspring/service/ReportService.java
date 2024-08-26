@@ -23,17 +23,18 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 @Service
 public class ReportService {
     @Autowired
     private ReportRepository reportRepo;
     @Autowired
     private TeleconEntriesService teleconServ;
-    @Value("src/main/Storage/Reports")
+    @Value("${reportUploadDir}")
     private String reportUploadDir;
 
     public List<Report> allReportDetails(){
-        System.out.println("appeared in service layer");
         return reportRepo.findAll();
     }
     public ResponseEntity<UploadReportResponse> uploadReports(ReportsRequestDto data,
@@ -48,44 +49,17 @@ public class ReportService {
         if (teleconEntry != null && !teleconEntry.getClinicianId().toString().equals(clinicianId)){
             try{
                 for(MultipartFile file: files) {
-                    String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-                    try{
-                        Path path = Paths.get(reportUploadDir + File.separator+ fileName);
-                        if(!Files.exists(path)){//if the path doesn't exist create em
-                            Files.createDirectories(path);
-                        }
-                        Files.copy(file.getInputStream(),path, StandardCopyOption.REPLACE_EXISTING);
+                    String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+                    ResponseEntity<UploadReportResponse> Internal_Server_Error = getUploadReportResponseResponseEntity(data, file, fileName, uploadFiles, uploadedReports, ReportIds);
+                    if (Internal_Server_Error != null) return Internal_Server_Error;
 
-                        //useful for creating uri to check the report
-                        String fileDownUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                                .path("/files")
-                                .path(fileName)
-                                .toUriString();
-                        uploadFiles.add(fileDownUri);
-
-                        // creating a report instance and saving it on the database
-                        Report report = new Report();
-                        report.setTeleconId(data.getTeleconId());
-                        report.setReportName(data.getReportName());
-                        report.setCreatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
-                        report.setUpdatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
-                        reportRepo.save(report);
-                        uploadedReports.add(report); //Report model list
-                        ReportIds.add(report.getId());
-
-                    }
-                    catch(Exception ex){
-                        return ResponseEntity.status(500).body(new UploadReportResponse(null,"Internal Server Error"));
-                    }
-
-            }
+                }
                 //to make sure not to overwritten on the existing IDs
                 List<ObjectId> reportIds = uploadedReports.stream().map(Report :: getId).toList();
                 List<ObjectId> existedReportIds = teleconEntry.getReports();
                 if(existedReportIds.isEmpty()){
                     existedReportIds = new ArrayList<>();
                 }
-                //reportIds.addAll(existedReportIds);
                 existedReportIds.addAll(reportIds);
                 teleconEntry.setReports(existedReportIds);
                 teleconEntry.setUpdatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
@@ -93,7 +67,6 @@ public class ReportService {
 
                 return ResponseEntity.status(200).body(new UploadReportResponse(uploadedReports, "Reports Uploaded Successfully"));
             }catch (Exception e){
-                //throw new RuntimeException("Failed to store the report");
                 return ResponseEntity.status(500).body(new UploadReportResponse(null
                         ,"Internal Server Error"));
         }
@@ -102,5 +75,37 @@ public class ReportService {
                 return ResponseEntity.status(404).body(new UploadReportResponse(null
                         ,"Entry Not Found"));
             }
+    }
+
+    private ResponseEntity<UploadReportResponse> getUploadReportResponseResponseEntity(ReportsRequestDto data, MultipartFile file, String fileName, List<String> uploadFiles, List<Report> uploadedReports, List<ObjectId> ReportIds) {
+        try{
+            Path path = Paths.get(reportUploadDir + File.separator+ fileName);
+            if(!Files.exists(path)){//if the path doesn't exist create em
+                Files.createDirectories(path);
+            }
+            Files.copy(file.getInputStream(),path, StandardCopyOption.REPLACE_EXISTING);
+
+            //useful for creating uri to check the report
+            String fileDownUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/files")
+                    .path(fileName)
+                    .toUriString();
+            uploadFiles.add(fileDownUri);
+
+            // creating a report instance and saving it on the database
+            Report report = new Report();
+            report.setTeleconId(data.getTeleconId());
+            report.setReportName(data.getReportName());
+            report.setCreatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+            report.setUpdatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+            reportRepo.save(report);
+            uploadedReports.add(report); //Report model list
+            ReportIds.add(report.getId());
+
+        }
+        catch(Exception ex){
+            return ResponseEntity.status(500).body(new UploadReportResponse(null, "Internal Server Error"));
+        }
+        return null;
     }
 }
