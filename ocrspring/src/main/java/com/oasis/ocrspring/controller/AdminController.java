@@ -44,13 +44,18 @@ public class AdminController {
     public void redirect(HttpServletResponse response) throws IOException {
         response.sendRedirect("/swagger-ui.html");
     }
+    static String unAuthorized = "Unauthorized access";
+    static String internalServerError = "Internal Server Error!";
+    static String userNotFund = "User not found";
+    static String roleNotFound = "Role not found";
+    static String requestNotFound = "Request not found";
 
     //get all requests
     @GetMapping("/requests")
     public ResponseEntity<?> getAllRequests(HttpServletRequest request, HttpServletResponse response) throws IOException {
         authenticationToken.authenticateRequest(request, response);
         if (!tokenService.checkPermissions(request, List.of("100"))) {
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+            return ResponseEntity.status(401).body(new ErrorMessage(unAuthorized));
         }
 
         try {
@@ -61,16 +66,17 @@ public class AdminController {
             }
             return ResponseEntity.ok(requestResDetailsDtos);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+            return ResponseEntity.status(500).body(new ErrorMessage(internalServerError));
         }
     }
+
 
     //get one request
     @GetMapping("/requests/{id}")
     public ResponseEntity<?> getRequest(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) throws IOException {
         authenticationToken.authenticateRequest(request, response);
         if (!tokenService.checkPermissions(request, List.of("100"))) {
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+            return ResponseEntity.status(401).body(new ErrorMessage(unAuthorized));
         }
 
         try {
@@ -78,10 +84,10 @@ public class AdminController {
             if (requestOptional.isPresent()) {
                 return ResponseEntity.ok(new RequestDetailsDto(requestOptional.get()));
             } else {
-                return ResponseEntity.status(404).body(new ErrorMessage("Request not found"));
+                return ResponseEntity.status(404).body(new ErrorMessage(requestNotFound));
             }
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+            return ResponseEntity.status(500).body(new ErrorMessage(internalServerError));
         }
     }
 
@@ -91,7 +97,7 @@ public class AdminController {
     public ResponseEntity<?> rejectRequest(HttpServletRequest request, HttpServletResponse response, @PathVariable String id, @RequestBody ReqestDeleteReasonDto reason) throws IOException {
         authenticationToken.authenticateRequest(request, response);
         if (!tokenService.checkPermissions(request, List.of("100"))) {
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+            return ResponseEntity.status(401).body(new ErrorMessage(unAuthorized));
         }
 
         try {
@@ -99,7 +105,7 @@ public class AdminController {
             if (isDeleted) {
                 return ResponseEntity.ok().body(new ErrorMessage("Request has been deleted!"));
             } else {
-                return ResponseEntity.status(404).body(new ErrorMessage("Request not found"));
+                return ResponseEntity.status(404).body(new ErrorMessage(requestNotFound));
             }
         }
         catch (MessagingException e) {
@@ -109,12 +115,11 @@ public class AdminController {
         }
     }
 
+    //approve a request
     @PostMapping("/accept/{id}")
     public ResponseEntity<?> acceptRequest(HttpServletRequest request, HttpServletResponse response, @PathVariable String id, @RequestBody ReqToUserDto userDto) throws IOException {
-        authenticationToken.authenticateRequest(request, response);
-        if (!tokenService.checkPermissions(request, List.of("100"))) {
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
-        }
+        ResponseEntity<?> authResponse = authenticateAndAuthorize(request, response, List.of("100"));
+        if (authResponse != null) return authResponse;
 
         try {
             Optional<Request> requestOptional = requestService.getRequestById(id);
@@ -128,38 +133,64 @@ public class AdminController {
                     return ResponseEntity.status(401).body(new ErrorMessage("Email address already in use"));
                 }
 
-                User newUser = new User(
-                        userDto.getUsername() != null ? userDto.getUsername() : req.getUserName(),
-                        req.getEmail(),
-                        req.getRegNo(),
-                        userDto.getRole(),
-                        req.getHospital(),
-                        userDto.getDesignation() != null ? userDto.getDesignation() : "",
-                        userDto.getContact_no() != null ? userDto.getContact_no() : "",
-                        true
-                );
+                User newUser = createUserFromRequest(req, userDto);
                 requestService.acceptRequest(id, newUser, userDto.getReason());
                 userService.sendAcceptanceEmail(req.getEmail(), userDto.getReason(), req.getUserName());
-                if(newUser.getUpdatedAt()==null){
-                    return ResponseEntity.ok(new UserResDto(newUser.getUsername(), newUser.getEmail(), newUser.getRegNo(), newUser.getHospital(), newUser.getDesignation(), newUser.getContactNo(),newUser.isAvailable(), newUser.getRole() ,newUser.getId().toString(), newUser.getCreatedAt().toString(),  "User created successfully"));
-                }
-                return ResponseEntity.ok(new UserResDto(newUser.getUsername(), newUser.getEmail(), newUser.getRegNo(), newUser.getHospital(), newUser.getDesignation(), newUser.getContactNo(),newUser.isAvailable(), newUser.getRole() ,newUser.getId().toString(), newUser.getCreatedAt().toString(), newUser.getUpdatedAt().toString(), "User created successfully"));
+                return buildUserResponse(newUser);
             } else {
-                return ResponseEntity.status(404).body(new ErrorMessage("Request not found"));
+                return ResponseEntity.status(404).body(new ErrorMessage(requestNotFound));
             }
-        }
-        catch (MessagingException e) {
+        } catch (MessagingException e) {
             return ResponseEntity.status(500).body(e);
-        }catch (Exception e) {
-            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorMessage(internalServerError));
         }
-
     }
 
-
-
-    //approve a request
-
+    private ResponseEntity<?> authenticateAndAuthorize(HttpServletRequest request, HttpServletResponse response, List<String> permissions) throws IOException {
+        authenticationToken.authenticateRequest(request, response);
+        if (!tokenService.checkPermissions(request, permissions)) {
+            return ResponseEntity.status(401).body(new ErrorMessage(unAuthorized));
+        }
+        return null;
+    }
+    private User createUserFromRequest(Request req, ReqToUserDto userDto) {
+        return new User(
+                userDto.getUsername() != null ? userDto.getUsername() : req.getUserName(),
+                req.getEmail(),
+                req.getRegNo(),
+                userDto.getRole(),
+                req.getHospital(),
+                userDto.getDesignation() != null ? userDto.getDesignation() : "",
+                userDto.getContact_no() != null ? userDto.getContact_no() : "",
+                true
+        );
+    }
+    private ResponseEntity<?> buildUserResponse(User newUser) {
+        if (newUser.getUpdatedAt() == null) {
+            return ResponseEntity.ok(new UserResDto(
+                    newUser.getUsername(),
+                    newUser.getEmail(), newUser.getRegNo(),
+                    newUser.getHospital(), newUser.getDesignation(),
+                    newUser.getContactNo(), newUser.isAvailable(),
+                    newUser.getRole(),
+                    newUser.getId().toString(),
+                    newUser.getCreatedAt().toString(),
+                    "User created successfully"));
+        }
+        return ResponseEntity.ok(new UserResDto(
+                newUser.getUsername(),
+                newUser.getEmail(),
+                newUser.getRegNo(),
+                newUser.getHospital(),
+                newUser.getDesignation(),
+                newUser.getContactNo(),
+                newUser.isAvailable(),
+                newUser.getRole(),
+                newUser.getId().toString(),
+                newUser.getCreatedAt().toString(),
+                newUser.getUpdatedAt().toString(), "User created successfully"));
+    }
 
     //get users by thier roles
     //only for read or write access permission
@@ -167,7 +198,7 @@ public class AdminController {
     public ResponseEntity<?> getUsersByRole(HttpServletRequest request, HttpServletResponse response, @PathVariable String role) throws IOException {
         authenticationToken.authenticateRequest(request, response);
         if (!tokenService.checkPermissions(request, List.of("106", "107"))) {
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+            return ResponseEntity.status(401).body(new ErrorMessage(unAuthorized));
         }
 
         try {
@@ -202,7 +233,7 @@ public class AdminController {
 
             return ResponseEntity.ok(userResDtos);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+            return ResponseEntity.status(500).body(new ErrorMessage(internalServerError));
         }
     }
 
@@ -215,16 +246,17 @@ public class AdminController {
 
         // Check permissions
         if (!tokenService.checkPermissions(request, List.of("106", "107", "100", "109"))) {
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+            return ResponseEntity.status(401).body(new ErrorMessage(unAuthorized));
         }
 
         try {
             List<Role> roles = roleService.allRoleDetails();
             return ResponseEntity.ok(roles);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+            return ResponseEntity.status(500).body(new ErrorMessage(internalServerError));
         }
     }
+
 
     //get one user role
     @GetMapping("/roles/{id}")
@@ -234,7 +266,7 @@ public class AdminController {
 
         // Check permissions
         if (!tokenService.checkPermissions(request, List.of("109"))) {
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+            return ResponseEntity.status(401).body(new ErrorMessage(unAuthorized));
         }
 
         try {
@@ -242,22 +274,22 @@ public class AdminController {
             if (role.isPresent()) {
                 return ResponseEntity.ok(role.get());
             } else {
-                return ResponseEntity.status(404).body(new ErrorMessage("Role not found"));
+                return ResponseEntity.status(404).body(new ErrorMessage(roleNotFound));
             }
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+            return ResponseEntity.status(500).body(new ErrorMessage(internalServerError));
         }
     }
 
     //add a new role
     @PostMapping("/roles")
-    public ResponseEntity<?> addRole(HttpServletRequest request, HttpServletResponse response, @RequestBody RoleReqDto role) throws IOException{
+    public ResponseEntity<ErrorMessage> addRole(HttpServletRequest request, HttpServletResponse response, @RequestBody RoleReqDto role) throws IOException{
         // Authenticate request
         authenticationToken.authenticateRequest(request, response);
 
         // Check permissions
         if (!tokenService.checkPermissions(request, List.of("109"))) {
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+            return ResponseEntity.status(401).body(new ErrorMessage(unAuthorized));
         }
 
         try {
@@ -269,19 +301,19 @@ public class AdminController {
                 return ResponseEntity.status(401).body(new ErrorMessage("Role already exists"));
             }
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+            return ResponseEntity.status(500).body(new ErrorMessage(internalServerError));
         }
     }
 
     //update user permission
     @PostMapping("/roles/{id}")
-    public ResponseEntity<?> updateRole(HttpServletRequest request, HttpServletResponse response, @PathVariable String id, @RequestBody Role roleDetails) throws IOException {
+    public ResponseEntity<ErrorMessage> updateRole(HttpServletRequest request, HttpServletResponse response, @PathVariable String id, @RequestBody RoleDto roleDetails) throws IOException {
         // Authenticate request
         authenticationToken.authenticateRequest(request, response);
 
         // Check permissions
         if (!tokenService.checkPermissions(request, List.of("109"))) {
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+            return ResponseEntity.status(401).body(new ErrorMessage(unAuthorized));
         }
 
         try {
@@ -290,12 +322,12 @@ public class AdminController {
                 roleService.updateRole(id, roleDetails);
                 return ResponseEntity.ok(new ErrorMessage("Role updated successfully"));
             } else {
-                return ResponseEntity.status(404).body(new ErrorMessage("Role not found"));
+                return ResponseEntity.status(404).body(new ErrorMessage(roleNotFound));
             }
         } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body(new ErrorMessage("Role not found"));
+            return ResponseEntity.status(404).body(new ErrorMessage(roleNotFound));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+            return ResponseEntity.status(500).body(new ErrorMessage(internalServerError));
         }
     }
 
@@ -307,7 +339,7 @@ public class AdminController {
 
         // Check permissions
         if (!tokenService.checkPermissions(request, List.of("106", "107"))) {
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+            return ResponseEntity.status(401).body(new ErrorMessage(unAuthorized));
         }
 
         try {
@@ -315,50 +347,50 @@ public class AdminController {
             if (user.isPresent()) {
                 return ResponseEntity.ok(new UserResDto(user.get()));
             } else {
-                return ResponseEntity.status(404).body(new ErrorMessage("User not found"));
+                return ResponseEntity.status(404).body(new ErrorMessage(userNotFund));
             }
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+            return ResponseEntity.status(500).body(new ErrorMessage(internalServerError));
         }
     }
 
     //update a user
     @PostMapping("/update/user/{id}")
-    public ResponseEntity<?> updateUser(HttpServletRequest request, HttpServletResponse response, @PathVariable String id, @RequestBody User userDetails) throws IOException {
+    public ResponseEntity<?> updateUser(HttpServletRequest request, HttpServletResponse response, @PathVariable String id, @RequestBody UserNameAndRoleDto userDetails) throws IOException {
         // Authenticate request
         authenticationToken.authenticateRequest(request, response);
 
         // Check permissions
         if (!tokenService.checkPermissions(request, List.of("107"))) {
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+            return ResponseEntity.status(401).body(new ErrorMessage(unAuthorized));
         }
 
         try {
             Optional<User> user = userService.getUserById(id);
             if (user.isPresent()) {
                 userService.updateUser(id, userDetails);
-                User updatedUser = userService.getUserById(id).orElseThrow(() -> new RuntimeException("User not found"));
+                User updatedUser = userService.getUserById(id).orElseThrow(() -> new RuntimeException(userNotFund));
                 UserResDto userResDto = new UserResDto(updatedUser);
                 userResDto.setMessage("User details updated successfully");
                 return ResponseEntity.ok(userResDto);
             } else {
-                return ResponseEntity.status(404).body(new ErrorMessage("User not found"));
+                return ResponseEntity.status(404).body(new ErrorMessage(userNotFund));
             }
         } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body(new ErrorMessage("User not found"));
+            return ResponseEntity.status(404).body(new ErrorMessage(userNotFund));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+            return ResponseEntity.status(500).body(new ErrorMessage(internalServerError));
         }
     }
 
     //delete a user
 
     @PostMapping("/delete/user/{id}")
-    public ResponseEntity<?> deleteUser(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) throws IOException {
+    public ResponseEntity<ErrorMessage> deleteUser(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) throws IOException {
         // Authenticate request
         authenticationToken.authenticateRequest(request, response);
         if (!tokenService.checkPermissions(request, List.of("107"))) {
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+            return ResponseEntity.status(401).body(new ErrorMessage(unAuthorized));
         }
 
         try {
@@ -369,19 +401,19 @@ public class AdminController {
                 return ResponseEntity.status(404).body(new ErrorMessage("User not found"));
             }
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+            return ResponseEntity.status(500).body(new ErrorMessage(internalServerError));
         }
     }
 
     //add hospital
     @PostMapping("/hospital")
-    public ResponseEntity<?> addHospital(HttpServletRequest request, HttpServletResponse response, @RequestBody HospitalDto hospitalDetails) throws IOException {
+    public ResponseEntity<ErrorMessage> addHospital(HttpServletRequest request, HttpServletResponse response, @RequestBody HospitalDto hospitalDetails) throws IOException {
         // Authenticate request
         authenticationToken.authenticateRequest(request, response);
 
         // Check permissions
         if (!tokenService.checkPermissions(request, List.of("101"))) {
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+            return ResponseEntity.status(401).body(new ErrorMessage(unAuthorized));
         }
 
         try {
@@ -392,19 +424,19 @@ public class AdminController {
                 return ResponseEntity.status(401).body(new ErrorMessage("Hospital is already added"));
             }
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new ErrorMessage("Internal Server Error!"));
+            return ResponseEntity.status(500).body(new ErrorMessage(internalServerError));
         }
     }
 
     //update hospital details
     @PostMapping("/hospitals/update/{id}")
-    public ResponseEntity<?> updateHospital(HttpServletRequest request, HttpServletResponse response, @PathVariable String id, @RequestBody HospitalDto hospitalDetails) throws IOException {
+    public ResponseEntity<MessageDto> updateHospital(HttpServletRequest request, HttpServletResponse response, @PathVariable String id, @RequestBody HospitalDto hospitalDetails) throws IOException {
         // Authenticate request
         authenticationToken.authenticateRequest(request, response);
 
         // Check permissions
         if (!tokenService.checkPermissions(request, List.of("101"))) {
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+            return ResponseEntity.status(401).body(new MessageDto(unAuthorized));
         }
 
         try {
@@ -418,19 +450,19 @@ public class AdminController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(new MessageDto("Hospital Not Found"));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new MessageDto("Internal Server Error!"));
+            return ResponseEntity.status(500).body(new MessageDto(internalServerError));
         }
     }
 
     //delete hospital
     @PostMapping("/hospitals/delete/{id}")
-    public ResponseEntity<?> deleteHospital(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) throws IOException {
+    public ResponseEntity<MessageDto> deleteHospital(HttpServletRequest request, HttpServletResponse response, @PathVariable String id) throws IOException {
         // Authenticate request
         authenticationToken.authenticateRequest(request, response);
 
         // Check permissions
         if (!tokenService.checkPermissions(request, List.of("101"))) {
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
+            return ResponseEntity.status(401).body(new MessageDto(unAuthorized));
         }
 
         try {
@@ -441,7 +473,7 @@ public class AdminController {
                 return ResponseEntity.status(404).body(new MessageDto("Hospital not found"));
             }
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new MessageDto("Internal Server Error!"));
+            return ResponseEntity.status(500).body(new MessageDto(internalServerError));
         }
     }
     //get all hospitals
@@ -452,7 +484,7 @@ public class AdminController {
 
         // Check permissions
         if (!tokenService.checkPermissions(request, List.of("101"))) {
-            return ResponseEntity.status(401).body(new MessageDto("Unauthorized access"));
+            return ResponseEntity.status(401).body(new MessageDto(unAuthorized));
         }
 
         try {
@@ -463,7 +495,7 @@ public class AdminController {
                 return ResponseEntity.status(404).body(new MessageDto("Hospital not found"));
             }
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new MessageDto("Internal Server Error!"));
+            return ResponseEntity.status(500).body(new MessageDto(internalServerError));
         }
     }
 
@@ -482,7 +514,7 @@ public class AdminController {
                 return ResponseEntity.ok(new OptionsDto(option));
             }
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new MessageDto("Internal Server Error!"));
+            return ResponseEntity.status(500).body(new MessageDto(internalServerError));
         }
     }
 
@@ -491,7 +523,7 @@ public class AdminController {
 
 
     @PostMapping("/option")
-    public ResponseEntity<?> addOption(@RequestBody OptionsDto optionsDto) {
+    public ResponseEntity<MessageDto> addOption(@RequestBody OptionsDto optionsDto) {
 
         try {
             Option existingOption = optionService.findByName(optionsDto.getName());
@@ -502,11 +534,11 @@ public class AdminController {
                     optionService.saveOption(new Option(optionsDto.getName(), optionsDto.getOptions()));
                     return ResponseEntity.ok(new MessageDto("Option is saved"));
                 } catch (Exception e) {
-                    return ResponseEntity.status(500).body(new MessageDto("Internal Server Error!"));
+                    return ResponseEntity.status(500).body(new MessageDto(internalServerError));
                 }
             }
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new MessageDto("Internal Server Error!"));
+            return ResponseEntity.status(500).body(new MessageDto(internalServerError));
         }
     }
 }

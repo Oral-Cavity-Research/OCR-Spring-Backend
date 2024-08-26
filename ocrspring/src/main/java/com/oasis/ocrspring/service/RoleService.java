@@ -1,5 +1,6 @@
 package com.oasis.ocrspring.service;
 
+import com.oasis.ocrspring.dto.RoleDto;
 import com.oasis.ocrspring.dto.RoleReqDto;
 import com.oasis.ocrspring.model.Role;
 import com.oasis.ocrspring.model.User;
@@ -43,7 +44,7 @@ public class RoleService {
         roleRepo.save(new Role(role.getRole(), role.getPermissions()));
         return true;
     }
-    public void updateRole(String id, Role roleDetails) {
+    public void updateRole(String id, RoleDto roleDetails) {
         Role role = roleRepo.findById(new ObjectId(id)).orElseThrow(() -> new RuntimeException("Role not found"));
         role.setRole(roleDetails.getRole());
         role.setPermissions(roleDetails.getPermissions());
