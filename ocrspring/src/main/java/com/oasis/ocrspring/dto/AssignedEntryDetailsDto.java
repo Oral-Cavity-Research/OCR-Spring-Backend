@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 @Getter
@@ -24,7 +23,8 @@ import java.util.stream.Collectors;
 public class AssignedEntryDetailsDto {
     private String id; // MongoDB typically uses String for IDs
     private PatientDetailsDto patient;
-    private ClinicianDetailsDto clinician_id;
+    @Field("clinician_id")
+    private ClinicianDetailsDto clinicianId;
     private String complaint;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
@@ -50,7 +50,7 @@ public class AssignedEntryDetailsDto {
                              List<Image> imageDetails, List<Report> reportDetails) {
         this.id = teleconEntry.getId().toString();
         this.patient = patient;
-        this.clinician_id = clinician;
+        this.clinicianId = clinician;
         this.complaint = teleconEntry.getComplaint();
         this.startTime = teleconEntry.getStartTime();
         this.endTime = teleconEntry.getEndTime();
@@ -58,7 +58,7 @@ public class AssignedEntryDetailsDto {
         this.status = teleconEntry.getStatus();
         this.currentHabits = teleconEntry.getCurrentHabits();
         this.updated = teleconEntry.isUpdated();
-        this.reviewers = teleconEntry.getReviewers().stream().map(ObjectId::toHexString).collect(Collectors.toList());
+        this.reviewers = teleconEntry.getReviewers().stream().map(ObjectId::toHexString).toList();
         this.reviews = teleconEntry.getReviews();
         this.imageDetails = imageDetails;
         this.reportDetails = reportDetails;

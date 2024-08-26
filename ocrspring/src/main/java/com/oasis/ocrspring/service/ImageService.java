@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ImageService {
@@ -31,7 +32,7 @@ public class ImageService {
     private ImageRepository imageRepo;
     @Autowired
     private TeleconEntriesService teleconServices;
-    @Value("src/main/Storage/images")
+    @Value("${uploadDir}")
     private String uploadDir;
 
     public List<Image> allImageDetails() {
@@ -53,12 +54,12 @@ public class ImageService {
             return ResponseEntity.status(500).body(new UploadImageResponse(null, errorMessage));
         }
 
-        if (teleconEntry == null || teleconEntry.getClinicianId().toString() == clinicianId) {
+        if (teleconEntry == null || teleconEntry.getClinicianId().toString().equals(clinicianId)) {
             return ResponseEntity.status(404).body(new UploadImageResponse(null, "Entry Not Found"));
         }
 
         for (MultipartFile file : files) {
-            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+            String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
             try {
                 extracted(file, fileName, imageURIs);
                 Image image = getImage(data);
@@ -120,7 +121,7 @@ public class ImageService {
     public List<String> uploadFiles(List<MultipartFile> files) throws IOException {
         List<String> uploadedFiles = new ArrayList<>();
         for (MultipartFile file : files) {
-            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+            String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
             try {
                 Path path = Paths.get(uploadDir + File.separator + fileName);
                 Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);

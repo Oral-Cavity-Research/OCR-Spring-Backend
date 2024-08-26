@@ -7,7 +7,6 @@ import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
 import com.oasis.ocrspring.service.TeleconEntriesService;
 import com.oasis.ocrspring.service.auth.AuthenticationToken;
 import com.oasis.ocrspring.service.auth.TokenService;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +22,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/user/entry")
 public class EntryController {
+    public static final String REVIEWER_ID = "reviewer_id";
     @Autowired
     private TeleconEntriesService teleconService;
     @Autowired
@@ -31,7 +31,7 @@ public class EntryController {
     private TokenService tokenService;
     @Autowired
     private AssignmentService assignmentService;
-    final  String errorMessage = "Unauthorized Access";
+    static final String UNAUTHORIZED_ACCESS = "Unauthorized Access";
 
     // connect entry to the service layer
     @ApiIgnore
@@ -48,7 +48,7 @@ public class EntryController {
     throws IOException{
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
         }
         // add a teleconsultation entry
         String clinicianId=request.getAttribute("_id").toString();
@@ -65,7 +65,7 @@ public class EntryController {
         int pageSize = 20;
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
         }
         String clinicianId = request.getAttribute("_id").toString();
         return teleconService.getAllUserEntries(clinicianId, page, filter, pageSize);
@@ -81,7 +81,7 @@ public class EntryController {
         int pageSize = 20;
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
         }
         // get patient entries
         String clinicianId = request.getAttribute("_id").toString();
@@ -100,7 +100,7 @@ public class EntryController {
         int pageSize = 20;
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("200"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
         }
         String clinicianId = request.getAttribute("_id").toString();
         return teleconService.getSharedPatient(clinicianId,id,filter,pageSize,page);
@@ -114,7 +114,7 @@ public class EntryController {
 
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("200"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
         }
         String clinicianId = request.getAttribute("_id").toString();
         // get one entry
@@ -127,7 +127,7 @@ public class EntryController {
     throws IOException{
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("200"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
         }
         String clinicianId = request.getAttribute("_id").toString();
         // get new review count
@@ -140,7 +140,7 @@ public class EntryController {
     throws IOException{
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("200"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
         }
         String clinicianId = request.getAttribute("_id").toString();
         // get unreviewed entry count
@@ -154,10 +154,10 @@ public class EntryController {
                                          @PathVariable String id,
                                          @RequestBody Map<String,String> payload
                               ) throws IOException{
-        String reviewerId = (String) payload.get("reviewer_id");
+        String reviewerId = payload.get(REVIEWER_ID);
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
         }
         String clinicianId = request.getAttribute("_id").toString();
         // add a reviewer
@@ -171,10 +171,10 @@ public class EntryController {
                                  @PathVariable String id,
                                  @RequestBody Map<String,String> payload) throws IOException{
         // remove a reviewer
-        String reviewerId = (String) payload.get("reviewer_id");
+        String reviewerId = payload.get(REVIEWER_ID);
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("200"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
         }
         String clinicianId = request.getAttribute("_id").toString();
         // add a reviewer
@@ -189,7 +189,7 @@ public class EntryController {
 
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
         }
         String clinicianId = request.getAttribute("_id").toString();
         // delete an entry
@@ -203,7 +203,7 @@ public class EntryController {
                                       @RequestParam(name = "filter",required = false) String filter) throws IOException{
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("200"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
         }
         String clinicianId = request.getAttribute("_id").toString();
         // get all shared entries
@@ -219,7 +219,7 @@ public class EntryController {
                                             ) throws IOException{
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("200"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
         }
         String clinicianId = request.getAttribute("_id").toString();
         // get one shared entry
@@ -233,9 +233,8 @@ public class EntryController {
                                                      @PathVariable String id) throws IOException{
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("200"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
         }
-        String clinicianId = request.getAttribute("_id").toString();
         // get assigned entry details
         return teleconService.getAssignedEntryDetails(id);
     }
@@ -247,7 +246,7 @@ public class EntryController {
                                              @PathVariable String id) throws IOException {
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, List.of("200","300"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
         }
         // get entry reviews
         return teleconService.getEntryReviews(id);
@@ -262,10 +261,10 @@ public class EntryController {
 
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("200"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
         }
         String clinicianId = request.getAttribute("_id").toString();
-        String ReviewerId = payload.get("reviewer_id");
+        String ReviewerId = payload.get(REVIEWER_ID);
         // change a reviewer
         return teleconService.changeReviewer(id,clinicianId,ReviewerId);
     }
@@ -278,7 +277,7 @@ public class EntryController {
                                           @RequestBody ReviewRequestDto reviewDetails) throws IOException{
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("200"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
         }
         String clinicianId = request.getAttribute("_id").toString();
         // add new review
@@ -292,7 +291,7 @@ public class EntryController {
                                         @PathVariable String id) throws IOException{
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("200"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
         }
         // mark as read
         return teleconService.markAsRead(id );
@@ -305,7 +304,7 @@ public class EntryController {
                                         @PathVariable String id) throws IOException{
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
         }
         // mark as open
         return teleconService.markAsOpen(id );

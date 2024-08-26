@@ -2,7 +2,10 @@ package com.oasis.ocrspring.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -57,19 +60,6 @@ public class Review {
     @LastModifiedDate
     @Field("updatedAt")
     private LocalDateTime updatedAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-
-//    public Review(ObjectId teleconEntryId, ObjectId reviewerId, String provisionalDiagnosis, String managementSuggestions, String referralSuggestions, String otherComments) {
-//        this.teleconEntryId = teleconEntryId;
-//        this.reviewerId = reviewerId;
-//        this.provisionalDiagnosis = provisionalDiagnosis;
-//        this.managementSuggestions = managementSuggestions;
-//        this.referralSuggestions = referralSuggestions;
-//        this.otherComments = otherComments;
-//        this.createdAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-//        this.updatedAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-//
-//    }
-
 
     @Override
     public String toString() {
