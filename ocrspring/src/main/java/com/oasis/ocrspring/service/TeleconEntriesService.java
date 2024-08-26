@@ -554,7 +554,7 @@ public class TeleconEntriesService {
                 teleconEntry.getReviews().add(String.valueOf(newReview.getId()));
                 teleconEntriesRepo.save(teleconEntry);
 
-                return ResponseEntity.status(200).body(Map.of("docs", newReview, "message", "Review added successfully"));
+                return ResponseEntity.status(200).body(Map.of( "message", "Review added successfully","docs", newReview));
 
             } else {
                 return ResponseEntity.status(404).body(new MessageDto(ENTRY_NOT_FOUND));

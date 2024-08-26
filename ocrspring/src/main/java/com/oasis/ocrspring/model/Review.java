@@ -39,38 +39,43 @@ public class Review {
     @JsonIgnore
     private ObjectId reviewerId;
     @JsonProperty("reviewer_id")
+    @Field("reviewer_id")
     public String getReviewerId(){return ((reviewerId != null)?reviewerId.toHexString():null);}
 
+    @JsonProperty("provisional_diagnosis")
     @Field("provisional_diagnosis")
     private String provisionalDiagnosis;
 
+    @JsonProperty("management_suggestions")
     @Field("management_suggestions")
     private String managementSuggestions;
 
+    @JsonProperty("referral_suggestions")
     @Field("referral_suggestions")
     private String referralSuggestions;
 
+    @JsonProperty("other_comments")
     @Field("other_comments")
     private String otherComments;
 
     @CreatedDate
-    @Field("createdAt")
+    @JsonProperty("createdAt")
     private LocalDateTime createdAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 
     @LastModifiedDate
-    @Field("updatedAt")
+    @JsonProperty("updatedAt")
     private LocalDateTime updatedAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 
     @Override
     public String toString() {
         return "Review{" +
-                "id=" + getIDString() +
-                ", teleconEntryId=" + getTeleconId() +
-                ", reviewerId=" + getReviewerId() +
-                ", provisionalDiagnosis='" + provisionalDiagnosis + '\'' +
-                ", managementSuggestions='" + managementSuggestions + '\'' +
-                ", referralSuggestions='" + referralSuggestions + '\'' +
-                ", otherComments='" + otherComments + '\'' +
+                "_id=" + getIDString() +
+                ", telecon_entry_id=" + getTeleconId() +
+                ", reviewer_id=" + getReviewerId() +
+                ", provisional_diagnosis='" + provisionalDiagnosis + '\'' +
+                ", management_suggestions='" + managementSuggestions + '\'' +
+                ", referral_suggestions='" + referralSuggestions + '\'' +
+                ", other_comments='" + otherComments + '\'' +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';
