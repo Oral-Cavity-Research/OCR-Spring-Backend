@@ -27,11 +27,4 @@ public class Assignment {
 
     private Boolean reviewed;
 
-    public Assignment(String reviewerId, String teleconEntry, Boolean checked,
-                      Boolean reviewed) {
-        this.reviewerId = reviewerId;
-        this.teleconEntry = teleconEntry;
-        this.checked = checked;
-        this.reviewed = reviewed;
-    }
 }

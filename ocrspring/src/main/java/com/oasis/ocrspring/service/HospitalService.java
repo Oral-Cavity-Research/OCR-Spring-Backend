@@ -3,7 +3,6 @@ package com.oasis.ocrspring.service;
 import com.oasis.ocrspring.dto.HospitalDto;
 import com.oasis.ocrspring.model.Hospital;
 import com.oasis.ocrspring.repository.HospitalRepository;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +35,7 @@ public class HospitalService {
 
     public void updateHospital(String id, HospitalDto hospitalDetails) {
         Hospital hospital = hospitalRepo.findById(id).orElseThrow(() -> new RuntimeException("Hospital Not Found"));
-        hospital.sethospital(hospitalDetails);
+        hospital.setHospital(hospitalDetails);
         hospitalRepo.save(hospital);
     }
     public boolean deleteHospital(String id) {

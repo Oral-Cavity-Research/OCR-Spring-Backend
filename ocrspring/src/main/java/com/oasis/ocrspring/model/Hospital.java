@@ -44,8 +44,7 @@ public class Hospital {
         this.createdAt = LocalDateTime.now();
         }
 
-
-    public void sethospital(HospitalDto hospitalDto) {
+    public void setHospital(HospitalDto hospitalDto) {
         this.name = hospitalDto.getName();
         this.category = hospitalDto.getCategory();
         this.city = hospitalDto.getCity();
@@ -54,11 +53,5 @@ public class Hospital {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public Hospital(String category, String city, String address, String contactNo) {
-        this.category = category;
-        this.city = city;
-        this.address = address;
-        this.contactNo = contactNo;
-    }
 
 }

@@ -29,26 +29,36 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/user/patient/")
 public class PatientController {
-    @Autowired
-    private PatientService patientService;
+
+
+    private final PatientService patientService;
+
+
+    private final AuthenticationToken authenticationToken;
+
+    private final TokenService tokenService;
+
+    private final ReviewService reviewerService;
 
     @Autowired
-    private AuthenticationToken authenticationToken;
-
-    @Autowired
-    private TokenService tokenService;
-
-    @Autowired
-    private ReviewService reviewerService;
-
-
+    public PatientController(
+            PatientService patientService,
+            AuthenticationToken authenticationToken,
+            TokenService tokenService,
+            ReviewService reviewerService) {
+        this.patientService = patientService;
+        this.authenticationToken = authenticationToken;
+        this.tokenService = tokenService;
+        this.reviewerService = reviewerService;
+    }
 
     @ApiIgnore
     public void redirect(HttpServletResponse response) throws IOException {
         response.sendRedirect("/swagger-ui.html");
     }
 
-
+    static String internalServerError="Internal Server Error";
+    static String unAuthorized="Unauthorized Access";
     @PostMapping("update/{id}")
     public ResponseEntity<?> updatePatient(HttpServletRequest request, HttpServletResponse response, @PathVariable String id, @RequestBody UpdatePatientDto updatePatient)throws IOException {
 
@@ -56,7 +66,7 @@ public class PatientController {
 
 
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized Access"));
+            return ResponseEntity.status(401).body(new ErrorMessage(unAuthorized));
         }
         String clinicianId=request.getAttribute("_id").toString();
         Optional<Patient> patient = patientService.getPaitentByIdAndClinicianId(id, clinicianId);
@@ -66,7 +76,7 @@ public class PatientController {
 
         Patient updatedPatent =patientService.findAndUpdate(id,clinicianId,updatePatient);
         if(updatedPatent==null){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage("Unauthorized Access"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage(unAuthorized));
         }
 
         Map<String, Object> finalRes = new HashMap<>(updatedPatent.toMap()); // Assuming you have a method to convert Patient to Map
@@ -91,7 +101,7 @@ public class PatientController {
         authenticationToken.authenticateRequest(request, response);
 
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized Access"));
+            return ResponseEntity.status(401).body(new ErrorMessage(unAuthorized));
         }
 
         String clinicianId=request.getAttribute("_id").toString();
@@ -100,8 +110,6 @@ public class PatientController {
         int pageQuery = page == null ? 1 : Integer.parseInt(page);
         String searchQuery = search == null ? "" : search;
         Sort.Direction sortDirection = sort == null || sort.equals("false") ? Sort.Direction.DESC : Sort.Direction.ASC;
-
-        Sort Order;
 
         Sort.Order sortOrder;
         switch (filter != null ? filter : "") {
@@ -124,9 +132,7 @@ public class PatientController {
                 sortOrder = Sort.Order.by("patientId").with(sortDirection);
                 break;
         }
-
-
-
+        
         List<SearchPatientDto> patients;
 
         try{
@@ -140,7 +146,7 @@ public class PatientController {
             finalRes.put("patients", patients);
             return ResponseEntity.ok(finalRes);
         }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage("Internal Server Error"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage(internalServerError));
         }
 
 
@@ -154,7 +160,7 @@ public class PatientController {
         authenticationToken.authenticateRequest(request, response);
 
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized Access"));
+            return ResponseEntity.status(401).body(new ErrorMessage(unAuthorized));
         }
         try {
             Patient patient = patientService.getPatientByPatientIDAndClinicianId(id, request.getAttribute("_id").toString());
@@ -164,7 +170,7 @@ public class PatientController {
                 return ResponseEntity.status(200).body(Collections.singletonMap("exists", false));
             }
         }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage("Internal Server Error"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage(internalServerError));
         }
     }
 
@@ -174,7 +180,7 @@ public class PatientController {
         authenticationToken.authenticateRequest(request, response);
 
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized Access"));
+            return ResponseEntity.status(401).body(new ErrorMessage(unAuthorized));
         }
         try{
             Optional<Patient> patientOptional =patientService.getPaitentByIdAndClinicianId(id,request.getAttribute("_id").toString());
@@ -195,11 +201,11 @@ public class PatientController {
                     patient.getFamilyHistory(),
                     patient.getContactNo(),
                     patient.getConsentForm(),
-                    patient.getCreatedAt().toString(),
-                    patient.getUpdatedAt().toString()
+                    patient.getCreatedAt(),
+                    patient.getUpdatedAt()
             ));
         }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage("Internal Server Error"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage(internalServerError));
         }
     }
 
@@ -210,7 +216,7 @@ public class PatientController {
         authenticationToken.authenticateRequest(request, response);
 
         if (!tokenService.checkPermissions(request, Collections.singletonList("200"))) {
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized Access"));
+            return ResponseEntity.status(401).body(new ErrorMessage(unAuthorized));
         }
 
         try {
@@ -225,7 +231,7 @@ public class PatientController {
                 return ResponseEntity.status(404).body(new ErrorMessage("Patient not found"));
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage("Internal Server Error"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage(internalServerError));
         }
     }
 
@@ -234,7 +240,7 @@ public class PatientController {
         authenticationToken.authenticateRequest(request, response);
 
         if (!tokenService.checkPermissions(request, Arrays.asList("300", "200"))) {
-            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized Access"));
+            return ResponseEntity.status(401).body(new ErrorMessage(unAuthorized));
         }
         try {
             List<User> reviewers = reviewerService.getAllReviewers();

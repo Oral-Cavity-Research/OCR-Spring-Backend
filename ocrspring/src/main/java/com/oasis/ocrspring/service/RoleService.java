@@ -3,17 +3,13 @@ package com.oasis.ocrspring.service;
 import com.oasis.ocrspring.dto.RoleDto;
 import com.oasis.ocrspring.dto.RoleReqDto;
 import com.oasis.ocrspring.model.Role;
-import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.repository.RoleRepository;
-import com.oasis.ocrspring.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class RoleService {

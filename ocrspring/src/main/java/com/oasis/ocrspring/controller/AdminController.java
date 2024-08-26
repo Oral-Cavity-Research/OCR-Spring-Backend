@@ -18,26 +18,31 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
     // connect admin to the service layer
+    private final TokenService tokenService;
+    private final RequestService requestService;
+    private final AuthenticationToken authenticationToken;
+    private final UserService userService;
+    private final RoleService roleService;
+    private final OptionService optionService;
+    private final HospitalService hospitalService;
+
     @Autowired
-    TokenService tokenService;
-    @Autowired
-    RequestService requestService;
-    @Autowired
-    AuthenticationToken authenticationToken;
-    @Autowired
-    UserService userService;
-    @Autowired
-    RoleService roleService;
-    @Autowired
-    OptionService optionService;
-    @Autowired
-    HospitalService hospitalService;
+    public AdminController(TokenService tokenService, RequestService requestService, AuthenticationToken authenticationToken,
+                           UserService userService, RoleService roleService, OptionService optionService, HospitalService hospitalService) {
+        this.tokenService = tokenService;
+        this.requestService = requestService;
+        this.authenticationToken = authenticationToken;
+        this.userService = userService;
+        this.roleService = roleService;
+        this.optionService = optionService;
+        this.hospitalService = hospitalService;
+    }
 
     @ApiIgnore
     @RequestMapping(value = "/")
@@ -109,9 +114,14 @@ public class AdminController {
             }
         }
         catch (MessagingException e) {
-            throw new RuntimeException(e);
+            throw new EmailSendingException("Failed to send email", e);
         }catch (Exception e) {
             return ResponseEntity.status(500).body(new ErrorMessage(e.toString()));
+        }
+    }
+    static class EmailSendingException extends RuntimeException {
+        public EmailSendingException(String message, Throwable cause) {
+            super(message, cause);
         }
     }
 
@@ -229,7 +239,7 @@ public class AdminController {
                             user.getCreatedAt().toString(),
                             user.getUpdatedAt() != null ? user.getUpdatedAt().toString() : null,
                             null))
-                    .collect(Collectors.toList());
+                    .toList();
 
             return ResponseEntity.ok(userResDtos);
         } catch (Exception e) {
@@ -530,13 +540,16 @@ public class AdminController {
             if (existingOption != null) {
                 return ResponseEntity.status(401).body(new MessageDto("Option already exists"));
             } else {
-                try {
-                    optionService.saveOption(new Option(optionsDto.getName(), optionsDto.getOptions()));
-                    return ResponseEntity.ok(new MessageDto("Option is saved"));
-                } catch (Exception e) {
-                    return ResponseEntity.status(500).body(new MessageDto(internalServerError));
-                }
+                return saveOption(optionsDto);
             }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new MessageDto(internalServerError));
+        }
+    }
+    private ResponseEntity<MessageDto> saveOption(OptionsDto optionsDto) {
+        try {
+            optionService.saveOption(new Option(optionsDto.getName(), optionsDto.getOptions()));
+            return ResponseEntity.ok(new MessageDto("Option is saved"));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(new MessageDto(internalServerError));
         }
