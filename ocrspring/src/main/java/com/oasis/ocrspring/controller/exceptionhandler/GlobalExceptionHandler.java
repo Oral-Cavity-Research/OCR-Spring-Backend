@@ -1,4 +1,4 @@
-package com.oasis.ocrspring.controller.exceptionHandler;
+package com.oasis.ocrspring.controller.exceptionhandler;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

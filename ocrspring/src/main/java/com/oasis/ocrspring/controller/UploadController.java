@@ -31,28 +31,35 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/user/upload")
 public class UploadController {
+    private final PatientRepository patientRepo;
+    private final ImageRepository imageRepo;
+    private final ReportRepository reportRepo;
+    private final TeleconEntriesRepository teleconEntriesRepo;
+    private final TeleconEntriesService teleconServices;
+    private final ImageService imageService;
+    private final ObjectMapper objectMapper;
+    private final ReportService reportServ;
+    private final PatientService patientService;
+    private final AuthenticationToken authenticationToken;
+    private final TokenService tokenService;
+
     @Autowired
-    private PatientRepository patientrepo;
-    @Autowired
-    private ImageRepository imageRepo;
-    @Autowired
-    private ReportRepository reportRepo;
-    @Autowired
-    private TeleconEntriesRepository teleconEntriesRepo;
-    @Autowired
-    private TeleconEntriesService teleconServices;
-    @Autowired
-    private ImageService imageService;
-    @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
-    private ReportService reportServ;
-    @Autowired
-    private PatientService patientService;
-    @Autowired
-    private AuthenticationToken authenticationToken;
-    @Autowired
-    private TokenService tokenService;
+    public UploadController(PatientRepository patientrepo, ImageRepository imageRepo, ReportRepository reportRepo,
+                            TeleconEntriesRepository teleconEntriesRepo, TeleconEntriesService teleconServices,
+                            ImageService imageService, ObjectMapper objectMapper, ReportService reportServ,
+                            PatientService patientService, AuthenticationToken authenticationToken, TokenService tokenService) {
+        this.patientRepo = patientrepo;
+        this.imageRepo = imageRepo;
+        this.reportRepo = reportRepo;
+        this.teleconEntriesRepo = teleconEntriesRepo;
+        this.teleconServices = teleconServices;
+        this.imageService = imageService;
+        this.objectMapper = objectMapper;
+        this.reportServ = reportServ;
+        this.patientService = patientService;
+        this.authenticationToken = authenticationToken;
+        this.tokenService = tokenService;
+    }
     static final String UNAUTHORIZED_ACCESS = "Unauthorized Access";
 
     @PostMapping(value = "/images/{id}")

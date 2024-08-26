@@ -13,8 +13,12 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/admin/auth")
 public class AdminAuthController {
+    private final UserRepository userRepo;
+
     @Autowired
-    private UserRepository userRepo;
+    public AdminAuthController(UserRepository userRepo) {
+        this.userRepo = userRepo;
+    }
 
     @ApiIgnore
     public void redirrect(HttpServletResponse response) throws IOException {

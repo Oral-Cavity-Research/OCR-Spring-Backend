@@ -4,7 +4,6 @@ import com.oasis.ocrspring.dto.EmailDto;
 import com.oasis.ocrspring.dto.RequestDto;
 import com.oasis.ocrspring.dto.TokenRequest;
 import com.oasis.ocrspring.model.RefreshToken;
-import com.oasis.ocrspring.model.Request;
 import com.oasis.ocrspring.model.Role;
 import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.repository.RequestRepository;
@@ -27,26 +26,31 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/auth")
 public class UserAuthController {
+    private final RequestRepository requestRepo;
+    private final UserService userService;
+    private final TokenService tokenService;
+    private final RoleService roleService;
+    private final RefreshtokenService refreshTokenService;
+    private final AuthenticationToken authenticationToken;
+    
+    static String permission ="permissions";
+    static String messageString = "message";
+    static String accessTokenString = "accessToken";
     @Autowired
-    private RequestRepository requestRepo;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private TokenService tokenService;
-    @Autowired
-    private RoleService roleService;
-    @Autowired
-    private RefreshtokenService refreshTokenService;
-    @Autowired
-    private AuthenticationToken authenticationToken;
+    public UserAuthController(RequestRepository requestRepo, UserService userService, TokenService tokenService,
+                              RoleService roleService, RefreshtokenService refreshTokenService, AuthenticationToken authenticationToken) {
+        this.requestRepo = requestRepo;
+        this.userService = userService;
+        this.tokenService = tokenService;
+        this.roleService = roleService;
+        this.refreshTokenService = refreshTokenService;
+        this.authenticationToken = authenticationToken;
+    }
 
     @Value("${jwt.refresh-time}")
     private String refreshTime;
@@ -76,7 +80,7 @@ public class UserAuthController {
         Optional<User> user = userService.getUserByEmail(email);
         if (!user.isPresent()) {
             Map<String, String> messageBody = new HashMap<>();
-            messageBody.put("message", "User is Not Registered");
+            messageBody.put(messageString, "User is Not Registered");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(messageBody);
         }
         String accessToken = tokenService.generateAccessToken(user.get());
@@ -90,14 +94,17 @@ public class UserAuthController {
 
         details.put("user", user.get());
 
-        details.put("message", "Successfully logged in");
-
-        details.put("permissions", rolePermission.get().getPermissions());
-
+        details.put(messageString, "Successfully logged in");
+        if (rolePermission.isPresent()) {
+            details.put(permission, rolePermission.get().getPermissions());
+        } else {
+            // Handle the case where rolePermission is not present
+            details.put(permission, Collections.emptyList());
+        }
 
         responseBody.put("others", details);
         responseBody.put("ref", user.get());
-        responseBody.put("accessToken", Map.of("token", accessToken, "expiresAt", refreshTime));
+        responseBody.put(accessTokenString, Map.of("token", accessToken, "expiresAt", refreshTime));
         return ResponseEntity.ok(responseBody);
     }
 
@@ -112,29 +119,29 @@ public class UserAuthController {
         String ipaddress = httpServletRequest.getRemoteAddr();
         Map<String, Object> tokenBody = tokenService.refreshToken(token, ipaddress);
 
-        String accessToken = (String) tokenBody.get("accessToken");
+        String accessToken = (String) tokenBody.get(accessTokenString);
 
         String refreshToken = (String) tokenBody.get("refreshToken");
 
         User ref = (User) tokenBody.get("ref");
 
-        List<String> permissions = (List<String>) tokenBody.get("permissions");
+        List<String> permissions = (List<String>) tokenBody.get(permission);
 
 
         tokenService.setTokenCookie(response, refreshToken);
 
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("success", true);
-        responseBody.put("message", "Token Refreshed Successfully");
+        responseBody.put(messageString, "Token Refreshed Successfully");
         responseBody.put("ref", ref);
-        responseBody.put("permissions", permissions);
-        responseBody.put("accessToken", Map.of("token", accessToken, "expiry", refreshTime));
+        responseBody.put(permission, permissions);
+        responseBody.put(accessTokenString, Map.of("token", accessToken, "expiry", refreshTime));
         return ResponseEntity.ok(responseBody);
 
     }
 
     @PostMapping("/revokeToken")
-    public ResponseEntity<?> revokeToken(HttpServletRequest request, HttpServletResponse response, @RequestBody(required = false) TokenRequest tokenRequest) throws IOException {
+    public ResponseEntity<ErrorResponse> revokeToken(HttpServletRequest request, HttpServletResponse response, @RequestBody(required = false) TokenRequest tokenRequest) throws IOException {
         authenticationToken.authenticateRequest(request, response);
 
         String token = tokenService.getTokenFromCookie(request);
