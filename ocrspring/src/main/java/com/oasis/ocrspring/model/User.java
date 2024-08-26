@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Document(collection = "users")
 @Getter
@@ -44,7 +43,15 @@ public class User {
 
     private LocalDateTime updatedAt;
 
-    public User(String username, String email, String regNo, String hospital, String designation, String contactNo, String password, boolean availability, String role) {
+    public User(String username,
+                String email,
+                String regNo,
+                String hospital,
+                String designation,
+                String contactNo,
+                String password,
+                boolean availability,
+                String role) {
         this.username = username;
         this.email = email;
         this.regNo = regNo;
@@ -57,7 +64,14 @@ public class User {
     }
 
 
-    public User(String username, String email, String regNo, String role, String hospital, String designation, String contactNo, boolean availability) {
+    public User(String username,
+                String email,
+                String regNo,
+                String role,
+                String hospital,
+                String designation,
+                String contactNo,
+                boolean availability) {
         this.username = username;
         this.email = email;
         this.regNo = regNo;
@@ -67,7 +81,7 @@ public class User {
         this.contactNo = contactNo;
         this.availability = availability;
         this.createdAt = LocalDateTime.now();
-       // LocalDateTime.parse((LocalDateTime.now().plusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+
     }
     public boolean isAvailable() {
         return availability;

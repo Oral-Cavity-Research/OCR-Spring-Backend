@@ -17,7 +17,6 @@ public class UserResDto {
     private String contact_no;
     private boolean availability;
     private String role;
-
     private String _id;
     private String createdAt;
     private String updatedAt;
@@ -35,5 +34,18 @@ public class UserResDto {
         this._id = _id;
         this.createdAt = createdAt;
         this.message = message;
+    }
+    public UserResDto(User user) {
+        this.username = user.getUsername();
+        this.email = user.getEmail();
+        this.reg_no = user.getRegNo();
+        this.hospital = user.getHospital();
+        this.designation = user.getDesignation();
+        this.contact_no = user.getContactNo();
+        this.availability = user.isAvailability();
+        this.role = user.getRole();
+        this._id = user.getId().toString();
+        this.createdAt = user.getCreatedAt().toString();
+        this.updatedAt = user.getUpdatedAt().toString();
     }
 }
