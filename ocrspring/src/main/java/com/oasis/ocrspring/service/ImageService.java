@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ImageService {
@@ -31,7 +32,7 @@ public class ImageService {
     private ImageRepository imageRepo;
     @Autowired
     private TeleconEntriesService teleconServices;
-    @Value("src/main/Storage/images")
+    @Value("${uploadDir}")
     private String uploadDir;
 
     public List<Image> allImageDetails() {
@@ -41,6 +42,7 @@ public class ImageService {
 
     public ResponseEntity<UploadImageResponse> uploadImages(ImageRequestDto data,
                                                             String id,
+                                                            String clinicianId,
                                                             List<MultipartFile> files) throws IOException {
         List<Image> uploadedImages = new ArrayList<>();
         List<String> imageURIs = new ArrayList<>();
@@ -52,12 +54,12 @@ public class ImageService {
             return ResponseEntity.status(500).body(new UploadImageResponse(null, errorMessage));
         }
 
-        if (teleconEntry == null) {
+        if (teleconEntry == null || teleconEntry.getClinicianId().toString().equals(clinicianId)) {
             return ResponseEntity.status(404).body(new UploadImageResponse(null, "Entry Not Found"));
         }
 
         for (MultipartFile file : files) {
-            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+            String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
             try {
                 extracted(file, fileName, imageURIs);
                 Image image = getImage(data);
@@ -111,15 +113,15 @@ public class ImageService {
         image.setLesionsAppear(data.getLesionsAppear());
         image.setAnnotation(data.getAnnotation());
         image.setPredictedCat(data.getPredictedCat());
-        image.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-        image.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+        image.setCreatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
+        image.setUpdatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
         return image;
     }
 
     public List<String> uploadFiles(List<MultipartFile> files) throws IOException {
         List<String> uploadedFiles = new ArrayList<>();
         for (MultipartFile file : files) {
-            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+            String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
             try {
                 Path path = Paths.get(uploadDir + File.separator + fileName);
                 Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);

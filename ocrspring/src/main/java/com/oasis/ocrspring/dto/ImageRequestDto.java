@@ -1,6 +1,7 @@
 package com.oasis.ocrspring.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.oasis.ocrspring.dto.subdto.AnnotationDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,7 +22,7 @@ public class ImageRequestDto {
     private String clinicalDiagnosis;
     @JsonProperty("lesions_appear")
     private Boolean lesionsAppear;
-    private List<String> annotation;
+    private List<AnnotationDto> annotation;
     @JsonProperty("predicted_cat")
     private String predictedCat;
 

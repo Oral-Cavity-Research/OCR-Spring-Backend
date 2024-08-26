@@ -30,7 +30,6 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,7 +43,7 @@ public class PatientService {
     private UserRepository userRepo;
     @Autowired
     private TeleconEntriesService teleconServ;
-    @Value("src/main/Storage/ConsentForms")
+    @Value("${consentFormUploadDir}")
     private String consentFormUploadDir;
 
     public List<Patient> allPatientDetails() {
@@ -100,8 +99,7 @@ public class PatientService {
 
 
 public Patient findOne(String patient_id, String clinician_id){
-    Patient patient =  patientRepo.findByPatientIdAndClinicianId(patient_id,new ObjectId(clinician_id)).orElse(null);
-    return patient;
+    return patientRepo.findByPatientIdAndClinicianId(patient_id,new ObjectId(clinician_id)).orElse(null);
 }
 
 
@@ -110,8 +108,7 @@ public  Patient findPatient(String id,String clinician_Id){
 
         ObjectId id_ = new ObjectId(id);
         ObjectId clinicianId_ = new ObjectId(clinician_Id);
-        Patient newPatient = patientRepo.findByIdAndClinicianId(id_, clinicianId_).orElse(null);
-        return newPatient;
+        return patientRepo.findByIdAndClinicianId(id_, clinicianId_).orElse(null);
     }
 
     public ResponseEntity<?> addPatient(
@@ -121,55 +118,59 @@ public  Patient findPatient(String id,String clinician_Id){
         List<String> uploadedURIs = new ArrayList<>();
 
         try {
-            Patient patient = findOne(data.getPatient_id(), id);
+            Patient patient = findOne(data.getPatientId(), id);
             if (patient != null) {
                 return ResponseEntity.status(401).body("Patient ID already exists");
             }
             String fileName = StringUtils.cleanPath(files.getOriginalFilename());
-            try {
-                Path path = Paths.get(consentFormUploadDir + File.separator + fileName);
-                if (!Files.exists(path)) {
-                    Files.createDirectories(path);
-                }
-                Files.copy(files.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-                String fileDownUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                        .path("/files")
-                        .path(fileName)
-                        .toUriString();
-                uploadedURIs.add(fileDownUri);
-
-                Patient newPatient = new Patient();
-
-                newPatient.setPatientId(data.getPatient_id());
-                newPatient.setClinicianId(new ObjectId(data.getClinician_id()));
-                newPatient.setPatientName(data.getPatient_name());
-                newPatient.setRiskFactors(data.getRisk_factors());
-                newPatient.setDob(LocalDate.parse(data.getDOB(), DateTimeFormatter.ISO_LOCAL_DATE));
-                newPatient.setGender(data.getGender());
-                newPatient.setHistoDiagnosis(data.getHisto_diagnosis());
-                newPatient.setMedicalHistory(data.getMedical_history());
-                newPatient.setFamilyHistory(data.getFamily_history());
-                newPatient.setSystemicDisease(data.getSystemic_disease());
-                newPatient.setContactNo(data.getContact_no());
-                newPatient.setConsentForm(data.getConsent_form());
-                newPatient.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-                newPatient.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-
-
-                patientRepo.save(newPatient);
-                return ResponseEntity.status(200).body(new ConsentResponseDto(newPatient));
-            } catch (MultipartException ex) {
-                return ResponseEntity.status(500).body(new ErrorResponseDto("Internal " +
-                        "Server Error!", ex.toString()));
-
-            } catch (Exception e) {
-                return ResponseEntity.status(500).body(new ErrorResponseDto("Internal " +
-                        "Server Error!", e.toString()));
-            }
+            return getResponse(data, files, fileName, uploadedURIs);
 
         } catch (Exception e) {
             return ResponseEntity.status(500).body(new ErrorResponseDto("Internal " +
                     "Server Error", e.toString()));
+        }
+    }
+
+    private ResponseEntity<?> getResponse(ConsentRequestDto data, MultipartFile files, String fileName, List<String> uploadedURIs) {
+        try {
+            Path path = Paths.get(consentFormUploadDir + File.separator + fileName);
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+            }
+            Files.copy(files.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+            String fileDownUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/files")
+                    .path(fileName)
+                    .toUriString();
+            uploadedURIs.add(fileDownUri);
+
+            Patient newPatient = new Patient();
+
+            newPatient.setPatientId(data.getPatientId());
+            newPatient.setClinicianId(new ObjectId(data.getClinicianId()));
+            newPatient.setPatientName(data.getPatientName());
+            newPatient.setRiskFactors(data.getRiskFactors());
+            newPatient.setDob(LocalDate.parse(data.getDob(), DateTimeFormatter.ISO_LOCAL_DATE));
+            newPatient.setGender(data.getGender());
+            newPatient.setHistoDiagnosis(data.getHistoDiagnosis());
+            newPatient.setMedicalHistory(data.getMedicalHistory());
+            newPatient.setFamilyHistory(data.getFamilyHistory());
+            newPatient.setSystemicDisease(data.getSystemicDisease());
+            newPatient.setContactNo(data.getContactNo());
+            newPatient.setConsentForm(data.getConsentForm());
+            newPatient.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+            newPatient.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+
+
+            patientRepo.save(newPatient);
+            return ResponseEntity.status(200).body(new ConsentResponseDto(newPatient));
+        } catch (MultipartException ex) {
+            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal " +
+                    "Server Error!", ex.toString()));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal " +
+                    "Server Error!", e.toString()));
         }
     }
 
@@ -193,8 +194,8 @@ public  Patient findPatient(String id,String clinician_Id){
         return searchRes;
     }
     public Patient getPatientByPatientIDAndClinicianId(String patient_id, String clinician_id){
-        Patient patient =  patientRepo.findByPatientIdAndClinicianId(patient_id,new ObjectId(clinician_id)).orElse(null);
-        return patient;
+        return patientRepo.findByPatientIdAndClinicianId(patient_id,new ObjectId(clinician_id)).orElse(null);
+
     }
 
     public Patient getSharedPatient(String patientId, String reviewerId) {

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oasis.ocrspring.dto.ConsentRequestDto;
 import com.oasis.ocrspring.dto.ImageRequestDto;
 import com.oasis.ocrspring.dto.ReportsRequestDto;
-import com.oasis.ocrspring.dto.UploadReportResponse;
 import com.oasis.ocrspring.repository.ImageRepository;
 import com.oasis.ocrspring.repository.PatientRepository;
 import com.oasis.ocrspring.repository.ReportRepository;
@@ -54,7 +53,7 @@ public class UploadController {
     private AuthenticationToken authenticationToken;
     @Autowired
     private TokenService tokenService;
-    final String errorMessage = "Unauthorized Access";
+    static final String UNAUTHORIZED_ACCESS = "Unauthorized Access";
 
     @PostMapping(value = "/images/{id}")
     public ResponseEntity<?> uploadImages(
@@ -65,9 +64,10 @@ public class UploadController {
 
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
         }
-        return imageService.uploadImages(data, id, files);
+        String clinicianId = request.getAttribute("_id").toString();
+        return imageService.uploadImages(data, id,clinicianId, files);
     }
 
     @PostMapping("/files")
@@ -83,22 +83,23 @@ public class UploadController {
 
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
         }
-        return reportServ.uploadReports(data, id, files);
+        String clinicianId=request.getAttribute("_id").toString();
+        return reportServ.uploadReports(data, id,clinicianId, files);
     }
 
     @PostMapping("/patient")
     public ResponseEntity<?> addConsentForm(
             HttpServletRequest request, HttpServletResponse response,
-            @RequestHeader("_id") String id,
             @RequestPart("data") ConsentRequestDto data,
             @RequestPart("files") MultipartFile files
     ) throws IOException {
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(errorMessage));
+            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
         }
-        return patientService.addPatient(id, data, files);
+        String clinicianId = request.getAttribute("_id").toString();
+        return patientService.addPatient(clinicianId, data, files);
     }
 }

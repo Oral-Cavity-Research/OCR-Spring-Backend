@@ -15,7 +15,7 @@ public interface PatientRepository extends MongoRepository<Patient, String> {
 
     Optional<Patient> findByIdAndClinicianId(ObjectId id, ObjectId clinicianId);
 
-    Patient findById(ObjectId id);
+    Optional<Patient> findById(ObjectId id);
 
     @Query("{ 'clinicianId': ?0, $or: [ { 'patientId': { $regex: ?1, $options: 'i' } }, { 'patientName': { $regex: ?1, $options: 'i' } }, { 'gender': { $regex: ?1, $options: 'i' } } ] }")
     List<Patient> findByClinicianIdAndSearch(ObjectId clinicianId, String search, Pageable pageable);

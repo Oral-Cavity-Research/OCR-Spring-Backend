@@ -12,6 +12,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Document(collection = "teleconentries")
@@ -49,6 +52,7 @@ public class TeleconEntry
     private LocalDateTime endTime;
 
     private String findings;
+    private String status;
 
     @Field("current_habits")
     private List<HabitDto> currentHabits;
@@ -64,10 +68,10 @@ public class TeleconEntry
     private List<ObjectId> reports;
 
     @CreatedDate
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 
     @LastModifiedDate
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 
     @Override
     public String toString() {
@@ -79,6 +83,7 @@ public class TeleconEntry
                 ", start_time=" + startTime +
                 ", end_time=" + endTime +
                 ", findings='" + findings + '\'' +
+                ", status='" + status + '\'' +
                 ", current_habits=" + currentHabits +
                 ", updated=" + updated +
                 ", reviewers=" + reviewers +
@@ -89,4 +94,6 @@ public class TeleconEntry
                 ", updatedAt=" + updatedAt +
                 '}';
     }
+
+
 }
