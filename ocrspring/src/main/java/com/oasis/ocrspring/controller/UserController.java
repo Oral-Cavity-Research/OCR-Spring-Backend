@@ -45,6 +45,7 @@ public class UserController {
     public void redirrect(HttpServletResponse response) throws IOException {
         response.sendRedirect("/swaggr-ui.html");
     }
+
     static String  message = "message";
 
     @GetMapping("/")
