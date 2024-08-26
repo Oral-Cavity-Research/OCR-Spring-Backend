@@ -11,7 +11,7 @@ import com.oasis.ocrspring.repository.TeleconEntriesRepository;
 import com.oasis.ocrspring.service.ImageService;
 import com.oasis.ocrspring.service.PatientService;
 import com.oasis.ocrspring.service.ReportService;
-import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
+import com.oasis.ocrspring.service.responsemessages.ErrorMessage;
 import com.oasis.ocrspring.service.TeleconEntriesService;
 import com.oasis.ocrspring.service.auth.AuthenticationToken;
 import com.oasis.ocrspring.service.auth.TokenService;

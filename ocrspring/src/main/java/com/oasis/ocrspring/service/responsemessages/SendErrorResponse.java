@@ -1,4 +1,4 @@
-package com.oasis.ocrspring.service.ResponseMessages;
+package com.oasis.ocrspring.service.responsemessages;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;

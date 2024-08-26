@@ -8,7 +8,7 @@ import com.oasis.ocrspring.model.Role;
 import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.repository.RequestRepository;
 import com.oasis.ocrspring.service.RefreshtokenService;
-import com.oasis.ocrspring.service.ResponseMessages.ErrorResponse;
+import com.oasis.ocrspring.service.responsemessages.ErrorResponse;
 import com.oasis.ocrspring.service.RoleService;
 import com.oasis.ocrspring.service.UserService;
 import com.oasis.ocrspring.service.auth.AuthenticationToken;

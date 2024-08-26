@@ -1,4 +1,4 @@
-package com.oasis.ocrspring.service.ResponseMessages;
+package com.oasis.ocrspring.service.responsemessages;
 
 public class ErrorResponse {
     private boolean success;

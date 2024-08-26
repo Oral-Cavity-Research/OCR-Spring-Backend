@@ -35,16 +35,21 @@ import java.util.Optional;
 
 @Service
 public class PatientService {
-    @Autowired
-    private PatientRepository patientRepo;
-    @Autowired
-    private TeleconEntriesRepository teleconEntriesRepo;
-    @Autowired
-    private UserRepository userRepo;
-    @Autowired
-    private TeleconEntriesService teleconServ;
+    private final PatientRepository patientRepo;
+    private final TeleconEntriesRepository teleconEntriesRepo;
+    private final UserRepository userRepo;
+    private final TeleconEntriesService teleconServ;
+
     @Value("${consentFormUploadDir}")
     private String consentFormUploadDir;
+
+    @Autowired
+    public PatientService(PatientRepository patientRepo, TeleconEntriesRepository teleconEntriesRepo, UserRepository userRepo, TeleconEntriesService teleconServ) {
+        this.patientRepo = patientRepo;
+        this.teleconEntriesRepo = teleconEntriesRepo;
+        this.userRepo = userRepo;
+        this.teleconServ = teleconServ;
+    }
 
     public List<Patient> allPatientDetails() {
         return patientRepo.findAll();
@@ -104,17 +109,17 @@ public Patient findOne(String patient_id, String clinician_id){
 
 
 
-public  Patient findPatient(String id,String clinician_Id){
+public  Patient findPatient(String id,String clinicianId){
 
         ObjectId id_ = new ObjectId(id);
-        ObjectId clinicianId_ = new ObjectId(clinician_Id);
-        return patientRepo.findByIdAndClinicianId(id_, clinicianId_).orElse(null);
+        ObjectId clinicianIdObject = new ObjectId(clinicianId);
+        return patientRepo.findByIdAndClinicianId(id_, clinicianIdObject).orElse(null);
     }
 
     public ResponseEntity<?> addPatient(
             String id,
             ConsentRequestDto data,
-            MultipartFile files) throws IOException {
+            MultipartFile files)  {
         List<String> uploadedURIs = new ArrayList<>();
 
         try {
@@ -193,8 +198,8 @@ public  Patient findPatient(String id,String clinician_Id){
         }
         return searchRes;
     }
-    public Patient getPatientByPatientIDAndClinicianId(String patient_id, String clinician_id){
-        return patientRepo.findByPatientIdAndClinicianId(patient_id,new ObjectId(clinician_id)).orElse(null);
+    public Patient getPatientByPatientIDAndClinicianId(String patientId, String clinicianId){
+        return patientRepo.findByPatientIdAndClinicianId(patientId,new ObjectId(clinicianId)).orElse(null);
 
     }
 

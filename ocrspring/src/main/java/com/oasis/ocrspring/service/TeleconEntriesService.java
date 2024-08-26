@@ -3,7 +3,7 @@ package com.oasis.ocrspring.service;
 import com.oasis.ocrspring.dto.*;
 import com.oasis.ocrspring.model.*;
 import com.oasis.ocrspring.repository.*;
-import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
+import com.oasis.ocrspring.service.responsemessages.ErrorMessage;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

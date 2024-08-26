@@ -3,7 +3,7 @@ package com.oasis.ocrspring.controller;
 import com.oasis.ocrspring.dto.*;
 import com.oasis.ocrspring.model.*;
 import com.oasis.ocrspring.service.*;
-import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
+import com.oasis.ocrspring.service.responsemessages.ErrorMessage;
 import com.oasis.ocrspring.service.auth.AuthenticationToken;
 import com.oasis.ocrspring.service.auth.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;

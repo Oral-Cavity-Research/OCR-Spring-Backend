@@ -7,7 +7,6 @@ import com.oasis.ocrspring.model.Request;
 import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.repository.RequestRepository;
 import com.oasis.ocrspring.repository.UserRepository;
-import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
 import com.oasis.ocrspring.service.email.EmailService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;

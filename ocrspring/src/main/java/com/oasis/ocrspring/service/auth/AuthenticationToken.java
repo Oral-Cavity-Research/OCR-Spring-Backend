@@ -3,7 +3,7 @@ package com.oasis.ocrspring.service.auth;
 import com.oasis.ocrspring.model.Role;
 import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.repository.RefreshtokenRepsitory;
-import com.oasis.ocrspring.service.ResponseMessages.SendErrorResponse;
+import com.oasis.ocrspring.service.responsemessages.SendErrorResponse;
 import com.oasis.ocrspring.service.RoleService;
 import com.oasis.ocrspring.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

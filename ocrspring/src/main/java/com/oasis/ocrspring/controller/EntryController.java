@@ -3,7 +3,7 @@ package com.oasis.ocrspring.controller;
 import com.oasis.ocrspring.dto.PatientTeleconRequest;
 import com.oasis.ocrspring.dto.ReviewRequestDto;
 import com.oasis.ocrspring.service.AssignmentService;
-import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
+import com.oasis.ocrspring.service.responsemessages.ErrorMessage;
 import com.oasis.ocrspring.service.TeleconEntriesService;
 import com.oasis.ocrspring.service.auth.AuthenticationToken;
 import com.oasis.ocrspring.service.auth.TokenService;

@@ -8,7 +8,7 @@ import com.oasis.ocrspring.dto.UpdatePatientDto;
 import com.oasis.ocrspring.model.Patient;
 import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.service.PatientService;
-import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
+import com.oasis.ocrspring.service.responsemessages.ErrorMessage;
 import com.oasis.ocrspring.service.ReviewService;
 import com.oasis.ocrspring.service.ReviewerResDto;
 import com.oasis.ocrspring.service.auth.AuthenticationToken;

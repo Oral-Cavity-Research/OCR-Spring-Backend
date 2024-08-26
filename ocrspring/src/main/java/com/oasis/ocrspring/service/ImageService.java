@@ -28,13 +28,16 @@ import java.util.Objects;
 
 @Service
 public class ImageService {
-    @Autowired
-    private ImageRepository imageRepo;
-    @Autowired
-    private TeleconEntriesService teleconServices;
+    private final ImageRepository imageRepo;
+    private final TeleconEntriesService teleconServices;
+
     @Value("${uploadDir}")
     private String uploadDir;
-
+    @Autowired
+    public ImageService(ImageRepository imageRepo, TeleconEntriesService teleconServices) {
+        this.imageRepo = imageRepo;
+        this.teleconServices = teleconServices;
+    }
     public List<Image> allImageDetails() {
         return imageRepo.findAll();
     }

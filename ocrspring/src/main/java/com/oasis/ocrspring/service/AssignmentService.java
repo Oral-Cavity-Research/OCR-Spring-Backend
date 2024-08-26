@@ -14,17 +14,21 @@ import java.util.Map;
 
 @Service
 public class AssignmentService {
+    private final AssignmentRepository assignmentRepo;
+
     @Autowired
-    private AssignmentRepository assignmentRepo;
+    public AssignmentService(AssignmentRepository assignmentRepo) {
+        this.assignmentRepo = assignmentRepo;
+    }
 
     public List<Assignment> allAssignmentDetails() {
         return assignmentRepo.findAll();
     }
 
     public ResponseEntity<?> getUnreviewedEntryCount(String clinicianId){
-        ObjectId clinicianId_ = new ObjectId(clinicianId);
+        ObjectId clinicianIdObject = new ObjectId(clinicianId);
         try {
-            long count = assignmentRepo.countByReviewerIdAndReviewedFalse(clinicianId_);
+            long count = assignmentRepo.countByReviewerIdAndReviewedFalse(clinicianIdObject);
             Map<String,Long> response = new HashMap<>();
             response.put("count",count);
             return ResponseEntity.status(200).body(response);
