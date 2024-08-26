@@ -10,7 +10,7 @@ import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.service.PatientService;
 import com.oasis.ocrspring.service.responsemessages.ErrorMessage;
 import com.oasis.ocrspring.service.ReviewService;
-import com.oasis.ocrspring.service.ReviewerResDto;
+import com.oasis.ocrspring.dto.ReviewerResDto;
 import com.oasis.ocrspring.service.auth.AuthenticationToken;
 import com.oasis.ocrspring.service.auth.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;

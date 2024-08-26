@@ -1,4 +1,4 @@
-package com.oasis.ocrspring.service;
+package com.oasis.ocrspring.dto;
 
 import com.oasis.ocrspring.model.Review;
 import com.oasis.ocrspring.model.User;

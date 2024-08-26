@@ -14,12 +14,16 @@ import java.util.Optional;
 
 @Service
 public class RequestService {
+    private final RequestRepository requestRepo;
+    private final EmailService emailService;
+    private final UserRepository userRepo;
+
     @Autowired
-    private RequestRepository requestRepo;
-    @Autowired
-    private EmailService emailService;
-    @Autowired
-    private UserRepository userRepo;
+    public RequestService(RequestRepository requestRepo, EmailService emailService, UserRepository userRepo) {
+        this.requestRepo = requestRepo;
+        this.emailService = emailService;
+        this.userRepo = userRepo;
+    }
     public List<Request> allRequestDetails(){
         return requestRepo.findAll();
     }
@@ -42,11 +46,14 @@ public class RequestService {
     }
     public void acceptRequest(String id, User newUser, String reason) throws MessagingException{
         Optional<Request> requestOptional = requestRepo.findById(id);
+        if (requestOptional.isPresent()) {
             Request request = requestOptional.get();
             userRepo.save(newUser);
             requestRepo.deleteById(id);
             emailService.sendEmail(request.getEmail(), "ACCEPT", reason, request.getUserName());
-
+        } else {
+            throw new IllegalArgumentException("Request with id " + id + " not found");
+        }
 
     }
 }

@@ -27,12 +27,16 @@ import java.util.Objects;
 
 @Service
 public class ReportService {
-    @Autowired
-    private ReportRepository reportRepo;
-    @Autowired
-    private TeleconEntriesService teleconServ;
+    private final ReportRepository reportRepo;
+    private final TeleconEntriesService teleconServ;
     @Value("${reportUploadDir}")
     private String reportUploadDir;
+
+    @Autowired
+    public ReportService(ReportRepository reportRepo, TeleconEntriesService teleconServ) {
+        this.reportRepo = reportRepo;
+        this.teleconServ = teleconServ;
+    }
 
     public List<Report> allReportDetails(){
         return reportRepo.findAll();
@@ -43,15 +47,15 @@ public class ReportService {
                                                               List<MultipartFile> files){
         List<Report> uploadedReports = new ArrayList<>();//Report model list
         List<String> uploadFiles = new ArrayList<>();//List of file uri's
-        List<ObjectId> ReportIds = new ArrayList<>();
+        List<ObjectId> reportIdList = new ArrayList<>();
 
         TeleconEntry teleconEntry = teleconServ.findByID(id);
         if (teleconEntry != null && !teleconEntry.getClinicianId().toString().equals(clinicianId)){
             try{
                 for(MultipartFile file: files) {
                     String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-                    ResponseEntity<UploadReportResponse> Internal_Server_Error = getUploadReportResponseResponseEntity(data, file, fileName, uploadFiles, uploadedReports, ReportIds);
-                    if (Internal_Server_Error != null) return Internal_Server_Error;
+                    ResponseEntity<UploadReportResponse> internalServerError = getUploadReportResponseResponseEntity(data, file, fileName, uploadFiles, uploadedReports, reportIdList);
+                    if (internalServerError != null) return internalServerError;
 
                 }
                 //to make sure not to overwritten on the existing IDs
@@ -77,7 +81,7 @@ public class ReportService {
             }
     }
 
-    private ResponseEntity<UploadReportResponse> getUploadReportResponseResponseEntity(ReportsRequestDto data, MultipartFile file, String fileName, List<String> uploadFiles, List<Report> uploadedReports, List<ObjectId> ReportIds) {
+    private ResponseEntity<UploadReportResponse> getUploadReportResponseResponseEntity(ReportsRequestDto data, MultipartFile file, String fileName, List<String> uploadFiles, List<Report> uploadedReports, List<ObjectId> reportIds) {
         try{
             Path path = Paths.get(reportUploadDir + File.separator+ fileName);
             if(!Files.exists(path)){//if the path doesn't exist create em
@@ -100,7 +104,7 @@ public class ReportService {
             report.setUpdatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
             reportRepo.save(report);
             uploadedReports.add(report); //Report model list
-            ReportIds.add(report.getId());
+            reportIds.add(report.getId());
 
         }
         catch(Exception ex){

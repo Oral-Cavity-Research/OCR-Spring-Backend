@@ -37,17 +37,17 @@ public class PatientService {
     private final PatientRepository patientRepo;
     private final TeleconEntriesRepository teleconEntriesRepo;
     private final UserRepository userRepo;
-    private final TeleconEntriesService teleconServ;
+
 
     @Value("${consentFormUploadDir}")
     private String consentFormUploadDir;
 
     @Autowired
-    public PatientService(PatientRepository patientRepo, TeleconEntriesRepository teleconEntriesRepo, UserRepository userRepo, TeleconEntriesService teleconServ) {
+    public PatientService(PatientRepository patientRepo, TeleconEntriesRepository teleconEntriesRepo, UserRepository userRepo) {
         this.patientRepo = patientRepo;
         this.teleconEntriesRepo = teleconEntriesRepo;
         this.userRepo = userRepo;
-        this.teleconServ = teleconServ;
+
     }
 
     public List<Patient> allPatientDetails() {
