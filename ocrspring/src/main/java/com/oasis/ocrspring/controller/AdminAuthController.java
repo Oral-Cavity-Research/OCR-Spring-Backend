@@ -1,8 +1,10 @@
 package com.oasis.ocrspring.controller;
 
-import com.oasis.ocrspring.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.oasis.ocrspring.dto.AdminSignUpRequestDto;
+import com.oasis.ocrspring.service.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
@@ -13,8 +15,11 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/admin/auth")
 public class AdminAuthController {
-    @Autowired
-    private UserRepository userRepo;
+    private final UserService userService;
+
+    public AdminAuthController( UserService userService){
+        this.userService = userService;
+    }
 
     @ApiIgnore
     public void redirrect(HttpServletResponse response) throws IOException {
@@ -22,8 +27,9 @@ public class AdminAuthController {
     }
 
     @PostMapping("/signup")
-    public String adminSignUp() {
-        return "/api/admin/auth/signup ";
+    public ResponseEntity<?> adminSignUp(@RequestBody AdminSignUpRequestDto signupRequest) {
+
+        return userService.adminSignUp(signupRequest);
     }
 }
 

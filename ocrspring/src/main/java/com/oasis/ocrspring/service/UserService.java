@@ -1,5 +1,6 @@
 package com.oasis.ocrspring.service;
 
+import com.oasis.ocrspring.dto.*;
 import com.oasis.ocrspring.dto.RequestDto;
 import com.oasis.ocrspring.dto.UserDto;
 import com.oasis.ocrspring.dto.UserNameAndRoleDto;
@@ -11,6 +12,7 @@ import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
 import com.oasis.ocrspring.service.email.EmailService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
@@ -21,13 +23,16 @@ import java.util.Optional;
 @Service
 public class UserService
 {
-    @Autowired
-    private UserRepository userRepo;
-    @Autowired
-    private RequestRepository requestRepo;
-    @Autowired
-    private EmailService emailService;
+    private final UserRepository userRepo;
+    private final RequestRepository requestRepo;
+    private final EmailService emailService;
 
+    @Autowired
+    public UserService(UserRepository userRepo, RequestRepository requestRepo, EmailService emailService){
+        this.userRepo = userRepo;
+        this.requestRepo = requestRepo;
+        this.emailService =  emailService;
+    }
 
     public Optional<List<User>> allUserDetails(){
         return Optional.of(userRepo.findAll());
@@ -92,6 +97,33 @@ public class UserService
         List<User> users = userRepo.findByRole(role);
         return users.isEmpty() ? Optional.empty() : Optional.of(users);
     }
+
+    public ResponseEntity<?> adminSignUp(AdminSignUpRequestDto signupRequest){
+        User userName = null;
+        User userEmail = null;
+        try{
+            userName = userRepo.findByUsername(signupRequest.getUsername()).orElse(null);
+            userEmail = userRepo.findByEmail(signupRequest.getEmail()).orElse(null);
+        if (userName != null){
+            return  ResponseEntity.status(401).body(new MessageDto("User name is taken"));
+        } else if (userEmail != null){
+            return ResponseEntity.status(401).body(new MessageDto("The email address is already in use"));
+        }else {
+            User newUser = new User();
+            newUser.setRegNo(signupRequest.getRegNo());
+            newUser.setUsername(signupRequest.getUsername());
+            newUser.setEmail(signupRequest.getEmail());
+            newUser.setHospital(signupRequest.getHospital());
+            newUser.setRole("System Admin");
+            userRepo.save(newUser);
+            AdminSignUpResponse response = new AdminSignUpResponse(newUser,"Successfully signed in");
+            return ResponseEntity.status(200).body(response);
+        }
+    }catch (Exception e){
+            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
+        }
+}
+
     public void updateUser(String id, UserNameAndRoleDto userDetails) {
         User user = userRepo.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         user.setUsername(userDetails.getUsername());

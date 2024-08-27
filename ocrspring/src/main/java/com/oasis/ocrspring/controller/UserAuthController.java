@@ -4,10 +4,10 @@ import com.oasis.ocrspring.dto.EmailDto;
 import com.oasis.ocrspring.dto.RequestDto;
 import com.oasis.ocrspring.dto.TokenRequest;
 import com.oasis.ocrspring.model.RefreshToken;
-import com.oasis.ocrspring.model.Request;
 import com.oasis.ocrspring.model.Role;
 import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.repository.RequestRepository;
+import com.oasis.ocrspring.repository.UserRepository;
 import com.oasis.ocrspring.service.RefreshtokenService;
 import com.oasis.ocrspring.service.ResponseMessages.ErrorResponse;
 import com.oasis.ocrspring.service.RoleService;
@@ -47,6 +47,8 @@ public class UserAuthController {
     private RefreshtokenService refreshTokenService;
     @Autowired
     private AuthenticationToken authenticationToken;
+    @Autowired
+    private UserRepository userRepo;
 
     @Value("${jwt.refresh-time}")
     private String refreshTime;
@@ -155,4 +157,5 @@ public class UserAuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(false, e.getMessage()));
         }
     }
+
 }
