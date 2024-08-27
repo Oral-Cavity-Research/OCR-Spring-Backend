@@ -12,9 +12,11 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthenticationToken {
@@ -53,7 +55,10 @@ public class AuthenticationToken {
         request.setAttribute("email", tokenBody.get("sub").toString());
         request.setAttribute("role", tokenBody.get("role").toString());
         request.setAttribute("_id", user.get().getId());
-        request.setAttribute("permissions", role.get().getPermissions());
+        List<String> permissions = role.get().getPermissions().stream()
+                .map(Object::toString)
+                .collect(Collectors.toList());
+        request.setAttribute("permissions", permissions);
         request.setAttribute("ownsToken", (TokenOwner) tokenToCheck -> refreshTokenRepository.findByUser(user.get().getId()).stream().anyMatch(rt -> rt.getToken().equals(tokenToCheck))
 
         );

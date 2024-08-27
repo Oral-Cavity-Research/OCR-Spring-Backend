@@ -9,6 +9,7 @@ import com.oasis.ocrspring.service.email.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,16 +21,16 @@ public class RequestService {
     private EmailService emailService;
     @Autowired
     private UserRepository userRepo;
-    public List<Request> AllRequestDetails(){
+    public List<Request> allRequestDetails(){
         return requestRepo.findAll();
     }
      public Optional<Request> getRequestById(String id) {
          return requestRepo.findById(id);
      }
-    public Request createRequest(Request Request){
-        return requestRepo.save(Request);
+    public Request createRequest(Request request){
+        return requestRepo.save(request);
     }
-    public boolean rejectRequest(String id, String reason) throws ErrorMessage {
+    public boolean rejectRequest(String id, String reason) throws MessagingException {
         Optional<Request> requestOptional = requestRepo.findById(id);
         if (requestOptional.isPresent()) {
             Request request = requestOptional.get();
@@ -40,7 +41,7 @@ public class RequestService {
             return false;
         }
     }
-    public void acceptRequest(String id, User newUser, String reason) throws ErrorMessage {
+    public void acceptRequest(String id, User newUser, String reason) throws MessagingException{
         Optional<Request> requestOptional = requestRepo.findById(id);
             Request request = requestOptional.get();
             userRepo.save(newUser);

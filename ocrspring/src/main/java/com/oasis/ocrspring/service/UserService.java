@@ -1,16 +1,22 @@
 package com.oasis.ocrspring.service;
 
 import com.oasis.ocrspring.dto.*;
+import com.oasis.ocrspring.dto.RequestDto;
+import com.oasis.ocrspring.dto.UserDto;
+import com.oasis.ocrspring.dto.UserNameAndRoleDto;
 import com.oasis.ocrspring.model.Request;
 import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.repository.RequestRepository;
 import com.oasis.ocrspring.repository.UserRepository;
 import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
 import com.oasis.ocrspring.service.email.EmailService;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,7 +63,7 @@ public class UserService
     }
     public Optional<User> getUserById(String id){
 
-        return userRepo.findById(id);
+        return Optional.ofNullable(userRepo.findById(new ObjectId(id)));
     }
 
     public Optional<User> getUserByEmail(String id){
@@ -83,7 +89,7 @@ public class UserService
     public User addUser(User user) {
         return userRepo.save(user);
     }
-    public void sendAcceptanceEmail(String email, String reason, String username) throws ErrorMessage {
+    public void sendAcceptanceEmail(String email, String reason, String username) throws MessagingException {
         emailService.sendEmail(email, "ACCEPT", reason, username);
 
     }
@@ -91,6 +97,7 @@ public class UserService
         List<User> users = userRepo.findByRole(role);
         return users.isEmpty() ? Optional.empty() : Optional.of(users);
     }
+
     public ResponseEntity<?> adminSignUp(AdminSignUpRequestDto signupRequest){
         User userName = null;
         User userEmail = null;
@@ -116,4 +123,21 @@ public class UserService
             return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
         }
 }
+
+    public void updateUser(String id, UserNameAndRoleDto userDetails) {
+        User user = userRepo.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        user.setUsername(userDetails.getUsername());
+        user.setRole(userDetails.getRole());
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepo.save(user);
+    }
+
+    public boolean deleteUser(String id) {
+        if (userRepo.existsById(id)) {
+            userRepo.deleteById(id);
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
