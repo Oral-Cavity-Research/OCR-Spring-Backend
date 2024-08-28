@@ -63,7 +63,7 @@ public class UserService
     }
     public Optional<User> getUserById(String id){
 
-        return Optional.ofNullable(userRepo.findById(new ObjectId(id)));
+        return userRepo.findById(new ObjectId(id));
     }
 
     public Optional<User> getUserByEmail(String id){

@@ -53,13 +53,9 @@ public class TeleconEntry
     private LocalDateTime endTime;
 
     private String findings;
+
     private String status;
 
-    @Field("current_habits")@CreatedDate
-    private LocalDateTime createdAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
     private List<HabitDto> currentHabits;
 
     private boolean updated;
@@ -72,7 +68,11 @@ public class TeleconEntry
 
     private List<ObjectId> reports;
 
+    @Field("current_habits")@CreatedDate
+    private LocalDateTime createdAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 
+    @LastModifiedDate
+    private LocalDateTime updatedAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 
     @Override
     public String toString() {
