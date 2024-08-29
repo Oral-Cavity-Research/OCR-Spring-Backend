@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface DraftEntryRepository extends MongoRepository<DraftEntry, String> {
     Page<DraftEntry> findByClinicianId(ObjectId clinicianId, Pageable pageable);
     Optional<DraftEntry> findByClinicianIdAndId(ObjectId clinicianId, ObjectId id);
+
+    Optional<DraftEntry> findById(ObjectId id);
 }

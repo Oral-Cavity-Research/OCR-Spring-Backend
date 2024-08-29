@@ -68,7 +68,7 @@ public class TeleconEntry
 
     private List<ObjectId> reports;
 
-    @Field("current_habits")@CreatedDate
+    @Field("current_habits")
     private LocalDateTime createdAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 
     @LastModifiedDate
