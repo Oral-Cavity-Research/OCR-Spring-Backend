@@ -1,13 +1,17 @@
 package com.oasis.ocrspring.model.draftModels;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.oasis.ocrspring.dto.subdto.AnnotationDto;
+import lombok.*;
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Document(collection = "draftimages")
@@ -15,12 +19,24 @@ import java.util.List;
 @Setter
 @ToString
 @NoArgsConstructor
-public class DraftImage {
+@AllArgsConstructor
+public class DraftImage
+{
     @Id
-    private String id;
+    @Field("_id")
+    @JsonIgnore
+    private ObjectId id;
+
+    @JsonProperty("_id")
+    public String getIdString() {
+        return id != null ? id.toHexString() : null;
+    }
 
     @Field("telecon_entry_id")
-    private String teleconEntryId;
+    @JsonIgnore
+    private ObjectId teleconEntryId;
+    @JsonProperty("telecon_entry_id")
+    public String getTeleconIdString(){return teleconEntryId != null? teleconEntryId.toHexString() : null;}
 
     @Field("image_name")
     private String imageName;
@@ -33,20 +49,15 @@ public class DraftImage {
     @Field("lesions_appear")
     private Boolean lesionsAppear;
 
-    private List<String> annotation;
+    private List<AnnotationDto> annotation;
 
     @Field("predicted_cat")
     private String predictedCat;
 
-    public DraftImage(String teleconEntryId, String imageName, String location,
-                      String clinicalDiagnosis, Boolean lesionsAppear,
-                      List<String> annotation, String predictedCat) {
-        this.teleconEntryId = teleconEntryId;
-        this.imageName = imageName;
-        this.location = location;
-        this.clinicalDiagnosis = clinicalDiagnosis;
-        this.lesionsAppear = lesionsAppear;
-        this.annotation = annotation;
-        this.predictedCat = predictedCat;
-    }
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
+
 }

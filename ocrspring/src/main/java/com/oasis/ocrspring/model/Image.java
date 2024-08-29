@@ -55,8 +55,10 @@ public class Image
 
     @Field("predicted_cat")
     private String predictedCat;
+
     @CreatedDate
     private LocalDateTime createdAt;
+
     @LastModifiedDate
     private LocalDateTime updatedAt;
 

@@ -19,6 +19,13 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class Report {
+    @Id
+    @Field("_id")
+    @JsonIgnore
+    private ObjectId id;
+    @JsonProperty("_id")
+    public String getIDString(){return id != null? id.toHexString():null;}
+
     @JsonIgnore
     @Field("telecon_entry_id")
     private ObjectId teleconId;
@@ -28,14 +35,9 @@ public class Report {
     @Field("report_name")
     private String reportName;
 
-    @Id
-    @Field("_id")
-    @JsonIgnore
-    private ObjectId id;
-    @JsonProperty("_id")
-    public String getIDString(){return id != null? id.toHexString():null;}
     @CreatedDate
     private LocalDateTime createdAt;
+
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
