@@ -2,6 +2,7 @@ package com.oasis.ocrspring.controller;
 
 import com.oasis.ocrspring.dto.AdminSignUpRequestDto;
 import com.oasis.ocrspring.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +18,7 @@ import java.io.IOException;
 public class AdminAuthController {
     private final UserService userService;
 
+    @Autowired
     public AdminAuthController( UserService userService){
         this.userService = userService;
     }
