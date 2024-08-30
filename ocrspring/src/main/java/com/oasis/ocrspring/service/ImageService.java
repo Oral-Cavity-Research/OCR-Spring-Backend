@@ -141,4 +141,8 @@ public class ImageService {
         return image;
     }
 
+    public long countImages() {
+        return imageRepo.count();
+    }
+
 }

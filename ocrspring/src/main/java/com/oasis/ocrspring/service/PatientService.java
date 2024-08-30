@@ -1,6 +1,7 @@
 package com.oasis.ocrspring.service;
 
 import com.oasis.ocrspring.dto.*;
+import com.oasis.ocrspring.dto.subdto.Risk_factors;
 import com.oasis.ocrspring.model.Patient;
 import com.oasis.ocrspring.model.TeleconEntry;
 import com.oasis.ocrspring.repository.PatientRepository;
@@ -27,10 +28,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class PatientService {
@@ -208,6 +207,36 @@ public  Patient findPatient(String id,String clinicianId){
         } else {
             return null;
         }
+    }
+
+    @Autowired
+    private PatientRepository patientRepository;
+
+    public Map<String, Double> calculateRiskHabitPercentages() {
+        List<Patient> patients = patientRepository.findAll();
+        long totalPatients = patients.size();
+        Map<String, Integer> habitCounts = new HashMap<>();
+
+        patients.forEach(patient -> {
+            List<Risk_factors> riskFactors = patient.getRiskFactors();
+            if (riskFactors != null)  // Add this null check
+                riskFactors.forEach(riskFactor ->
+                    habitCounts.put(riskFactor.getHabit(),
+                            habitCounts.getOrDefault(riskFactor.getHabit(), 0) + 1
+                    )
+                );
+
+        });
+
+        Map<String, Double> percentages = new HashMap<>();
+        habitCounts.forEach((habit, count) ->
+            percentages.put(habit, (count * 100.0) / totalPatients));
+
+        return percentages;
+    }
+
+    public long countPatients() {
+        return patientRepo.count();
     }
 }
 
