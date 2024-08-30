@@ -5,6 +5,7 @@ import com.oasis.ocrspring.dto.UploadImageResponse;
 import com.oasis.ocrspring.model.Image;
 import com.oasis.ocrspring.model.TeleconEntry;
 import com.oasis.ocrspring.repository.ImageRepository;
+import com.oasis.ocrspring.repository.TeleconEntriesRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,14 +31,18 @@ import java.util.Objects;
 public class ImageService {
     private final ImageRepository imageRepo;
     private final TeleconEntriesService teleconServices;
+    private final TeleconEntriesRepository teleconRepo;
 
     @Value("${uploadDir}")
     private String uploadDir;
+
     @Autowired
-    public ImageService(ImageRepository imageRepo, TeleconEntriesService teleconServices) {
+    public ImageService(ImageRepository imageRepo, TeleconEntriesService teleconServices, TeleconEntriesRepository teleconRepo) {
         this.imageRepo = imageRepo;
         this.teleconServices = teleconServices;
+        this.teleconRepo = teleconRepo;
     }
+
     public List<Image> allImageDetails() {
         return imageRepo.findAll();
     }
@@ -52,27 +57,30 @@ public class ImageService {
         final String errorMessage = "Internal Server Error";
         TeleconEntry teleconEntry;
         try {
-            teleconEntry = teleconServices.findByID(id);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(new UploadImageResponse(null, errorMessage));
-        }
-
-        if (teleconEntry == null || teleconEntry.getClinicianId().toString().equals(clinicianId)) {
-            return ResponseEntity.status(404).body(new UploadImageResponse(null, "Entry Not Found"));
-        }
-
-        for (MultipartFile file : files) {
-            String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-            try {
-                extracted(file, fileName, imageURIs);
-                Image image = getImage(data);
-                imageRepo.save(image);
-                uploadedImages.add(image);
-            } catch (Exception e) {
+            teleconEntry = teleconRepo.findById(new ObjectId(id)).orElse(null);
+            if (teleconEntry == null || teleconEntry.getClinicianId().toString().equals(clinicianId)) {
+                return ResponseEntity.status(404).body(new UploadImageResponse(null, "Entry Not Found"));
+            }
+            if (files.size() >12){
                 return ResponseEntity.status(500).body(new UploadImageResponse(null, errorMessage));
             }
-        }
 
+            for (MultipartFile file : files) {
+                String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+                ResponseEntity<UploadImageResponse> savedImage = saveImage(data, file, fileName, imageURIs, uploadedImages, errorMessage);
+                if (savedImage != null) return savedImage;
+            }
+
+            ResponseEntity<UploadImageResponse> updatedEntry = updateEntry(uploadedImages, teleconEntry, errorMessage);
+            if (updatedEntry != null) return updatedEntry;
+
+            return ResponseEntity.status(200).body(new UploadImageResponse(uploadedImages, "Images Uploaded Successfully"));
+        }catch (Exception e) {
+            return ResponseEntity.status(500).body(new UploadImageResponse(null, errorMessage));
+        }
+    }
+
+    private ResponseEntity<UploadImageResponse> updateEntry(List<Image> uploadedImages, TeleconEntry teleconEntry, String errorMessage) {
         try {
             List<ObjectId> imageIds = uploadedImages.stream().map(Image::getId).toList();
             List<ObjectId> existedImageIds = teleconEntry.getImages();
@@ -87,11 +95,23 @@ public class ImageService {
         } catch (Exception e) {
             return ResponseEntity.status(500).body(new UploadImageResponse(null, errorMessage));
         }
-
-        return ResponseEntity.status(200).body(new UploadImageResponse(uploadedImages, "Images Uploaded Successfully"));
+        return null;
     }
 
-    private void extracted(MultipartFile file, String fileName, List<String> imageURIs) throws IOException {
+    private ResponseEntity<UploadImageResponse> saveImage(ImageRequestDto data, MultipartFile file, String fileName, List<String> imageURIs, List<Image> uploadedImages, String errorMessage) {
+        try {
+            creatingPathAndURI(file, fileName, imageURIs);
+            Image image = getImage(data);
+            imageRepo.save(image);
+            uploadedImages.add(image);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new UploadImageResponse(null, errorMessage));
+        }
+        return null;
+    }
+
+
+    private void creatingPathAndURI(MultipartFile file, String fileName, List<String> imageURIs) throws IOException {
         Path path = Paths.get(uploadDir + File.separator + fileName);
         if (!Files.exists(path)) {
             Files.createDirectories(path);
@@ -121,23 +141,4 @@ public class ImageService {
         return image;
     }
 
-    public List<String> uploadFiles(List<MultipartFile> files) throws IOException {
-        List<String> uploadedFiles = new ArrayList<>();
-        for (MultipartFile file : files) {
-            String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-            try {
-                Path path = Paths.get(uploadDir + File.separator + fileName);
-                Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-                String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                        .path("/files/")
-                        .path(fileName)
-                        .toUriString();
-                uploadedFiles.add(fileDownloadUri);
-
-            } catch (IOException ex) {
-                throw new IOException("Couldn't save file: " + fileName);
-            }
-        }
-        return uploadedFiles;
-    }
 }

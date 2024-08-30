@@ -1,9 +1,7 @@
 package com.oasis.ocrspring.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.oasis.ocrspring.dto.ConsentRequestDto;
-import com.oasis.ocrspring.dto.ImageRequestDto;
-import com.oasis.ocrspring.dto.ReportsRequestDto;
+import com.oasis.ocrspring.dto.*;
 import com.oasis.ocrspring.repository.ImageRepository;
 import com.oasis.ocrspring.repository.PatientRepository;
 import com.oasis.ocrspring.repository.ReportRepository;
@@ -16,7 +14,6 @@ import com.oasis.ocrspring.service.TeleconEntriesService;
 import com.oasis.ocrspring.service.auth.AuthenticationToken;
 import com.oasis.ocrspring.service.auth.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -63,7 +60,7 @@ public class UploadController {
     static final String UNAUTHORIZED_ACCESS = "Unauthorized Access";
 
     @PostMapping(value = "/images/{id}")
-    public ResponseEntity<?> uploadImages(
+    public ResponseEntity<UploadImageResponse> uploadImages(
             HttpServletRequest request, HttpServletResponse response,
             @PathVariable String id,
             @RequestPart("data") ImageRequestDto data,
@@ -71,26 +68,21 @@ public class UploadController {
 
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
+            return ResponseEntity.status(401).body(new UploadImageResponse(null,UNAUTHORIZED_ACCESS));
         }
         String clinicianId = request.getAttribute("_id").toString();
         return imageService.uploadImages(data, id,clinicianId, files);
     }
 
-    @PostMapping("/files")
-    public ResponseEntity<?> uploadFiles(@RequestParam("files") List<MultipartFile> files) throws IOException {
-        return ResponseEntity.status(HttpStatus.OK).body(imageService.uploadFiles(files));
-    }
-
     @PostMapping(value = "/reports/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> uploadReports(HttpServletRequest request, HttpServletResponse response,
+    public ResponseEntity<UploadReportResponse> uploadReports(HttpServletRequest request, HttpServletResponse response,
                                                               @PathVariable String id,
                                                               @RequestPart("data") ReportsRequestDto data,
                                                               @RequestPart("files") List<MultipartFile> files) throws IOException{
 
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
-            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
+            return ResponseEntity.status(401).body(new UploadReportResponse(null,UNAUTHORIZED_ACCESS));
         }
         String clinicianId=request.getAttribute("_id").toString();
         return reportServ.uploadReports(data, id,clinicianId, files);

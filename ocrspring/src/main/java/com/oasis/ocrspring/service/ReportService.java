@@ -50,13 +50,12 @@ public class ReportService {
         List<ObjectId> reportIdList = new ArrayList<>();
 
         TeleconEntry teleconEntry = teleconServ.findByID(id);
-        if (teleconEntry != null && !teleconEntry.getClinicianId().toString().equals(clinicianId)){
+        if (teleconEntry != null && !teleconEntry.getClinicianId().toString().equals(clinicianId) && (files.size() <= 3)){
             try{
                 for(MultipartFile file: files) {
                     String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-                    ResponseEntity<UploadReportResponse> internalServerError = getUploadReportResponseResponseEntity(data, file, fileName, uploadFiles, uploadedReports, reportIdList);
-                    if (internalServerError != null) return internalServerError;
-
+                    ResponseEntity<UploadReportResponse> uploadedReport = uploadReport(data, file, fileName, uploadFiles, uploadedReports, ReportIds);
+                    if (uploadedReport != null) return uploadedReport;
                 }
                 //to make sure not to overwritten on the existing IDs
                 List<ObjectId> reportIds = uploadedReports.stream().map(Report :: getId).toList();
@@ -81,7 +80,7 @@ public class ReportService {
             }
     }
 
-    private ResponseEntity<UploadReportResponse> getUploadReportResponseResponseEntity(ReportsRequestDto data, MultipartFile file, String fileName, List<String> uploadFiles, List<Report> uploadedReports, List<ObjectId> reportIds) {
+    private ResponseEntity<UploadReportResponse> uploadReport(ReportsRequestDto data, MultipartFile file, String fileName, List<String> uploadFiles, List<Report> uploadedReports, List<ObjectId> ReportIds) {
         try{
             Path path = Paths.get(reportUploadDir + File.separator+ fileName);
             if(!Files.exists(path)){//if the path doesn't exist create em

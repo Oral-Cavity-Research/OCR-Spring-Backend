@@ -7,6 +7,7 @@ import com.oasis.ocrspring.model.RefreshToken;
 import com.oasis.ocrspring.model.Role;
 import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.repository.RequestRepository;
+import com.oasis.ocrspring.repository.UserRepository;
 import com.oasis.ocrspring.service.RefreshtokenService;
 import com.oasis.ocrspring.service.responsemessages.ErrorResponse;
 import com.oasis.ocrspring.service.RoleService;
@@ -41,6 +42,7 @@ public class UserAuthController {
     static String permission ="permissions";
     static String messageString = "message";
     static String accessTokenString = "accessToken";
+  
     @Autowired
     public UserAuthController(RequestRepository requestRepo, UserService userService, TokenService tokenService,
                               RoleService roleService, RefreshtokenService refreshTokenService, AuthenticationToken authenticationToken) {
@@ -162,4 +164,5 @@ public class UserAuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(false, e.getMessage()));
         }
     }
+
 }
