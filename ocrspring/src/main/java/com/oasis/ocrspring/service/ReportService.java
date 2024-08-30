@@ -5,6 +5,7 @@ import com.oasis.ocrspring.dto.UploadReportResponse;
 import com.oasis.ocrspring.model.Report;
 import com.oasis.ocrspring.model.TeleconEntry;
 import com.oasis.ocrspring.repository.ReportRepository;
+import com.oasis.ocrspring.repository.TeleconEntriesRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,13 +27,21 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-public class ReportService {
+public class ReportService {private final ReportRepository reportRepo;
+    private final TeleconEntriesService teleconServ;
+    private final TeleconEntriesRepository teleconRepo;
+    private final String reportUploadDir;
+
     @Autowired
-    private ReportRepository reportRepo;
-    @Autowired
-    private TeleconEntriesService teleconServ;
-    @Value("${reportUploadDir}")
-    private String reportUploadDir;
+    public ReportService(ReportRepository reportRepo,
+                         TeleconEntriesService teleconServ,
+                         TeleconEntriesRepository teleconRepo,
+                         @Value("${reportUploadDir}") String reportUploadDir) {
+        this.reportRepo = reportRepo;
+        this.teleconServ = teleconServ;
+        this.teleconRepo = teleconRepo;
+        this.reportUploadDir = reportUploadDir;
+    }
 
     public List<Report> allReportDetails(){
         return reportRepo.findAll();
@@ -43,14 +52,14 @@ public class ReportService {
                                                               List<MultipartFile> files){
         List<Report> uploadedReports = new ArrayList<>();//Report model list
         List<String> uploadFiles = new ArrayList<>();//List of file uri's
-        List<ObjectId> ReportIds = new ArrayList<>();
+        List<ObjectId> reportIdList = new ArrayList<>();
 
-        TeleconEntry teleconEntry = teleconServ.findByID(id);
+        TeleconEntry teleconEntry = teleconRepo.findById(new ObjectId(id)).orElse(null);
         if (teleconEntry != null && !teleconEntry.getClinicianId().toString().equals(clinicianId) && (files.size() <= 3)){
             try{
                 for(MultipartFile file: files) {
                     String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-                    ResponseEntity<UploadReportResponse> uploadedReport = uploadReport(data, file, fileName, uploadFiles, uploadedReports, ReportIds);
+                    ResponseEntity<UploadReportResponse> uploadedReport = uploadReport(data, file, fileName, uploadFiles, uploadedReports, reportIdList);
                     if (uploadedReport != null) return uploadedReport;
 
                 }
@@ -77,7 +86,9 @@ public class ReportService {
             }
     }
 
-    private ResponseEntity<UploadReportResponse> uploadReport(ReportsRequestDto data, MultipartFile file, String fileName, List<String> uploadFiles, List<Report> uploadedReports, List<ObjectId> ReportIds) {
+    private ResponseEntity<UploadReportResponse> uploadReport(ReportsRequestDto data, MultipartFile file,
+                                                              String fileName, List<String> uploadFiles,
+                                                              List<Report> uploadedReports, List<ObjectId> reportIdList) {
         try{
             Path path = Paths.get(reportUploadDir + File.separator+ fileName);
             if(!Files.exists(path)){//if the path doesn't exist create em
@@ -100,7 +111,7 @@ public class ReportService {
             report.setUpdatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
             reportRepo.save(report);
             uploadedReports.add(report); //Report model list
-            ReportIds.add(report.getId());
+            reportIdList.add(report.getId());
 
         }
         catch(Exception ex){

@@ -5,7 +5,6 @@ import com.oasis.ocrspring.model.Patient;
 import com.oasis.ocrspring.model.TeleconEntry;
 import com.oasis.ocrspring.repository.PatientRepository;
 import com.oasis.ocrspring.repository.TeleconEntriesRepository;
-import com.oasis.ocrspring.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,20 +29,23 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
 public class PatientService {
+    private final PatientRepository patientRepo;
+    private final TeleconEntriesRepository teleconEntriesRepo;
+    private final String consentFormUploadDir;
+
     @Autowired
-    private PatientRepository patientRepo;
-    @Autowired
-    private TeleconEntriesRepository teleconEntriesRepo;
-    @Autowired
-    private UserRepository userRepo;
-    @Autowired
-    private TeleconEntriesService teleconServ;
-    @Value("${consentFormUploadDir}")
-    private String consentFormUploadDir;
+    public PatientService(PatientRepository patientRepo,
+                          TeleconEntriesRepository teleconEntriesRepo,
+                          @Value("${consentFormUploadDir}") String consentFormUploadDir) {
+        this.patientRepo = patientRepo;
+        this.teleconEntriesRepo = teleconEntriesRepo;
+        this.consentFormUploadDir = consentFormUploadDir;
+    }
 
     public List<Patient> allPatientDetails() {
         return patientRepo.findAll();
@@ -98,23 +99,23 @@ public class PatientService {
 
 
 
-public Patient findOne(String patient_id, String clinician_id){
-    return patientRepo.findByPatientIdAndClinicianId(patient_id,new ObjectId(clinician_id)).orElse(null);
+public Patient findOne(String patientId, String clinicianId){
+    return patientRepo.findByPatientIdAndClinicianId(patientId,new ObjectId(clinicianId)).orElse(null);
 }
 
 
 
-public  Patient findPatient(String id,String clinician_Id){
+public  Patient findPatient(String id,String clinicianId){
 
-        ObjectId id_ = new ObjectId(id);
-        ObjectId clinicianId_ = new ObjectId(clinician_Id);
-        return patientRepo.findByIdAndClinicianId(id_, clinicianId_).orElse(null);
+        ObjectId patientObjectId = new ObjectId(id);
+        ObjectId clinicianObjectId = new ObjectId(clinicianId);
+        return patientRepo.findByIdAndClinicianId(patientObjectId, clinicianObjectId).orElse(null);
     }
 
     public ResponseEntity<?> addPatient(
             String id,
             ConsentRequestDto data,
-            MultipartFile files) throws IOException {
+            MultipartFile files) {
         List<String> uploadedURIs = new ArrayList<>();
 
         try {
@@ -122,7 +123,7 @@ public  Patient findPatient(String id,String clinician_Id){
             if (patient != null) {
                 return ResponseEntity.status(401).body("Patient ID already exists");
             }
-            String fileName = StringUtils.cleanPath(files.getOriginalFilename());
+            String fileName = StringUtils.cleanPath(Objects.requireNonNull(files.getOriginalFilename()));
             return getResponse(data, files, fileName, uploadedURIs);
 
         } catch (Exception e) {
@@ -193,8 +194,8 @@ public  Patient findPatient(String id,String clinician_Id){
         }
         return searchRes;
     }
-    public Patient getPatientByPatientIDAndClinicianId(String patient_id, String clinician_id){
-        return patientRepo.findByPatientIdAndClinicianId(patient_id,new ObjectId(clinician_id)).orElse(null);
+    public Patient getPatientByPatientIDAndClinicianId(String patientId, String clinicianId){
+        return patientRepo.findByPatientIdAndClinicianId(patientId,new ObjectId(clinicianId)).orElse(null);
 
     }
 

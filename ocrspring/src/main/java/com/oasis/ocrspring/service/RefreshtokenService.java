@@ -9,11 +9,14 @@ import java.util.List;
 
 @Service
 public class RefreshtokenService {
+    private final RefreshtokenRepsitory refreshtokenRepo;
+
     @Autowired
-    private RefreshtokenRepsitory refreshtokenRepo;
+    public RefreshtokenService(RefreshtokenRepsitory refreshtokenRepo) {
+        this.refreshtokenRepo = refreshtokenRepo;
+    }
 
     public List<RefreshToken> allRefreshtokenDetails() {
-        System.out.println("appeared in service layer");
         return refreshtokenRepo.findAll();
     }
 }

@@ -1,9 +1,6 @@
 package com.oasis.ocrspring.controller;
 
 import com.oasis.ocrspring.dto.PatientTeleconRequest;
-import com.oasis.ocrspring.repository.PatientRepository;
-import com.oasis.ocrspring.repository.draftRepos.DraftReportRepository;
-import com.oasis.ocrspring.repository.draftRepos.DraftimageRepository;
 import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
 import com.oasis.ocrspring.service.auth.AuthenticationToken;
 import com.oasis.ocrspring.service.auth.TokenService;
@@ -29,7 +26,7 @@ public class DraftEntryController {
     @Autowired
     public DraftEntryController(DraftEntryService draftEntryService,
                                 TokenService tokenService,AuthenticationToken authenticationToken)
-                                {
+    {
         this.draftEntryService = draftEntryService;
         this.tokenService = tokenService;
         this.authenticationToken = authenticationToken;
@@ -44,7 +41,7 @@ public class DraftEntryController {
     public ResponseEntity<?> addDraftTeleconEntry(HttpServletRequest request, HttpServletResponse response,
                                                   @PathVariable String id,
                                                   @RequestBody PatientTeleconRequest patientRequest)
-    throws IOException{
+            throws IOException{
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
             return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
@@ -55,9 +52,9 @@ public class DraftEntryController {
 
     @GetMapping("/get")
     public ResponseEntity<?> getAllDraftEntries(HttpServletRequest request, HttpServletResponse response,
-                                     @RequestParam(name = "_page", required = false, defaultValue = "1") Integer page,
-                                     @RequestParam(name = "_query", required = false, defaultValue = "Created Date") String filter)
-    throws IOException{
+                                                @RequestParam(name = "_page", required = false, defaultValue = "1") Integer page,
+                                                @RequestParam(name = "_query", required = false, defaultValue = "Created Date") String filter)
+            throws IOException{
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
             return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
@@ -66,7 +63,7 @@ public class DraftEntryController {
         int pageSize = 20;
         return draftEntryService.getAllDraftEntries(page,filter,clinicianId,pageSize);
     }
-
+//This commented out block might be needed
 //    @GetMapping("/get/patient/:id")
 //    public ResponseEntity<?> getPtientEntries(HttpServletRequest request, HttpServletResponse response,
 //                                   @PathVariable String id,
@@ -84,7 +81,7 @@ public class DraftEntryController {
 
     @GetMapping("/get/{id}")
     public ResponseEntity<?> getEntryDetails(HttpServletRequest request, HttpServletResponse response,
-                                @PathVariable String id) throws IOException{
+                                             @PathVariable String id) throws IOException{
         authenticationToken.authenticateRequest(request, response);
         if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
             return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));

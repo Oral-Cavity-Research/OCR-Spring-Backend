@@ -51,7 +51,7 @@ public class ImageService {
     public ResponseEntity<UploadImageResponse> uploadImages(ImageRequestDto data,
                                                             String id,
                                                             String clinicianId,
-                                                            List<MultipartFile> files) throws IOException {
+                                                            List<MultipartFile> files)  {
         List<Image> uploadedImages = new ArrayList<>();
         List<String> imageURIs = new ArrayList<>();
         final String errorMessage = "Internal Server Error";

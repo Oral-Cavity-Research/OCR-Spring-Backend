@@ -22,15 +22,21 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/user/entry")
 public class EntryController {
+    private final TeleconEntriesService teleconService;
+    private final AuthenticationToken authenticationToken;
+    private final TokenService tokenService;
+    private final AssignmentService assignmentService;
+    @Autowired
+    public EntryController(TeleconEntriesService teleconService,
+                           AuthenticationToken authenticationToken,
+                           TokenService tokenService,
+                           AssignmentService assignmentService) {
+        this.teleconService = teleconService;
+        this.authenticationToken = authenticationToken;
+        this.tokenService = tokenService;
+        this.assignmentService = assignmentService;
+    }
     public static final String REVIEWER_ID = "reviewer_id";
-    @Autowired
-    private TeleconEntriesService teleconService;
-    @Autowired
-    private AuthenticationToken authenticationToken;
-    @Autowired
-    private TokenService tokenService;
-    @Autowired
-    private AssignmentService assignmentService;
     static final String UNAUTHORIZED_ACCESS = "Unauthorized Access";
 
     // connect entry to the service layer
@@ -264,9 +270,9 @@ public class EntryController {
             return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
         }
         String clinicianId = request.getAttribute("_id").toString();
-        String ReviewerId = payload.get(REVIEWER_ID);
+        String reviewerId = payload.get(REVIEWER_ID);
         // change a reviewer
-        return teleconService.changeReviewer(id,clinicianId,ReviewerId);
+        return teleconService.changeReviewer(id,clinicianId,reviewerId);
     }
 
     //add new review

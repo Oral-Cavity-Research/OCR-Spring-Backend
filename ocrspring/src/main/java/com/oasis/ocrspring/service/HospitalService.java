@@ -11,10 +11,12 @@ import java.util.Optional;
 
 @Service
 public class HospitalService {
+    private final HospitalRepository hospitalRepo;
+
     @Autowired
-    private HospitalRepository hospitalRepo;
-    @Autowired
-    private HospitalRepository hospitalReop;
+    public HospitalService(HospitalRepository hospitalRepo) {
+        this.hospitalRepo = hospitalRepo;
+    }
 
     public List<Hospital> allHospitalDetails() {
         return hospitalRepo.findAll();

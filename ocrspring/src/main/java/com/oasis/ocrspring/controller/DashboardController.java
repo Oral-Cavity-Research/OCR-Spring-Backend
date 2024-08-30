@@ -15,13 +15,16 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/dashboard")
 public class DashboardController {
+    private final UserRepository userRepo;
+    private final ImageRepository imageRepo;
+    private final PatientRepository patientRepo;
 
     @Autowired
-    private UserRepository userRepo;
-    @Autowired
-    private ImageRepository imageRepo;
-    @Autowired
-    private PatientRepository patientRepo;
+    public DashboardController(UserRepository userRepo, ImageRepository imageRepo, PatientRepository patientRepo) {
+        this.userRepo = userRepo;
+        this.imageRepo = imageRepo;
+        this.patientRepo = patientRepo;
+    }
 
     @ApiIgnore
     public void redirect(HttpServletResponse response) throws IOException {

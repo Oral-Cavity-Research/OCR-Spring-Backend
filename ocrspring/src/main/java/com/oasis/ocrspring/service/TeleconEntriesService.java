@@ -26,47 +26,51 @@ import java.util.*;
 
 @Service
 public class TeleconEntriesService {
+    private final TeleconEntriesRepository teleconEntriesRepo;
+    private final PatientService patientService;
+    private final PatientRepository patientRepo;
+    private final UserRepository userRepo;
+    private final AssignmentRepository assignmentRepo;
+    private final ImageRepository imageRepo;
+    private final ReportRepository reportRepo;
+    private final MongoTemplate mongoTemplate;
+    private final ReviewRepository reviewRepo;
+
     @Autowired
-    private TeleconEntriesRepository teleconEntriesRepo;
-    @Autowired
-    private PatientService patientService;
-    @Autowired
-    private PatientRepository patientRepo;
-    @Autowired
-    private UserRepository userRepo;
-    @Autowired
-    private AssignmentRepository assignmentRepo;
-    @Autowired
-    private ImageRepository imageRepo;
-    @Autowired
-    private ReportRepository reportRepo;
-    @Autowired
-    private MongoTemplate mongoTemplate;
-    @Autowired
-    private ReviewRepository reviewRepo;
+    public TeleconEntriesService(TeleconEntriesRepository teleconEntriesRepo,
+                                 PatientService patientService,
+                                 PatientRepository patientRepo,
+                                 UserRepository userRepo,
+                                 AssignmentRepository assignmentRepo,
+                                 ImageRepository imageRepo,
+                                 ReportRepository reportRepo,
+                                 MongoTemplate mongoTemplate,
+                                 ReviewRepository reviewRepo) {
+        this.teleconEntriesRepo = teleconEntriesRepo;
+        this.patientService = patientService;
+        this.patientRepo = patientRepo;
+        this.userRepo = userRepo;
+        this.assignmentRepo = assignmentRepo;
+        this.imageRepo = imageRepo;
+        this.reportRepo = reportRepo;
+        this.mongoTemplate = mongoTemplate;
+        this.reviewRepo = reviewRepo;
+    }
 
     static final String INTERNAL_SERVER_ERROR = "Internal Server Error!";
     static final String REVIEWERS = "reviewers";
     static final String ENTRY_NOT_FOUND = "Entry Not Found!";
     static final  String REVIEWED = "reviewed";
 
-    public TeleconEntry findByID(String id){
-        return teleconEntriesRepo.findById(id).orElse(null);
-    }
-    public TeleconEntry findOne(String patient_id, String clinician_id){
-        ObjectId patientId = new ObjectId(patient_id);
-        ObjectId clinicianId = new ObjectId(clinician_id);
-        return  teleconEntriesRepo.findByPatientAndClinicianId(patientId,clinicianId).orElse(null);
-    }
     public void save(TeleconEntry teleconEntry){
         teleconEntriesRepo.save(teleconEntry);
     }
-    public ResponseEntity<?> patientTeleconEntry(String patient_id,
-                                                 String clinician_id,
+    public ResponseEntity<?> patientTeleconEntry(String patientId,
+                                                 String clinicianId,
                                                  PatientTeleconRequest newPatient ){ //path patient id
 
         try{
-            Patient patient = patientService.findPatient(patient_id,clinician_id);//patient_id, String clinician_id
+            Patient patient = patientService.findPatient(patientId,clinicianId);//patient_id, String clinician_id
             if(patient != null){
                 TeleconEntry newEntry = new TeleconEntry();
                 createTeleconEntry(newPatient, newEntry, patient);
@@ -113,40 +117,40 @@ public class TeleconEntriesService {
     {
         Pageable pageable = PageRequest.of(page-1,pageSize,Sort.by(Sort.Direction.DESC,getSortField(filter)));//page-1 cuz Page numbers in Spring Data are zero-based
         //pageSize is the number of items you want to retrieve per page
-        ObjectId id_ = new ObjectId(id);
-        Page<TeleconEntry> EntryPage;
+        ObjectId clinicianObjectId = new ObjectId(id);
+        Page<TeleconEntry> entryPage;
         List<TeleconEntry> entryPageList ;
         try {
             switch (filter) {
                 case "Assigned":
-                    EntryPage = teleconEntriesRepo.findByClinicianIdAndReviewersIsNotNull(id_, pageable);
+                    entryPage = teleconEntriesRepo.findByClinicianIdAndReviewersIsNotNull(clinicianObjectId, pageable);
                     break;
                 case "Unassigned":
-                    EntryPage = teleconEntriesRepo.findByClinicianIdAndReviewersIsEmpty(id_, pageable);
+                    entryPage = teleconEntriesRepo.findByClinicianIdAndReviewersIsEmpty(clinicianObjectId, pageable);
                     break;
                 case "Reviewed":
-                    EntryPage = teleconEntriesRepo.findByClinicianIdAndReviewsIsNotNull(id_, pageable);
+                    entryPage = teleconEntriesRepo.findByClinicianIdAndReviewsIsNotNull(clinicianObjectId, pageable);
                     break;
                 case "Unreviewed":
-                    EntryPage = teleconEntriesRepo.findByClinicianIdAndReviewsIsEmpty(id_, pageable);
+                    entryPage = teleconEntriesRepo.findByClinicianIdAndReviewsIsEmpty(clinicianObjectId, pageable);
                     break;
                 case "Newly Reviewed":
-                    EntryPage = teleconEntriesRepo.findByClinicianIdAndUpdatedTrue(id_, pageable);
+                    entryPage = teleconEntriesRepo.findByClinicianIdAndUpdatedTrue(clinicianObjectId, pageable);
                     break;
                 default:
-                    EntryPage = teleconEntriesRepo.findByClinicianId(id_, pageable);
+                    entryPage = teleconEntriesRepo.findByClinicianId(clinicianObjectId, pageable);
                     break;
             }
-            entryPageList = EntryPage.getContent();
+            entryPageList = entryPage.getContent();
             List<TeleconEntryDto> response = new ArrayList<>();
 
             //loop through the list to access getters and setters
             for(TeleconEntry entry: entryPageList){
                 Patient patient = (patientRepo.findById(entry.getPatient()).orElse(null));
                 PatientDetailsDto patientDetails =new PatientDetailsDto(patient);
-                List<ObjectId> ReviewerList = entry.getReviewers() ;
+                List<ObjectId> reviewerList = entry.getReviewers() ;
                 List<ReviewerDetailsDto> reviewerObjectList = new ArrayList<>();
-                for(ObjectId Reviewer : ReviewerList){
+                for(ObjectId Reviewer : reviewerList){
                     User user = userRepo.findById(Reviewer).orElse(null);
                     ReviewerDetailsDto reviewerDetails = new ReviewerDetailsDto(user);
                     reviewerObjectList.add(reviewerDetails);
@@ -163,21 +167,21 @@ public class TeleconEntriesService {
                                               Integer page, String filter, Integer pageSize){
         Pageable pageable = PageRequest.of(page-1,pageSize,Sort.by(Sort.Direction.DESC,getSortField(filter)));
         ObjectId patientId = new ObjectId(patient);
-        ObjectId clinician_Id = new ObjectId(clinicianId);
-        Page<TeleconEntry> EntryPage ;
-        List<TeleconEntry> EntryPageList;
+        ObjectId clinicianObjectId = new ObjectId(clinicianId);
+        Page<TeleconEntry> entryPage ;
+        List<TeleconEntry> entryPageList;
         List<TeleconEntryDto> response = new ArrayList<>();
         try{
-            EntryPage = teleconEntriesRepo.findByPatientAndClinicianId(patientId,clinician_Id,pageable);
-            EntryPageList = EntryPage.getContent();
-            for(TeleconEntry entry:EntryPageList){
+            entryPage = teleconEntriesRepo.findByPatientAndClinicianId(patientId,clinicianObjectId,pageable);
+            entryPageList = entryPage.getContent();
+            for(TeleconEntry entry:entryPageList){
                 Patient patientProfile = patientRepo.findById(entry.getPatient()).orElse(null);
                 PatientDetailsDto patientDetails = new PatientDetailsDto(patientProfile);
                 List<ObjectId> reviewerIdList = entry.getReviewers();
                 List<ReviewerDetailsDto> reviewerList = new ArrayList<>();
                 for (ObjectId reviewer: reviewerIdList){
-                    User Reviewer = userRepo.findById(reviewer).orElse(null);
-                    reviewerList.add(new ReviewerDetailsDto(Reviewer));
+                    User reviewerObject = userRepo.findById(reviewer).orElse(null);
+                    reviewerList.add(new ReviewerDetailsDto(reviewerObject));
                 }
                 response.add(new TeleconEntryDto(entry,patientDetails,reviewerList));
             }
@@ -191,12 +195,12 @@ public class TeleconEntriesService {
 
         Pageable pageable = PageRequest.of(page-1, pageSize, Sort.by( Sort.Direction.DESC, getSortField(filter)));
         ObjectId patientId = new ObjectId(patient);
-        ObjectId clinician_id = new ObjectId(clinicianId);
+        ObjectId clinicianObjectId = new ObjectId(clinicianId);
         List<TeleconEntry> entryList = new ArrayList<>();
         List<TeleconEntryDto> results = new ArrayList<>();
 
         try {
-            Optional<TeleconEntry> entry = teleconEntriesRepo.findByPatientAndReviewersIn(patientId, clinician_id); //List Can be used as well
+            Optional<TeleconEntry> entry = teleconEntriesRepo.findByPatientAndReviewersIn(patientId, clinicianObjectId); //List Can be used as well
             if (entry.isEmpty()) {
                 return ResponseEntity.status(404).body(new ErrorMessage("Entries Not Found"));
             }
@@ -220,10 +224,10 @@ public class TeleconEntriesService {
 
     }
     public ResponseEntity<?> getEntryDetails(String clinicianId,String id){
-        ObjectId clinicinId_ = new ObjectId(clinicianId);
+        ObjectId clinicinObjectId = new ObjectId(clinicianId);
         ObjectId teleconId = new ObjectId(id);
         try{
-            Optional<TeleconEntry> entry = teleconEntriesRepo.findByIdAndClinicianId(teleconId,clinicinId_);
+            Optional<TeleconEntry> entry = teleconEntriesRepo.findByIdAndClinicianId(teleconId,clinicinObjectId);
             if (entry.isPresent()) {
                 TeleconEntry entryDetails = entry.get();
                 Patient patient = patientRepo.findById(entryDetails.getPatient()).orElse(null);
@@ -248,9 +252,9 @@ public class TeleconEntriesService {
         }
     }
     public ResponseEntity<?> countNewReviews(String clinicianId){
-        ObjectId clinicianId_ = new ObjectId(clinicianId);
+        ObjectId clinicianObjectId = new ObjectId(clinicianId);
         try{
-            long count = teleconEntriesRepo.countByClinicianIdAndUpdatedTrue(clinicianId_);
+            long count = teleconEntriesRepo.countByClinicianIdAndUpdatedTrue(clinicianObjectId);
             Map<String,Long> response = new HashMap<>();
             response.put("count",count);
             return ResponseEntity.status(200).body(response);
@@ -262,23 +266,23 @@ public class TeleconEntriesService {
 
     public ResponseEntity<?> addReviewer(String clinicianId, String id, String reviewerId){
 
-        ObjectId clinicianId_ = new ObjectId(clinicianId);
+        ObjectId clinicianObjectId = new ObjectId(clinicianId);
         ObjectId teleconId = new ObjectId(id);
-        ObjectId reviewerId_ = new ObjectId(reviewerId);
+        ObjectId reviewerObjectId = new ObjectId(reviewerId);
 
         Optional<TeleconEntry> entry;
         TeleconEntry entryElement;
         List<ObjectId> reviewers;
         try {
-            entry = teleconEntriesRepo.findByIdAndClinicianId(teleconId, clinicianId_);
+            entry = teleconEntriesRepo.findByIdAndClinicianId(teleconId, clinicianObjectId);
             if(entry.isEmpty()){
                 return ResponseEntity.status(404).body(new ErrorMessage("Entry not found"));
             }
             entryElement = entry.get();
             reviewers = entryElement.getReviewers();
-            if (entryElement.getReviewers().contains(reviewerId_)){
+            if (entryElement.getReviewers().contains(reviewerObjectId)){
 
-                TeleconEntry teleconEntry = teleconEntriesRepo.findByIdAndClinicianId(teleconId,clinicianId_).orElse(null);
+                TeleconEntry teleconEntry = teleconEntriesRepo.findByIdAndClinicianId(teleconId,clinicianObjectId).orElse(null);
                 if (teleconEntry == null) {
                     throw new NullPointerException("TeleconEntry is null");
                 }
@@ -300,9 +304,9 @@ public class TeleconEntriesService {
                 PopulatedResultDto updatedEntry = new PopulatedResultDto(teleconEntry, patientDetails, reviewerDetails, imageList, reportList);
                 return ResponseEntity.status(200).body(updatedEntry);
             }
-            createAssignment(teleconId, clinicianId_);
+            createAssignment(teleconId, clinicianObjectId);
 
-            reviewers.add(reviewerId_);
+            reviewers.add(reviewerObjectId);
             entryElement.setReviewers(reviewers);
             teleconEntriesRepo.save(entryElement);
             return ResponseEntity.status(200).body(new MessageDto("Reviewer is added"));
@@ -316,19 +320,19 @@ public class TeleconEntriesService {
 
     public ResponseEntity<?> removeReviewer(String clinicianId,String id, String reviewerId){
 
-        ObjectId clinicianId_ = new ObjectId(clinicianId);
+        ObjectId clinicianObjectId = new ObjectId(clinicianId);
         ObjectId teleconId = new ObjectId(id);
-        ObjectId reviewerId_ = new ObjectId(reviewerId);
+        ObjectId reviewerObjectId = new ObjectId(reviewerId);
 
         Optional<TeleconEntry> entry;
         TeleconEntry entryElement;
         try{
-            entry = teleconEntriesRepo.findByIdAndClinicianId(teleconId,clinicianId_);
+            entry = teleconEntriesRepo.findByIdAndClinicianId(teleconId,clinicianObjectId);
             if (entry.isEmpty()){
                 return ResponseEntity.status(404).body(new MessageDto("Entry is not found"));
             }
             entryElement = entry.get();
-            assignmentRepo.deleteByTeleconEntryAndReviewerId(teleconId,reviewerId_);
+            assignmentRepo.deleteByTeleconEntryAndReviewerId(teleconId,reviewerObjectId);
             pullReviewFromEntry(teleconId,entryElement.getReviewers());
             return ResponseEntity.status(200).body(new MessageDto("Reviewer is removed"));
         }catch(Exception err){
@@ -336,24 +340,24 @@ public class TeleconEntriesService {
         }
     }
     public ResponseEntity<?> deleteEntry(String clinicianId,String id){
-        ObjectId clinicianId_ = new ObjectId(clinicianId);
-        ObjectId teleconId_ = new ObjectId(id);
+        ObjectId clinicianObjectId = new ObjectId(clinicianId);
+        ObjectId teleconObjectId = new ObjectId(id);
         try{
-            Optional<TeleconEntry> entry = teleconEntriesRepo.findByIdAndClinicianId(teleconId_,clinicianId_);
+            Optional<TeleconEntry> entry = teleconEntriesRepo.findByIdAndClinicianId(teleconObjectId,clinicianObjectId);
 
             if (entry.isPresent()){
-                TeleconEntry entry_ = entry.get();
+                TeleconEntry entryObject = entry.get();
                 final LocalDateTime now = LocalDateTime.now();
-                final LocalDateTime createdAt = entry_.getCreatedAt();
+                final LocalDateTime createdAt = entryObject.getCreatedAt();
                 final Duration duration = Duration.between(now,createdAt) ;
                 final float hours = duration.toMinutes()/60f;
                 if(hours >= 24){
                     return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
                 }
-                assignmentRepo.deleteByTeleconEntry(teleconId_);
-                imageRepo.deleteByTeleconEntryId(teleconId_);
-                reportRepo.deleteByTeleconId(teleconId_);
-                teleconEntriesRepo.deleteById(teleconId_);
+                assignmentRepo.deleteByTeleconEntry(teleconObjectId);
+                imageRepo.deleteByTeleconEntryId(teleconObjectId);
+                reportRepo.deleteByTeleconId(teleconObjectId);
+                teleconEntriesRepo.deleteById(teleconObjectId);
                 return ResponseEntity.status(200).body(new MessageDto("Entry is deleted successfully"));
             }
             else {
@@ -409,9 +413,9 @@ public class TeleconEntriesService {
 
     public ResponseEntity<?> getSharedEntry(String id, String clinicianId){
         ObjectId teleconId = new ObjectId(id);
-        ObjectId clinicianId_ = new ObjectId(clinicianId);
+        ObjectId clinicianObjectId = new ObjectId(clinicianId);
         try{
-            TeleconEntry entry = teleconEntriesRepo.findByIdAndReviewersContaining(teleconId,clinicianId_).orElse(null);
+            TeleconEntry entry = teleconEntriesRepo.findByIdAndReviewersContaining(teleconId, clinicianObjectId).orElse(null);
             if (entry == null){
                 return ResponseEntity.status(404).body(new MessageDto(ENTRY_NOT_FOUND));
             }
@@ -495,26 +499,26 @@ public class TeleconEntriesService {
     }
 
     public ResponseEntity<?> changeReviewer(String id, String clinicianId,String reviewerId){
-        ObjectId assignment_Id = new ObjectId(id);
-        ObjectId clinician_Id = new ObjectId(clinicianId);
-        ObjectId reviewerId_ = new ObjectId(reviewerId);
-        Assignment assignment = assignmentRepo.findByIdAndReviewerId(assignment_Id, clinician_Id).orElse(null);
+        ObjectId assignmentId = new ObjectId(id);
+        ObjectId clinicianObjectId = new ObjectId(clinicianId);
+        ObjectId reviewerObjectId = new ObjectId(reviewerId);
+        Assignment assignment = assignmentRepo.findByIdAndReviewerId(assignmentId, clinicianObjectId).orElse(null);
         if(assignment != null){
             try {
-                Assignment exists = assignmentRepo.findByReviewerIdAndTeleconEntry(reviewerId_,assignment.getTeleconEntry()).orElse(null);
+                Assignment exists = assignmentRepo.findByReviewerIdAndTeleconEntry(reviewerObjectId,assignment.getTeleconEntry()).orElse(null);
                 if (exists == null){
                     Assignment newAssignment = new Assignment();
                     newAssignment.setTeleconEntry(assignment.getTeleconEntry());
-                    newAssignment.setReviewerId(reviewerId_);
+                    newAssignment.setReviewerId(reviewerObjectId);
                     newAssignment.setReviewed(false);
                     newAssignment.setChecked(false);
 
                     assignmentRepo.save(newAssignment);
                     //updating teleconEntry
-                    pushReviewerToEntry(assignment.getTeleconEntry(), reviewerId_);
+                    pushReviewerToEntry(assignment.getTeleconEntry(), reviewerObjectId);
                 }
-                assignmentRepo.deleteByIdAndReviewerId(assignment_Id,clinician_Id);
-                pullReviewerFromEntry(assignment.getTeleconEntry(), clinician_Id);
+                assignmentRepo.deleteByIdAndReviewerId(assignmentId,clinicianObjectId);
+                pullReviewerFromEntry(assignment.getTeleconEntry(), clinicianObjectId);
 
                 return ResponseEntity.status(200).body(new MessageDto("Reviewer assigned successfully"));
             }catch(Exception e){
@@ -527,21 +531,21 @@ public class TeleconEntriesService {
 
     public ResponseEntity<?> addReview(String clinicianId, String teleconId,
                                        ReviewRequestDto reviewDetails){
-        ObjectId clinicianId_ = new ObjectId(clinicianId);
-        ObjectId teleconId_ = new ObjectId(teleconId);
+        ObjectId clinicianObjectId = new ObjectId(clinicianId);
+        ObjectId teleconObjectId = new ObjectId(teleconId);
 
         try{
-            TeleconEntry teleconEntry = teleconEntriesRepo.findById(teleconId_).orElse(null);
-            if (teleconEntry != null && teleconEntry.getReviewers().contains(clinicianId_)){
+            TeleconEntry teleconEntry = teleconEntriesRepo.findById(teleconObjectId).orElse(null);
+            if (teleconEntry != null && teleconEntry.getReviewers().contains(clinicianObjectId)){
                 Review newReview = new Review();
-                newReview.setTeleconEntryId(teleconId_);
-                newReview.setReviewerId(clinicianId_);
+                newReview.setTeleconEntryId(teleconObjectId);
+                newReview.setReviewerId(clinicianObjectId);
                 newReview.setProvisionalDiagnosis(reviewDetails.getProvisionalDiagnosis());
                 newReview.setManagementSuggestions(reviewDetails.getManagementSuggestions());
                 newReview.setReferralSuggestions(reviewDetails.getReferralSuggestions());
                 newReview.setOtherComments(reviewDetails.getOtherComments());
 
-                Assignment assignment = assignmentRepo.findByReviewerIdAndTeleconEntry(clinicianId_, teleconId_).orElse(null);
+                Assignment assignment = assignmentRepo.findByReviewerIdAndTeleconEntry(clinicianObjectId, teleconObjectId).orElse(null);
                 if (assignment == null) {
                     return ResponseEntity.status(404).body(new MessageDto("Assignment not found"));
                 }
@@ -567,8 +571,8 @@ public class TeleconEntriesService {
     }
 
     public ResponseEntity<?> markAsRead(String id ){
-        ObjectId assignment_id = new ObjectId(id);
-        Assignment assignment = assignmentRepo.findById(assignment_id).orElse(null);
+        ObjectId assignmentObjectId = new ObjectId(id);
+        Assignment assignment = assignmentRepo.findById(assignmentObjectId).orElse(null);
         try{
             if (assignment == null) {
                 return ResponseEntity.status(404).body(new ErrorMessage("Assignment not found"));
@@ -582,8 +586,8 @@ public class TeleconEntriesService {
     }
 
     public ResponseEntity<?> markAsOpen(String id ){
-        ObjectId telecon_id = new ObjectId(id);
-        TeleconEntry teleconEntry = teleconEntriesRepo.findById(telecon_id).orElse(null);
+        ObjectId teleconObjectId = new ObjectId(id);
+        TeleconEntry teleconEntry = teleconEntriesRepo.findById(teleconObjectId).orElse(null);
         try {
             if (teleconEntry == null) {
                 return ResponseEntity.status(404).body(new MessageDto("TeleconEntry not found"));
@@ -616,10 +620,10 @@ public class TeleconEntriesService {
         mongoTemplate.updateFirst(query,update,TeleconEntry.class);
     }
 
-    private void createAssignment(ObjectId teleconId, ObjectId clinicianId_) {
+    private void createAssignment(ObjectId teleconId, ObjectId clinicianObjectId) {
         Assignment newAssignement = new Assignment();
         newAssignement.setTeleconEntry(teleconId);
-        newAssignement.setReviewerId(clinicianId_);
+        newAssignement.setReviewerId(clinicianObjectId);
         newAssignement.setChecked(Boolean.FALSE);
         newAssignement.setReviewed(Boolean.FALSE);
         assignmentRepo.save(newAssignement);

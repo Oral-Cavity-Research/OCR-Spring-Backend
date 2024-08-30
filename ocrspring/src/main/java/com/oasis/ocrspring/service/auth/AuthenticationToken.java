@@ -21,14 +21,21 @@ import java.util.stream.Collectors;
 @Service
 public class AuthenticationToken {
 
+    private final TokenService tokenService;
+    private final UserService userservice;
+    private final RoleService roleService;
+    private final RefreshtokenRepsitory refreshTokenRepository;
+
     @Autowired
-    private TokenService tokenService;
-    @Autowired
-    private UserService userservice;
-    @Autowired
-    private RoleService roleService;
-    @Autowired
-    private RefreshtokenRepsitory refreshTokenRepository;
+    public AuthenticationToken(TokenService tokenService,
+                               UserService userservice,
+                               RoleService roleService,
+                               RefreshtokenRepsitory refreshTokenRepository) {
+        this.tokenService = tokenService;
+        this.userservice = userservice;
+        this.roleService = roleService;
+        this.refreshTokenRepository = refreshTokenRepository;
+    }
 
     public void authenticateRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String authHeader = request.getHeader("Authorization");
