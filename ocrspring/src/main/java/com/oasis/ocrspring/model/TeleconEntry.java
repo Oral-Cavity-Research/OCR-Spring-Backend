@@ -56,6 +56,7 @@ public class TeleconEntry
 
     private String status;
 
+    @Field("current_habits")
     private List<HabitDto> currentHabits;
 
     private boolean updated;
@@ -68,7 +69,7 @@ public class TeleconEntry
 
     private List<ObjectId> reports;
 
-    @Field("current_habits")
+    @CreatedDate
     private LocalDateTime createdAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 
     @LastModifiedDate

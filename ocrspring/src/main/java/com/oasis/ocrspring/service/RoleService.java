@@ -13,9 +13,12 @@ import java.util.Optional;
 
 @Service
 public class RoleService {
-    @Autowired
-    private RoleRepository roleRepo;
+    private final RoleRepository roleRepo;
 
+    @Autowired
+    public RoleService(RoleRepository roleRepo) {
+        this.roleRepo = roleRepo;
+    }
 
     public List<Role> allRoleDetails() {
         return roleRepo.findAll();

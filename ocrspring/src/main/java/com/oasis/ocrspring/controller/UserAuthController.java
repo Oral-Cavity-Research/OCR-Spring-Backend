@@ -6,9 +6,6 @@ import com.oasis.ocrspring.dto.TokenRequest;
 import com.oasis.ocrspring.model.RefreshToken;
 import com.oasis.ocrspring.model.Role;
 import com.oasis.ocrspring.model.User;
-import com.oasis.ocrspring.repository.RequestRepository;
-import com.oasis.ocrspring.repository.UserRepository;
-import com.oasis.ocrspring.service.RefreshtokenService;
 import com.oasis.ocrspring.service.ResponseMessages.ErrorResponse;
 import com.oasis.ocrspring.service.RoleService;
 import com.oasis.ocrspring.service.UserService;
@@ -35,20 +32,24 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/auth")
 public class UserAuthController {
+    public static final String PERMISSIONS = "permissions";
+    public static final String ACCESS_TOKEN = "accessToken";
+    public static final String MESSAGE = "message";
+    private final UserService userService;
+    private final TokenService tokenService;
+    private final RoleService roleService;
+    private final AuthenticationToken authenticationToken;
+
     @Autowired
-    private RequestRepository requestRepo;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private TokenService tokenService;
-    @Autowired
-    private RoleService roleService;
-    @Autowired
-    private RefreshtokenService refreshTokenService;
-    @Autowired
-    private AuthenticationToken authenticationToken;
-    @Autowired
-    private UserRepository userRepo;
+    public UserAuthController(UserService userService,
+                              TokenService tokenService,
+                              RoleService roleService,
+                              AuthenticationToken authenticationToken) {
+        this.userService = userService;
+        this.tokenService = tokenService;
+        this.roleService = roleService;
+        this.authenticationToken = authenticationToken;
+    }
 
     @Value("${jwt.refresh-time}")
     private String refreshTime;
@@ -78,7 +79,7 @@ public class UserAuthController {
         Optional<User> user = userService.getUserByEmail(email);
         if (!user.isPresent()) {
             Map<String, String> messageBody = new HashMap<>();
-            messageBody.put("message", "User is Not Registered");
+            messageBody.put(MESSAGE, "User is Not Registered");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(messageBody);
         }
         String accessToken = tokenService.generateAccessToken(user.get());
@@ -92,14 +93,14 @@ public class UserAuthController {
 
         details.put("user", user.get());
 
-        details.put("message", "Successfully logged in");
+        details.put(MESSAGE, "Successfully logged in");
 
-        details.put("permissions", rolePermission.get().getPermissions());
+        details.put(PERMISSIONS, rolePermission.get().getPermissions());
 
 
         responseBody.put("others", details);
         responseBody.put("ref", user.get());
-        responseBody.put("accessToken", Map.of("token", accessToken, "expiresAt", refreshTime));
+        responseBody.put(ACCESS_TOKEN, Map.of("token", accessToken, "expiresAt", refreshTime));
         return ResponseEntity.ok(responseBody);
     }
 
@@ -114,23 +115,23 @@ public class UserAuthController {
         String ipaddress = httpServletRequest.getRemoteAddr();
         Map<String, Object> tokenBody = tokenService.refreshToken(token, ipaddress);
 
-        String accessToken = (String) tokenBody.get("accessToken");
+        String accessToken = (String) tokenBody.get(ACCESS_TOKEN);
 
         String refreshToken = (String) tokenBody.get("refreshToken");
 
         User ref = (User) tokenBody.get("ref");
 
-        List<String> permissions = (List<String>) tokenBody.get("permissions");
+        List<String> permissions = (List<String>) tokenBody.get(PERMISSIONS);
 
 
         tokenService.setTokenCookie(response, refreshToken);
 
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("success", true);
-        responseBody.put("message", "Token Refreshed Successfully");
+        responseBody.put(MESSAGE, "Token Refreshed Successfully");
         responseBody.put("ref", ref);
-        responseBody.put("permissions", permissions);
-        responseBody.put("accessToken", Map.of("token", accessToken, "expiry", refreshTime));
+        responseBody.put(PERMISSIONS, permissions);
+        responseBody.put(ACCESS_TOKEN, Map.of("token", accessToken, "expiry", refreshTime));
         return ResponseEntity.ok(responseBody);
 
     }

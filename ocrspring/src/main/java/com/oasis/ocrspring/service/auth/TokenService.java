@@ -27,18 +27,25 @@ import static com.oasis.ocrspring.service.auth.TokenGenerator.generateRandomToke
 @Service
 public class TokenService {
 
+    public static final String REFRESH_TOKEN = "refreshToken";
     @Value("${jwt.access-secret}")
     private String accessSecret;
 
     @Value("${jwt.refresh-time}")
     private String refreshTime;
 
+    private final RefreshtokenRepsitory refreshTokenRepository;
+    private final UserService userservice;
+    private final RoleService roleService;
+
     @Autowired
-    RefreshtokenRepsitory refreshTokenRepository;
-    @Autowired
-    private UserService userservice;
-    @Autowired
-    private RoleService roleService;
+    public TokenService(RefreshtokenRepsitory refreshTokenRepository,
+                        UserService userservice,
+                        RoleService roleService) {
+        this.refreshTokenRepository = refreshTokenRepository;
+        this.userservice = userservice;
+        this.roleService = roleService;
+    }
 
 
     public boolean checkPermissions(HttpServletRequest request, List<String> requiredPermissions) {
@@ -110,7 +117,7 @@ public class TokenService {
     }
 
     public void setTokenCookie(HttpServletResponse response, String token) {
-        Cookie cookie = new Cookie("refreshToken", token);
+        Cookie cookie = new Cookie(REFRESH_TOKEN, token);
         cookie.setHttpOnly(true);
 
         // Set the expiration time as 24 hours from the current time
@@ -126,7 +133,7 @@ public class TokenService {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("refreshToken".equals(cookie.getName())) {
+                if (REFRESH_TOKEN.equals(cookie.getName())) {
                     return cookie.getValue();
                 }
             }
@@ -161,7 +168,7 @@ public class TokenService {
 
         Map<String, Object> tokens = new HashMap<>();
         tokens.put("accessToken", accessToken);
-        tokens.put("refreshToken", newRefreshToken.getToken());
+        tokens.put(REFRESH_TOKEN, newRefreshToken.getToken());
         tokens.put("ref", user);
         tokens.put("permissions", rolePermissions.getPermissions());
 

@@ -1,16 +1,10 @@
 package com.oasis.ocrspring.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oasis.ocrspring.dto.*;
-import com.oasis.ocrspring.repository.ImageRepository;
-import com.oasis.ocrspring.repository.PatientRepository;
-import com.oasis.ocrspring.repository.ReportRepository;
-import com.oasis.ocrspring.repository.TeleconEntriesRepository;
 import com.oasis.ocrspring.service.ImageService;
 import com.oasis.ocrspring.service.PatientService;
 import com.oasis.ocrspring.service.ReportService;
 import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
-import com.oasis.ocrspring.service.TeleconEntriesService;
 import com.oasis.ocrspring.service.auth.AuthenticationToken;
 import com.oasis.ocrspring.service.auth.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,29 +22,25 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/user/upload")
 public class UploadController {
-    @Autowired
-    private PatientRepository patientrepo;
-    @Autowired
-    private ImageRepository imageRepo;
-    @Autowired
-    private ReportRepository reportRepo;
-    @Autowired
-    private TeleconEntriesRepository teleconEntriesRepo;
-    @Autowired
-    private TeleconEntriesService teleconServices;
-    @Autowired
-    private ImageService imageService;
-    @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
-    private ReportService reportServ;
-    @Autowired
-    private PatientService patientService;
-    @Autowired
-    private AuthenticationToken authenticationToken;
-    @Autowired
-    private TokenService tokenService;
+    private final ImageService imageService;
+    private final ReportService reportServ;
+    private final PatientService patientService;
+    private final AuthenticationToken authenticationToken;
+    private final TokenService tokenService;
     static final String UNAUTHORIZED_ACCESS = "Unauthorized Access";
+
+    @Autowired
+    public UploadController(ImageService imageService,
+                            ReportService reportServ,
+                            PatientService patientService,
+                            AuthenticationToken authenticationToken,
+                            TokenService tokenService) {
+        this.imageService = imageService;
+        this.reportServ = reportServ;
+        this.patientService = patientService;
+        this.authenticationToken = authenticationToken;
+        this.tokenService = tokenService;
+    }
 
     @PostMapping(value = "/images/{id}")
     public ResponseEntity<UploadImageResponse> uploadImages(

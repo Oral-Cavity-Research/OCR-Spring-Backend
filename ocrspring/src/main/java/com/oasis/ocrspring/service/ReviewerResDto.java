@@ -1,6 +1,5 @@
 package com.oasis.ocrspring.service;
 
-import com.oasis.ocrspring.model.Review;
 import com.oasis.ocrspring.model.User;
 import lombok.Getter;
 import lombok.Setter;

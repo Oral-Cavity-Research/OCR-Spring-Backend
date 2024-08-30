@@ -1,10 +1,8 @@
 package com.oasis.ocrspring.service.email;
 
-import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
@@ -19,8 +17,12 @@ public class EmailService {
     private String sendersEmail;
     @Value("${senders.pass}")
     private String sendersPass;
+    private final TemplateEngine templateEngine;
+
     @Autowired
-    private TemplateEngine templateEngine;
+    public EmailService(TemplateEngine templateEngine) {
+        this.templateEngine = templateEngine;
+    }
 
     public void sendEmail(String receiversEmail, String type, String message, String name) throws MessagingException {
         Properties props = new Properties();

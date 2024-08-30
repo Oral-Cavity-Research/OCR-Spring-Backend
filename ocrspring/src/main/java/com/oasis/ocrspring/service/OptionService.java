@@ -9,8 +9,12 @@ import java.util.List;
 
 @Service
 public class OptionService {
+    private final OptionRepository optionRepo;
+
     @Autowired
-    private OptionRepository optionRepo;
+    public OptionService(OptionRepository optionRepo) {
+        this.optionRepo = optionRepo;
+    }
 
     public List<Option> allOptionDetails() {
         return optionRepo.findAll();
