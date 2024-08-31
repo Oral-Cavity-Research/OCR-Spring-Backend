@@ -1,6 +1,8 @@
 package com.oasis.ocrspring.service;
 
+import com.oasis.ocrspring.dto.ImageNotFoundException;
 import com.oasis.ocrspring.dto.ImageRequestDto;
+import com.oasis.ocrspring.dto.UpdateImageRequestDto;
 import com.oasis.ocrspring.dto.UploadImageResponse;
 import com.oasis.ocrspring.model.Image;
 import com.oasis.ocrspring.model.TeleconEntry;
@@ -26,6 +28,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class ImageService {
@@ -145,4 +148,20 @@ public class ImageService {
         return imageRepo.count();
     }
 
+
+
+    // id is entry _id
+    public void updateImage(UpdateImageRequestDto request) {
+        Optional<Image> optionalImage = imageRepo.findById(request.get_id());
+        if (optionalImage.isPresent()) {
+            Image image = optionalImage.get();
+            image.setLocation(request.getLocation());
+            image.setClinicalDiagnosis(request.getClinical_diagnosis());
+            image.setLesionsAppear(request.getLesions_appear());
+            image.setAnnotation(request.getAnnotation());
+            imageRepo.save(image);
+        } else {
+            throw new ImageNotFoundException("Image not found");
+        }
+    }
 }
