@@ -29,13 +29,13 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class PatientService {
     private final PatientRepository patientRepo;
     private final TeleconEntriesRepository teleconEntriesRepo;
     private final String consentFormUploadDir;
+
 
     @Autowired
     public PatientService(PatientRepository patientRepo,
@@ -46,21 +46,6 @@ public class PatientService {
         this.consentFormUploadDir = consentFormUploadDir;
     }
 
-    public List<Patient> allPatientDetails() {
-        return patientRepo.findAll();
-    }
-
-    public Patient createPatient(Patient patient) {
-        return patientRepo.save(patient);
-    }
-
-    public Patient getPatientById(String id) {
-        return patientRepo.findById(id).orElse(null);
-    }
-
-    public boolean isExist(String id) {
-        return patientRepo.existsById(id);
-    }
 
 
 
@@ -209,11 +194,10 @@ public  Patient findPatient(String id,String clinicianId){
         }
     }
 
-    @Autowired
-    private PatientRepository patientRepository;
+
 
     public Map<String, Double> calculateRiskHabitPercentages() {
-        List<Patient> patients = patientRepository.findAll();
+        List<Patient> patients = patientRepo.findAll();
         long totalPatients = patients.size();
         Map<String, Integer> habitCounts = new HashMap<>();
 
