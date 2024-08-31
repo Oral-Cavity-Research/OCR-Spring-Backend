@@ -136,4 +136,8 @@ public class UserService
             return false;
         }
     }
+
+    public long countUsers() {
+        return userRepo.count();
+    }
 }

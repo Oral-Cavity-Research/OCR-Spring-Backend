@@ -1,6 +1,7 @@
 package com.oasis.ocrspring.service;
 
 import com.oasis.ocrspring.dto.*;
+import com.oasis.ocrspring.dto.subdto.Risk_factors;
 import com.oasis.ocrspring.model.Patient;
 import com.oasis.ocrspring.model.TeleconEntry;
 import com.oasis.ocrspring.repository.PatientRepository;
@@ -27,16 +28,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PatientService {
     private final PatientRepository patientRepo;
     private final TeleconEntriesRepository teleconEntriesRepo;
     private final String consentFormUploadDir;
+
 
     @Autowired
     public PatientService(PatientRepository patientRepo,
@@ -47,21 +46,6 @@ public class PatientService {
         this.consentFormUploadDir = consentFormUploadDir;
     }
 
-    public List<Patient> allPatientDetails() {
-        return patientRepo.findAll();
-    }
-
-    public Patient createPatient(Patient patient) {
-        return patientRepo.save(patient);
-    }
-
-    public Patient getPatientById(String id) {
-        return patientRepo.findById(id).orElse(null);
-    }
-
-    public boolean isExist(String id) {
-        return patientRepo.existsById(id);
-    }
 
 
 
@@ -208,6 +192,35 @@ public  Patient findPatient(String id,String clinicianId){
         } else {
             return null;
         }
+    }
+
+
+
+    public Map<String, Double> calculateRiskHabitPercentages() {
+        List<Patient> patients = patientRepo.findAll();
+        long totalPatients = patients.size();
+        Map<String, Integer> habitCounts = new HashMap<>();
+
+        patients.forEach(patient -> {
+            List<Risk_factors> riskFactors = patient.getRiskFactors();
+            if (riskFactors != null)  // Add this null check
+                riskFactors.forEach(riskFactor ->
+                    habitCounts.put(riskFactor.getHabit(),
+                            habitCounts.getOrDefault(riskFactor.getHabit(), 0) + 1
+                    )
+                );
+
+        });
+
+        Map<String, Double> percentages = new HashMap<>();
+        habitCounts.forEach((habit, count) ->
+            percentages.put(habit, (count * 100.0) / totalPatients));
+
+        return percentages;
+    }
+
+    public long countPatients() {
+        return patientRepo.count();
     }
 }
 
