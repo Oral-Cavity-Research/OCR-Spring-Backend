@@ -1,15 +1,14 @@
 package com.oasis.ocrspring.dto.subdto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 @Data
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class AnnotationDto {
     private Integer id;
     private String name ;
