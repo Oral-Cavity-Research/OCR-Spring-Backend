@@ -1,6 +1,7 @@
 package com.oasis.ocrspring.service.draftServices;
 
 import com.oasis.ocrspring.dto.*;
+import com.oasis.ocrspring.model.TeleconEntry;
 import com.oasis.ocrspring.model.draftModels.DraftEntry;
 import com.oasis.ocrspring.model.Image;
 import com.oasis.ocrspring.model.Patient;
@@ -8,6 +9,7 @@ import com.oasis.ocrspring.model.Report;
 import com.oasis.ocrspring.repository.ImageRepository;
 import com.oasis.ocrspring.repository.PatientRepository;
 import com.oasis.ocrspring.repository.ReportRepository;
+import com.oasis.ocrspring.repository.TeleconEntriesRepository;
 import com.oasis.ocrspring.repository.draftRepos.DraftEntryRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,15 +31,18 @@ public class DraftEntryService {
     private final PatientRepository patientRepo;
     private final ImageRepository imageRepo;
     private final ReportRepository reportRepo;
+    private final TeleconEntriesRepository teleconEntryRepo;
 
 
     @Autowired
     public DraftEntryService(DraftEntryRepository draftEntryRepo,PatientRepository patientRepo
-                            ,ImageRepository imageRepo, ReportRepository reportRepo){
+                            ,ImageRepository imageRepo, ReportRepository reportRepo,
+                             TeleconEntriesRepository teleconEntryRepo){
         this.draftEntryRepo = draftEntryRepo;
         this.patientRepo = patientRepo;
         this.imageRepo = imageRepo;
         this.reportRepo = reportRepo;
+        this.teleconEntryRepo = teleconEntryRepo;
     }
 
     public List<DraftEntry> allDraftEntryDetails() {
@@ -104,32 +109,34 @@ public class DraftEntryService {
         }
     }
 
-//    public ResponseEntity<?> getPatientDraftEntries(int page,int pageSize,String clinicianId,String filter, String id){
-//        ObjectId clinicianObjectId = new ObjectId(clinicianId);
-//        ObjectId patientObjectId = new ObjectId(id);
-//        Pageable pageable = PageRequest.of(page-1,pageSize,Sort.by(Sort.Direction.DESC,getSortField(filter)));
-//        try{
-//            Page<TeleconEntry> teleconEntry = teleconEntryRepo.findByPatientAndClinicianId(patientObjectId,clinicianObjectId,pageable);
-//            List<TeleconEntryDto> response = new ArrayList<>();
-//
-//            if (!teleconEntry.isEmpty()) {
-//                List<TeleconEntry> teleconEntryList = teleconEntry.getContent();
-//                for (TeleconEntry newEntry : teleconEntryList) {
-//                    Patient patient = patientRepo.findById(newEntry.getPatient()).orElse(null);
-//                    if(patient != null){
-//                        PatientDetailsDto patientDetails = new PatientDetailsDto(patient);
-//                        TeleconEntryDto draftEntryResponse = new TeleconEntryDto(newEntry, patientDetails);
-//                        response.add(draftEntryResponse);
-//                    }
-//
-//                }
-//
-//            }
-//            return ResponseEntity.status(200).body(response);
-//        }catch (Exception e){
-//            return ResponseEntity.status(500).body(new ErrorResponseDto("Internal Server Error!",e.toString()));
-//        }
-//    }
+    public ResponseEntity<?> getPatientDraftEntries(int page,int pageSize,String clinicianId,String filter, String id){
+        ObjectId clinicianObjectId = new ObjectId(clinicianId);
+        ObjectId patientObjectId = new ObjectId(id);
+        Pageable pageable = PageRequest.of(page-1,pageSize,Sort.by(Sort.Direction.DESC,getSortField(filter)));
+        try{
+            Page<TeleconEntry> teleconEntry = teleconEntryRepo.findByPatientAndClinicianId(patientObjectId,clinicianObjectId,pageable);
+            List<PopulatedTeleconsultationEntry> response = new ArrayList<>();
+
+            if (!teleconEntry.isEmpty()) {
+                List<TeleconEntry> teleconEntryList = teleconEntry.getContent();
+                for (TeleconEntry newEntry : teleconEntryList) {
+                    Patient patient = patientRepo.findById(newEntry.getPatient()).orElse(null);
+                    if(patient != null){
+                        PatientDetailsDto patientDetails = new PatientDetailsDto(patient);
+                        PopulatedTeleconsultationEntry draftEntryResponse = new PopulatedTeleconsultationEntry(newEntry, patientDetails);
+                        response.add(draftEntryResponse);
+                    }
+
+                }
+                return ResponseEntity.status(200).body(response);
+            }else {
+                return ResponseEntity.status(500).body(new MessageDto("Entry Not Found"));
+            }
+
+        }catch (Exception e){
+            return ResponseEntity.status(500).body(new ErrorResponseDto(INTERNAL_SERVER_ERROR,e.toString()));
+        }
+    }
 
     public ResponseEntity<?> getEntryDetails(String clinicianId,String id){
         ObjectId clinicianObjectId = new ObjectId(clinicianId);
