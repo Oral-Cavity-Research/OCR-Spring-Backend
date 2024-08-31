@@ -1,4 +1,5 @@
 package com.oasis.ocrspring.dto;
+
 import com.oasis.ocrspring.dto.subdto.HabitDto;
 import com.oasis.ocrspring.model.Image;
 import com.oasis.ocrspring.model.Report;
@@ -11,7 +12,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Data
