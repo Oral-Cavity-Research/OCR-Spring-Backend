@@ -63,21 +63,21 @@ public class DraftEntryController {
         int pageSize = 20;
         return draftEntryService.getAllDraftEntries(page,filter,clinicianId,pageSize);
     }
-//This commented out block might be needed
-//    @GetMapping("/get/patient/:id")
-//    public ResponseEntity<?> getPtientEntries(HttpServletRequest request, HttpServletResponse response,
-//                                   @PathVariable String id,
-//                                   @RequestParam(name = "_page", required = false, defaultValue = "1") Integer page,
-//                                   @RequestParam(name = "_query", required = false, defaultValue = "Created Date") String filter)
-//    throws IOException{
-//        authenticationToken.authenticateRequest(request, response);
-//        if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
-//            return ResponseEntity.status(401).body(new ErrorMessage("Unauthorized access"));
-//        }
-//        String clinicianId = request.getAttribute("_id").toString();
-//        int pageSize = 20;
-//        return draftEntryService.getPatientDraftEntries(page,pageSize,clinicianId,filter,id);
-//    }
+
+    @GetMapping("/get/patient/{id}")
+    public ResponseEntity<?> getPtientEntries(HttpServletRequest request, HttpServletResponse response,
+                                   @PathVariable String id,
+                                   @RequestParam(name = "_page", required = false, defaultValue = "1") Integer page,
+                                   @RequestParam(name = "_query", required = false, defaultValue = "Created Date") String filter)
+    throws IOException{
+        authenticationToken.authenticateRequest(request, response);
+        if(!tokenService.checkPermissions(request, Collections.singletonList("300"))){
+            return ResponseEntity.status(401).body(new ErrorMessage(UNAUTHORIZED_ACCESS));
+        }
+        String clinicianId = request.getAttribute("_id").toString();
+        int pageSize = 20;
+        return draftEntryService.getPatientDraftEntries(page,pageSize,clinicianId,filter,id);
+    }
 
     @GetMapping("/get/{id}")
     public ResponseEntity<?> getEntryDetails(HttpServletRequest request, HttpServletResponse response,

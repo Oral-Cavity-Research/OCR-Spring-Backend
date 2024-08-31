@@ -2,18 +2,22 @@ package com.oasis.ocrspring.dto;
 
 import com.oasis.ocrspring.dto.subdto.HabitDto;
 import com.oasis.ocrspring.model.TeleconEntry;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class TeleconEntryDto {
+public class PopulatedTeleconsultationEntry {
     private String id; // MongoDB typically uses String for IDs
     private PatientDetailsDto patient;
     private String clinicianId;
@@ -23,14 +27,18 @@ public class TeleconEntryDto {
     private String findings;
     private List<HabitDto> currentHabits;
     private boolean updated;
-    private List<ReviewerDetailsDto> reviewers;
+    private List<String> reviewers;
     private List<String> reviews;
     private List<String> images;
     private List<String> reports;
+    @CreatedDate
+    @Field("createdAt")
     private LocalDateTime createdAt;
+    @LastModifiedDate
+    @Field("updatedAt")
     private LocalDateTime updatedAt;
 
-    public TeleconEntryDto(TeleconEntry teleconEntry, PatientDetailsDto patient, List<ReviewerDetailsDto> reviewer) {
+    public PopulatedTeleconsultationEntry(TeleconEntry teleconEntry, PatientDetailsDto patient){
         this.id = teleconEntry.getId().toString();
         this.patient = patient;
         this.clinicianId = teleconEntry.getClinicianId().toString();
@@ -40,10 +48,10 @@ public class TeleconEntryDto {
         this.findings = teleconEntry.getFindings();
         this.currentHabits = teleconEntry.getCurrentHabits();
         this.updated = teleconEntry.isUpdated();
-        this.reviewers = reviewer;
+        this.reviewers = teleconEntry.getReviewers().stream().map(ObjectId::toHexString).toList();
         this.reviews = teleconEntry.getReviews();
-        this.images = teleconEntry.getImages().stream().map(ObjectId::toHexString).toList();
-        this.reports = teleconEntry.getReports().stream().map(ObjectId::toHexString).toList();
+        this.images =  teleconEntry.getImages().stream().map(ObjectId::toHexString).toList();
+        this.reports =  teleconEntry.getReports().stream().map(ObjectId::toHexString).toList();
         this.createdAt = teleconEntry.getCreatedAt();
         this.updatedAt = teleconEntry.getUpdatedAt();
     }

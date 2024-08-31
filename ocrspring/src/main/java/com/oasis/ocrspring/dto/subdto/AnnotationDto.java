@@ -12,7 +12,6 @@ import java.util.List;
 public class AnnotationDto {
     private Integer id;
     private String name ;
-    private String Lesion;
     private List<Integer> annotations;
     private List<Integer> bbox;
 }
