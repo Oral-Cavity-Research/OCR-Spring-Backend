@@ -37,6 +37,10 @@ public class AuthenticationToken {
         this.refreshTokenRepository = refreshTokenRepository;
     }
 
+    /*
+      * @deprecated (use Protected annotation instead , this method will be removed in future)
+     */
+    @Deprecated(since="under next issue", forRemoval=true)
     public void authenticateRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String authHeader = request.getHeader("Authorization");
         String token = authHeader != null ? authHeader.split(" ")[1] : null;

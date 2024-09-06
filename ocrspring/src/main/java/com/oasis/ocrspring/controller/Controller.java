@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/test")
 public class Controller
 {
-
     @Protected
     @GetMapping("/hello")
     public String hello()
@@ -22,8 +21,4 @@ public class Controller
     {
         return "this end point is not protected";
     }
-
-
-
-
 }

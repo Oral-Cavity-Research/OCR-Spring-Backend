@@ -6,8 +6,7 @@ import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.repository.RefreshtokenRepsitory;
 import com.oasis.ocrspring.service.RoleService;
 import com.oasis.ocrspring.service.UserService;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -97,7 +96,12 @@ public class TokenService {
                 .compact();
     }
 
-    public Map<String, Object> decodeAccessToken(String token) {
+    public Map<String, Object> decodeAccessToken(String token) throws
+                                                               MalformedJwtException,
+                                                               ExpiredJwtException,
+                                                               UnsupportedJwtException,
+                                                                IllegalArgumentException
+    {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()

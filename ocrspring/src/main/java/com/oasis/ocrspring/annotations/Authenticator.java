@@ -16,10 +16,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 public class Authenticator implements HandlerInterceptor
@@ -30,8 +27,7 @@ public class Authenticator implements HandlerInterceptor
     private final RoleService roleService;
     private final RefreshtokenRepsitory refreshTokenRepository;
 
-    private HttpServletRequest request;
-    private HttpServletResponse response;
+    public static final String USER_NOT_FOUND = "User not found";
 
     @Autowired
     public Authenticator(TokenService tokenService, UserService userService,
@@ -47,11 +43,8 @@ public class Authenticator implements HandlerInterceptor
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
-                             Object handler) throws Exception
+                             Object handler)
     {
-        this.request = request;
-        this.response = response;
-
         // Check if the handler is a method
         if (handler instanceof HandlerMethod handlerMethod)
         {
@@ -61,22 +54,17 @@ public class Authenticator implements HandlerInterceptor
             Protected annotatedProtected = method.getAnnotation(Protected.class);
             if (annotatedProtected != null)
             {
-                String token = request.getHeader("Authorization").split(" ")[1];
+                String token = extractToken(request.getHeader("Authorization"));
                 String email = request.getHeader("email");
 
-                if (token == null || email == null)
+                if (validateTokenAndEmail(token, email) &&
+                        isAccessGrantedAndSetAttribute(request, token, email))
                 {
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    return false;  // Stop further processing
-                }
-
-                if (validateTokenAndEmail(token, email))
-                {
-                    return true;  // Continue with the request
+                    return true;
                 } else
                 {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    return false;  // Stop further processing
+                    return false;
                 }
             }
         }
@@ -84,20 +72,56 @@ public class Authenticator implements HandlerInterceptor
         return true;  // If no @Protect annotation, continue with the request
     }
 
+    private static String extractToken(String authorizationHeader)
+    {
+       if (authorizationHeader != null && authorizationHeader.startsWith("Bearer "))
+       {
+           return authorizationHeader.substring("Bearer ".length());
+       }
+       return null;
+    }
+
+
     private boolean validateTokenAndEmail(String token, String email)
     {
-        // Implement your validation logic here
-        Map<String, Object> tokenBody = tokenService.decodeAccessToken(token);
-        Optional<User> user = userService.getUserByEmail(getEmail(tokenBody));
+        return (token != null && email != null);
+    }
 
-        if (user.isEmpty() || !Objects.equals(user.get().getEmail(),
-                email) || !Objects.equals(user.get().getRole(),
-                getRole(tokenBody)))
+    private boolean isAccessGrantedAndSetAttribute(HttpServletRequest request,
+                                                   String token, String email)
+    {
+        try
         {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            Map<String, Object> tokenBody = tokenService.decodeAccessToken(token);
+            Optional<User> user = userService.getUserByEmail(getEmail(tokenBody));
+
+            if(user.isEmpty())
+            {
+                return false;
+            }
+            String userEmail = user.get().getEmail();
+            String userRole = user.get().getRole();
+            if (Objects.equals(userEmail, email) && Objects.equals(userRole,
+                    getRole(tokenBody)))
+            {
+                setRequestAttributes(request, user, tokenBody);
+            }
+        }
+        catch (Exception e)
+        {
             return false;
         }
+        return true;
+    }
 
+    private void setRequestAttributes(HttpServletRequest request, Optional<User> user,
+                                      Map<String, Object> tokenBody)
+            throws NoSuchElementException
+    {
+        if (user.isEmpty())
+        {
+            throw new NoSuchElementException(USER_NOT_FOUND);
+        }
         Optional<Role> role = roleService.getRoleByrole(user.get().getRole());
 
         request.setAttribute("email", getEmail(tokenBody));
@@ -109,8 +133,8 @@ public class Authenticator implements HandlerInterceptor
                                 getId(user)).stream()
                         .anyMatch(rt -> rt.getToken().equals(tokenToCheck)));
 
-        return true;
     }
+
 
     private List<String> getPermission(Optional<Role> role)
     {
@@ -121,10 +145,11 @@ public class Authenticator implements HandlerInterceptor
 
     private static ObjectId getId(Optional<User> user) throws NullPointerException
     {
-        if(user.isPresent()){
+        if (user.isPresent())
+        {
             return user.get().getId();
         }
-        throw new NullPointerException("User not found");
+        throw new NoSuchElementException(USER_NOT_FOUND);
     }
 
     private static String getRole(Map<String, Object> tokenBody)
