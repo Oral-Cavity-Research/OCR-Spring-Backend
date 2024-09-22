@@ -4,7 +4,10 @@ import com.oasis.ocrspring.dto.UserDto;
 import com.oasis.ocrspring.model.Hospital;
 import com.oasis.ocrspring.model.User;
 import com.oasis.ocrspring.service.HospitalService;
+import com.oasis.ocrspring.service.ResponseMessages.ErrorMessage;
 import com.oasis.ocrspring.service.UserService;
+import com.oasis.ocrspring.service.auth.AuthenticationToken;
+import com.oasis.ocrspring.service.auth.TokenService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,24 +17,31 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/api/user/self")
 public class UserController {
 
-
+    private final AuthenticationToken authenticationToken;
     private final UserService userservice;
     private final HospitalService hospitalService;
+    private final TokenService tokenService;
+    static String unAuthorized="Unauthorized Access";
 
     @Autowired
-    public UserController(UserService userservice, HospitalService hospitalService) {
+    public UserController(UserService userservice, HospitalService hospitalService,AuthenticationToken authenticationToken, TokenService tokenService) {
         this.userservice = userservice;
         this.hospitalService = hospitalService;
+        this.authenticationToken = authenticationToken;
+        this.tokenService = tokenService;
     }
 
     @Getter
@@ -71,7 +81,10 @@ public class UserController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<?> updateUserDetail(String id, @RequestBody UserDto userBody) {
+    public ResponseEntity<?> updateUserDetail(HttpServletRequest request,HttpServletResponse response, @RequestBody UserDto userBody) throws IOException {
+        authenticationToken.authenticateRequest(request, response);
+
+        String id = request.getAttribute("_id").toString();
         try {
             Optional<User> existingUser = userservice.getUserById(id);
             if (existingUser.isPresent()) {
