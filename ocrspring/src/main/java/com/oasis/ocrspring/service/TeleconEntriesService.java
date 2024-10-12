@@ -100,8 +100,8 @@ public class TeleconEntriesService {
     private static void createTeleconEntry(PatientTeleconRequest newPatient, TeleconEntry newEntry, Patient patient) {
         newEntry.setPatient(patient.getId());
         newEntry.setClinicianId(patient.getClinicianId());
-        newEntry.setStartTime(OffsetDateTime.parse(newPatient.getStartTime()).toLocalDateTime());
-        newEntry.setEndTime(OffsetDateTime.parse(newPatient.getEndTime()).toLocalDateTime());
+        newEntry.setStartTime(LocalDateTime.parse(newPatient.getStartTime()));
+        newEntry.setEndTime(LocalDateTime.parse(newPatient.getEndTime()));
         newEntry.setComplaint(newPatient.getComplaint());
         newEntry.setFindings(newPatient.getFindings());
         newEntry.setCurrentHabits(newPatient.getCurrentHabits());

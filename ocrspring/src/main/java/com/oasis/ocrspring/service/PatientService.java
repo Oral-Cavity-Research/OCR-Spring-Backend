@@ -108,6 +108,7 @@ public  Patient findPatient(String id,String clinicianId){
                 return ResponseEntity.status(401).body("Patient ID already exists");
             }
             String fileName = StringUtils.cleanPath(Objects.requireNonNull(files.getOriginalFilename()));
+//            String fileName = data.getConsentForm();
             return getResponse(data, files, fileName, uploadedURIs);
 
         } catch (Exception e) {
