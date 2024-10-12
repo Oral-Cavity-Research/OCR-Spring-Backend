@@ -70,7 +70,7 @@ public class PatientService {
             currentPatient.setSystemicDisease(updatePatientDto.getSystemic_disease());
             currentPatient.setFamilyHistory(updatePatientDto.getFamily_history());
             currentPatient.setMedicalHistory(updatePatientDto.getMedical_history());
-            currentPatient.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+            currentPatient.setUpdatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
             return patientRepo.save(currentPatient);
 
         }else{
@@ -143,8 +143,8 @@ public  Patient findPatient(String id,String clinicianId){
             newPatient.setSystemicDisease(data.getSystemicDisease());
             newPatient.setContactNo(data.getContactNo());
             newPatient.setConsentForm(data.getConsentForm());
-            newPatient.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-            newPatient.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+            newPatient.setCreatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
+            newPatient.setUpdatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
 
 
             patientRepo.save(newPatient);

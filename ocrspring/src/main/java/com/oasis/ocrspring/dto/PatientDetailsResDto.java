@@ -27,8 +27,8 @@ public class PatientDetailsResDto {
     private List<String> family_history;
     private String contact_no;
     private String consent_form;
-    private String  createdAt;
-    private String updatedAt;
+    private LocalDateTime  createdAt;
+    private LocalDateTime updatedAt;
 
 
 

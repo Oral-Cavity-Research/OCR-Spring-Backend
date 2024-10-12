@@ -61,7 +61,7 @@ public class EntryController {
         return teleconService.patientTeleconEntry(id, clinicianId, newPatient);
     }
 
-    //get all entries
+    //get all entries for the cliniciaan
     @GetMapping("/get")
     public ResponseEntity<?> getAllEntries(HttpServletRequest request, HttpServletResponse response,
                                            @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
