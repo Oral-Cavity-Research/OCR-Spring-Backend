@@ -193,6 +193,7 @@ public class PatientController {
                     patient.getId().toString(),
                     patient.getPatientId(),
                     patient.getClinicianId().toString(),
+                    patient.getDob().toString(),
                     patient.getPatientName(),
                     patient.getRiskFactors(),
                     patient.getGender(),

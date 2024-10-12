@@ -18,6 +18,7 @@ public class PatientDetailsResDto {
     private String _id;
     private String patient_id;
     private String clinician_id;
+    private String dob;
     private String patient_name;
     private List<Risk_factors> risk_factors;
     private String gender;
