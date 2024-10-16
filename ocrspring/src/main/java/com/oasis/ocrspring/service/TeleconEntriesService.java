@@ -304,7 +304,7 @@ public class TeleconEntriesService {
                 PopulatedResultDto updatedEntry = new PopulatedResultDto(teleconEntry, patientDetails, reviewerDetails, imageList, reportList);
                 return ResponseEntity.status(200).body(updatedEntry);
             }
-            createAssignment(teleconId, clinicianObjectId);
+            createAssignment(teleconId, reviewerObjectId);
 
             reviewers.add(reviewerObjectId);
             entryElement.setReviewers(reviewers);
@@ -410,6 +410,8 @@ public class TeleconEntriesService {
             return ResponseEntity.status(500).body(new ErrorResponseDto(INTERNAL_SERVER_ERROR,e.toString()));
         }
     }
+
+    
 
     public ResponseEntity<?> getSharedEntry(String id, String clinicianId){
         ObjectId teleconId = new ObjectId(id);

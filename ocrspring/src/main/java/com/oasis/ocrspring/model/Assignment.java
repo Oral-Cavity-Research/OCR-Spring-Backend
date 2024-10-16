@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Document(collection = "assignments")
 @Getter
@@ -32,11 +33,9 @@ public class Assignment {
     private Boolean reviewed;
 
     @CreatedDate
-    @Field("createdAt")
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 
     @LastModifiedDate
-    @Field("updatedAt")
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt = LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 
 }
