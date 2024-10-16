@@ -123,13 +123,13 @@ public class TeleconEntriesService {
         try {
             switch (filter) {
                 case "Assigned":
-                    entryPage = teleconEntriesRepo.findByClinicianIdAndReviewersIsNotNull(clinicianObjectId, pageable);
+                    entryPage = teleconEntriesRepo.findByClinicianIdAndReviewersNotEmpty(clinicianObjectId, pageable);
                     break;
                 case "Unassigned":
                     entryPage = teleconEntriesRepo.findByClinicianIdAndReviewersIsEmpty(clinicianObjectId, pageable);
                     break;
                 case "Reviewed":
-                    entryPage = teleconEntriesRepo.findByClinicianIdAndReviewsIsNotNull(clinicianObjectId, pageable);
+                    entryPage = teleconEntriesRepo.findByClinicianIdAndReviewsIsNotEmpty(clinicianObjectId, pageable);
                     break;
                 case "Unreviewed":
                     entryPage = teleconEntriesRepo.findByClinicianIdAndReviewsIsEmpty(clinicianObjectId, pageable);
