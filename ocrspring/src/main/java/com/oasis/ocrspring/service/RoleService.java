@@ -31,10 +31,12 @@ public class RoleService {
     public Optional<Role> getRoleByrole(String role) {
         return roleRepo.findByRole(role);
     }
+
     public Optional<Role> getRoleById(String id) {
-        return roleRepo.findById( new ObjectId(id));
+        return roleRepo.findById(new ObjectId(id));
     }
-    public boolean addRole(RoleReqDto role)  {
+
+    public boolean addRole(RoleReqDto role) {
         Optional<Role> existingRole = roleRepo.findByRoleIgnoreCase(role.getRole());
         if (existingRole.isPresent()) {
             return false;
@@ -43,6 +45,7 @@ public class RoleService {
         roleRepo.save(new Role(role.getRole(), role.getPermissions()));
         return true;
     }
+
     public void updateRole(String id, RoleDto roleDetails) {
         Role role = roleRepo.findById(new ObjectId(id)).orElseThrow(() -> new RuntimeException("Role not found"));
         role.setRole(roleDetails.getRole());
@@ -51,4 +54,3 @@ public class RoleService {
     }
 
 }
-
