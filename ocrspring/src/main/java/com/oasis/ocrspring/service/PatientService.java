@@ -143,7 +143,7 @@ public  Patient findPatient(String id,String clinicianId){
             newPatient.setFamilyHistory(data.getFamilyHistory());
             newPatient.setSystemicDisease(data.getSystemicDisease());
             newPatient.setContactNo(data.getContactNo());
-            newPatient.setConsentForm(data.getConsentForm());
+            newPatient.setConsentForm(data.getPatientId().toString()+".pdf");
             newPatient.setCreatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
             newPatient.setUpdatedAt(LocalDateTime.parse(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
 

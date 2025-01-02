@@ -34,7 +34,5 @@ public class ConsentRequestDto {
     private String systemicDisease;
     @JsonProperty("contact_no")
     private String contactNo;
-    @JsonProperty("consent_form")
-    private String consentForm;
 
 }
