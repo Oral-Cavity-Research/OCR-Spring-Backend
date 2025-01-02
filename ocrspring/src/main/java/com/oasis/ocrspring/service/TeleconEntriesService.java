@@ -333,7 +333,7 @@ public class TeleconEntriesService {
             }
             entryElement = entry.get();
             assignmentRepo.deleteByTeleconEntryAndReviewerId(teleconId,reviewerObjectId);
-            pullReviewFromEntry(teleconId,entryElement.getReviewers());
+            pullReviewerFromEntry(teleconId,reviewerObjectId);
             return ResponseEntity.status(200).body(new MessageDto("Reviewer is removed"));
         }catch(Exception err){
             return ResponseEntity.status(500).body(new ErrorResponseDto(INTERNAL_SERVER_ERROR,err.toString()));

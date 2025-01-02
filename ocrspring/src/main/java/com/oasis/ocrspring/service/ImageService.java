@@ -61,7 +61,7 @@ public class ImageService {
         TeleconEntry teleconEntry;
         try {
             teleconEntry = teleconRepo.findById(new ObjectId(id)).orElse(null);
-            if (teleconEntry == null || teleconEntry.getClinicianId().toString().equals(clinicianId)) {
+            if (teleconEntry == null ) {
                 return ResponseEntity.status(404).body(new UploadImageResponse(null, "Entry Not Found"));
             }
             if (files.size() >12){
